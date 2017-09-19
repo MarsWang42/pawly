@@ -7,11 +7,9 @@ import {
   Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
 import FBSDK from 'react-native-fbsdk';
-const {
-  LoginManager,
-} = FBSDK;
+
+const { LoginManager, AccessToken } = FBSDK;
 
 export default class FBLoginButton extends Component {
   constructor() {
@@ -25,10 +23,15 @@ export default class FBLoginButton extends Component {
 
   handleLogin() {
     // Permission of the token
-    LoginManager.loginWithPermissions(['email', 'user_birthday']).then(
-      function(data){
-        this.setState({ user : data});
-        this.props.onLogin && this.props.onLogin(data);
+    LoginManager.logInWithReadPermissions(['public_profile']).then(
+      function(result){
+        console.log(result)
+        if (!result.isCancelled) {
+          AccessToken.getCurrentAccessToken().then((data) => {
+            console.log(this.props.onLogin)
+            this.props.onLogin && this.props.onLogin(data);
+          })
+        }
       }.bind(this)
     );
   }
@@ -39,7 +42,7 @@ export default class FBLoginButton extends Component {
   }
 
   render() {
-    var text = 'Log in with Facebook';
+    const text = 'Log in with Facebook';
     return (
       <View style={this.props.style}>
         <TouchableHighlight
@@ -88,7 +91,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: 'white',
     fontWeight: '500',
-    fontFamily: 'Helvetica neue',
+    fontFamily: 'Lato',
     fontSize: height <= 480 ? 12 : 16,
     textAlign: 'center',
   },

@@ -36,7 +36,7 @@ class Login extends Component {
               name={'envelope'}
               size={18}
               color={'#292f33'}
-              style={{ marginHorizontal: 15 }}
+              style={{ marginHorizontal: 13 }}
             />
             <TextInput
               blurOnSubmit={ false }
@@ -54,9 +54,9 @@ class Login extends Component {
           <View style={styles.textInputContainer}>
             <Icon
               name={'lock'}
-              size={22}
+              size={24}
               color={'#292f33'}
-              style={{ paddingHorizontal: 15 }}
+              style={{ paddingHorizontal: 14 }}
             />
             <TextInput
               blurOnSubmit={ false }
@@ -86,6 +86,7 @@ class Login extends Component {
           </View>
           <LoginButton
             style={styles.loginButton}
+            text={'Log In'}
             onPress={() => this.props.dispatch({
               type: actions.LOGIN_USER,
               strategy: 'local',

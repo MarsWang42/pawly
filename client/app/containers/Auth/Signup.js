@@ -10,9 +10,14 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import FBLoginButton from '../../components/Auth/FBLoginButton';
-import LoginButton from '../../components/Auth/LoginButton';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import * as actions from '../../reducers/session';
+import LoginButton from '../../components/Auth/LoginButton';
+
+function validateEmail(email) {
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+}
 
 class Signup extends Component {
   constructor(props) {
@@ -29,7 +34,6 @@ class Signup extends Component {
     const {
       email,
       password,
-      fullnameError,
       emailError,
       passwordError,
     } = this.state;
@@ -47,12 +51,10 @@ class Signup extends Component {
     }
 
     if (password && email && validateEmail(email)) {
-      this.props.loginUserByEmail({
-        userName: fullname,
+      this.props.dispatch({
+        type: actions.REGISTER_USER,
         email,
         password,
-        navigate: this.props.navigation.navigate,
-        register: true,
       });
     }
   }
@@ -67,7 +69,7 @@ class Signup extends Component {
               name={'envelope'}
               size={18}
               color={'#292f33'}
-              style={{ paddingHorizontal: 15 }}
+              style={{ paddingHorizontal: 13 }}
             />
             <TextInput
               blurOnSubmit={ false }
@@ -91,9 +93,9 @@ class Signup extends Component {
           <View style={styles.textInputContainer}>
             <Icon
               name={'lock'}
-              size={22}
+              size={24}
               color={'#292f33'}
-              style={{ paddingHorizontal: 10 }}
+              style={{ paddingHorizontal: 14 }}
             />
             <TextInput
               blurOnSubmit={ false }
@@ -137,7 +139,8 @@ class Signup extends Component {
           </View>
           <LoginButton
             style={styles.loginButton}
-            onSubmitEditing={() => this.submitForm()}
+            text={'Sign Up'}
+            onPress={() => this.submitForm()}
           />
         </View>
       </KeyboardAwareScrollView>

@@ -34,6 +34,9 @@ ActiveRecord::Schema.define(version: 20170919015039) do
     t.string "avatar"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email"
+    t.index ["facebook_id"], name: "index_users_on_facebook_id"
+    t.index ["username"], name: "index_users_on_username"
   end
 
   add_foreign_key "pets", "users", column: "owner_id"

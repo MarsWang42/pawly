@@ -17,7 +17,7 @@ export default class LoginButton extends Component {
         >
           <View style={styles.loginButton}>
             <Text style={styles.loginButtonText}
-              numberOfLines={1}>Log in</Text>
+              numberOfLines={1}>{ this.props.text }</Text>
           </View>
         </TouchableHighlight>
       </View>
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   loginButtonText: {
     color: 'white',
     fontWeight: '500',
-    fontFamily: 'Helvetica neue',
+    fontFamily: 'Lato',
     fontSize: height <= 480 ? 12 : 16,
   },
   loginButtonTextLoggedIn: {
