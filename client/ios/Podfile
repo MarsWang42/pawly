@@ -1,0 +1,30 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '8.0'
+
+target 'Pawly' do
+  # Uncomment the next line if you're using Swift or would like to use dynamic frameworks
+  # use_frameworks!
+
+  # Pods for Pawly
+  pod 'RSKImageCropper'
+  pod 'QBImagePickerController'
+
+  target 'PawlyTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end
+
+target 'Pawly-tvOS' do
+  # Uncomment the next line if you're using Swift or would like to use dynamic frameworks
+  # use_frameworks!
+
+  # Pods for Pawly-tvOS
+
+  target 'Pawly-tvOSTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end
