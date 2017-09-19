@@ -20,19 +20,19 @@
 	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-  <key>CFBundleURLTypes</key>
-  <array>
-    <dict>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>fb313752759094344</string>
-      </array>
-    </dict>
-  </array>
-  <key>FacebookAppID</key>
-  <string>313752759094344</string>
-  <key>FacebookDisplayName</key>
-  <string>Pawly</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb313752759094344</string>
+			</array>
+		</dict>
+	</array>
+	<key>FacebookAppID</key>
+	<string>313752759094344</string>
+	<key>FacebookDisplayName</key>
+	<string>Pawly</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fbapi</string>
@@ -53,12 +53,12 @@
 			</dict>
 		</dict>
 	</dict>
-  <key>NSPhotoLibraryUsageDescription</key>
-  <string>This app requires access to the photo library.</string>
-  <key>NSMicrophoneUsageDescription</key>
-  <string>This app does not require access to the microphone.</string>
-  <key>NSCameraUsageDescription</key>
-  <string>This app requires access to the camera.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to the photo library.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app does not require access to the microphone.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to the camera.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string/>
 	<key>UIAppFonts</key>

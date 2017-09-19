@@ -66,12 +66,7 @@ class Avatar extends Component {
   }
 
   updateUsername() {
-    this.props.dispatch({
-      type: actions.UPDATE_USER,
-      update: { username: this.state.username },
-      token: this.props.currentUser.accessToken,
-      callback: () => this.setState({ isLoadingImage: false }),
-    });
+    this.props.setUsername(this.state.username);
   }
 
   render() {
@@ -99,7 +94,7 @@ class Avatar extends Component {
             <Icon
               name={'account'}
               size={22}
-              color={'#141823'}
+              color={'white'}
               style={{ paddingHorizontal: 10 }}
             />
             <TextInput
@@ -107,7 +102,7 @@ class Avatar extends Component {
               autoCapitalize={'none'}
               returnKeyType={ 'go' }
               placeholder={'8-20 characters'}
-              placeholderTextColor={'grey'}
+              placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
               value={this.state.username}
               style={styles.textInput}
               onChangeText={(text) => this.setState({ username: text })}
@@ -126,7 +121,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height,
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -140,6 +135,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: 'Lato',
+    color: 'white',
     fontSize: 26,
     marginTop: 30,
     marginBottom: 15,
@@ -155,13 +151,13 @@ const styles = StyleSheet.create({
     height: 40,
     marginHorizontal: 30,
     marginVertical: 10,
-    backgroundColor: 'rgba(150, 150, 150, 0.3)',
+    backgroundColor: 'rgba(200, 200, 200, 0.3)',
     borderRadius: 4,
     alignItems: 'center',
   },
   textInput: {
     fontSize: 16,
-    color: '#141823',
+    color: '#fff',
     height: 40,
     width: width - 150,
   },

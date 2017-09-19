@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
   has_many :pets, foreign_key: :owner_id
-  mount_uploader :avatar, UserAvatarUploader
+  mount_uploader :avatar, AvatarUploader
 
   validates :username, length: { in: 2..20 }, uniqueness: true, allow_nil: true
   validates :email,

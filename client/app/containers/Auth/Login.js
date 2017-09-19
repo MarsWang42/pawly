@@ -29,13 +29,13 @@ class Login extends Component {
   render(){
     const { loginUserByFacebook, loginUserByEmail, loginError, navigation } = this.props;
     return (
-      <KeyboardAwareScrollView scrollEnabled={false} >
+      <KeyboardAwareScrollView scrollEnabled={false} style={{ backgroundColor: 'transparent' }} >
         <View style={styles.container}>
-          <View style={[styles.textInputContainer, { marginTop: 28 }]}>
+          <View style={[styles.textInputContainer, { marginTop: 25 }]}>
             <Icon
               name={'envelope'}
               size={18}
-              color={'#292f33'}
+              color={'white'}
               style={{ marginHorizontal: 13 }}
             />
             <TextInput
@@ -43,7 +43,7 @@ class Login extends Component {
               autoCapitalize={'none'}
               returnKeyType={ 'next' }
               placeholder={'E-mail'}
-              placeholderTextColor={'gray'}
+              placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
               value={this.state.email}
               style={styles.textInput}
               onChangeText={(text) => this.setState({ email: text })}
@@ -55,7 +55,7 @@ class Login extends Component {
             <Icon
               name={'lock'}
               size={24}
-              color={'#292f33'}
+              color={'white'}
               style={{ paddingHorizontal: 14 }}
             />
             <TextInput
@@ -64,7 +64,7 @@ class Login extends Component {
               returnKeyType={ 'go' }
               secureTextEntry
               placeholder={'Password'}
-              placeholderTextColor={'gray'}
+              placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
               value={this.state.password}
               style={styles.textInput}
               onChangeText={(text) => this.setState({ password: text })}
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
     height: height <= 480 ? 30 : 40,
     marginHorizontal: height <= 480 ? 30 : 40,
     marginVertical: height <= 480 ? 16 : 18,
-    backgroundColor: 'rgba(150, 150, 150, 0.3)',
+    backgroundColor: 'rgba(200, 200, 200, 0.3)',
     alignItems: 'center',
     borderRadius: 8,
   },
   textInput: {
     fontSize: height <= 480 ? 14 : 16,
-    color: '#292f33',
+    color: '#fff',
     height: height <= 480 ? 30 : 40,
     width: width - 120,
   },

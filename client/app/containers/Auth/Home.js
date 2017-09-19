@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   Dimensions,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -9,24 +10,29 @@ import {
 } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import * as Animatable from 'react-native-animatable';
+import LinearGradient from 'react-native-linear-gradient';
 import * as actions from '../../reducers/session';
 import FBLoginButton from '../../components/Auth/FBLoginButton';
 import Login from './Login';
 import Signup from './Signup';
 import Avatar from './Avatar';
+import Pet from './Pet';
 
 class Home extends Component {
   constructor() {
     super();
     this.state = {
       isUploadingAvatar: false,
+      isSettingPet: false,
       tab: 0,
+      username: '',
     };
+    this.setUsername = this.setUsername.bind(this);
     this.navigateToLogin = this.navigateToLogin.bind(this);
     this.navigateToSignup = this.navigateToSignup.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillUpdate(nextProps, nextState) {
     // Check the users without username.
     if (
       nextProps.currentUser &&
@@ -36,6 +42,11 @@ class Home extends Component {
       ))) {
       this.setState({ isUploadingAvatar: true });
       this.avatar.bounceIn(800);
+    }
+    if (nextState.username && nextState.username !== this.state.username) {
+      this.setState({ isSettingPet: true });
+      this.avatar.fadeOut(800);
+      this.petView.fadeIn(800);
     }
   }
 
@@ -47,8 +58,12 @@ class Home extends Component {
     this.tabview.goToPage(0);
   }
 
+  setUsername(username) {
+    this.setState({ username })
+  }
+
   render() {
-    const { isUploadingAvatar, tab } = this.state;
+    const { isUploadingAvatar, isSettingPet, tab } = this.state;
     const { currentUser } = this.props;
 
     const text = tab === 0
@@ -61,17 +76,33 @@ class Home extends Component {
 
     return (
       <View style={styles.container}>
-        <View style={[styles.overlay, { backgroundColor: '#fff' }]} />
+        <LinearGradient
+          colors={['#e63460', '#e6535a']}
+          style={[styles.overlay, {
+            zIndex: isUploadingAvatar ? 1 : isSettingPet ? 2 : 0
+          }]}
+        />
         <Animatable.View
           style={[styles.overlay, {
             zIndex: isUploadingAvatar ? 2 : -1
           }]}
           ref={avatar => this.avatar = avatar}
         >
-          <Avatar />
+          <Avatar setUsername={this.setUsername} />
+        </Animatable.View>
+        <Animatable.View
+          style={[styles.overlay, {
+            zIndex: isSettingPet ? 3 : -1
+          }]}
+          ref={petView => this.petView = petView}
+        >
+          <Pet username={this.state.username} />
         </Animatable.View>
         <View style={styles.titleContainer} >
-          <Text style={styles.title} >PAWLY</Text>
+          <Image
+            source={require('../../assets/img/logo.png')}
+            style={{ width: 125, height: 125, resizeMode: 'stretch' }}
+          />
         </View>
         <ScrollableTabView
           prerenderingSiblingsNumber={1}
@@ -79,7 +110,7 @@ class Home extends Component {
           ref={tabview => this.tabview = tabview}
           renderTabBar={() => <View />}
           onChangeTab={index => this.setState({ tab: index.i })}
-          style={{ backgroundColor: '#fff', flex: 0 }}
+          style={{ backgroundColor: 'transparent', flex: 0 }}
         >
           <Login tabLabel={'login'} { ...this.props } />
           <Signup tabLabel={'signup'} { ...this.props } />
@@ -99,7 +130,10 @@ class Home extends Component {
             })
           }
         />
-        <TouchableOpacity onPress={() => navigate()} >
+        <TouchableOpacity
+          style={{ backgroundColor: 'transparent' }}
+          onPress={() => navigate()}
+        >
           <Text style={styles.signupText}>{ text }</Text>
         </TouchableOpacity>
       </View>
@@ -140,14 +174,17 @@ const styles = StyleSheet.create({
   textContainer: {
     alignItems:'center',
     justifyContent:'center',
+    backgroundColor: 'transparent',
     height: height <= 480 ? 15 : 30,
   },
   text: {
-    color: '#141823',
+    color: 'white',
+    fontFamily: 'Lato',
     fontSize: height <= 480 ? 10 : 12,
   },
   signupText: {
-    color: '#f89406',
+    color: '#FFCC00',
+    fontFamily: 'Lato',
     fontSize: height <= 480 ? 12 : 14,
     textAlign: 'center',
     marginTop: height <= 480 ? 20 : 30,
@@ -184,14 +221,15 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   titleContainer: {
-    marginTop: height >= 730 ? 125 : 75,
-    marginBottom: width <= 325 ? 20 : 50,
+    marginTop: height >= 730 ? 100 : 50,
+    marginBottom: width <= 325 ? 25 : 35,
+    backgroundColor: 'transparent',
     alignItems:'center',
     justifyContent:'center'
   },
   title: {
     fontSize: height <= 480 ? 50 : 70,
-    color: '#CD594A',
+    color: 'white',
     fontFamily: 'BerlinBold',
   },
 });

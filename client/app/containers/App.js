@@ -16,11 +16,11 @@ class AppNavigation extends React.Component {
     const {
       navigationState,
       dispatch,
-      isLoggingIn,
+      isCheckingUser,
       currentUser,
     } = this.props;
 
-    if (isLoggingIn) {
+    if (isCheckingUser) {
       return <View />
     } else if (currentUser && currentUser.username) {
       return <View />
@@ -34,7 +34,7 @@ const mapStateToProps = (state) => {
   return {
     navigationState: state.nav.app,
     isLoggedIn: state.session.isLoggedIn,
-    isLoggingIn: state.session.isLoggingIn,
+    isCheckingUser: state.session.isCheckingUser,
     currentUser: state.session.currentUser,
   };
 };

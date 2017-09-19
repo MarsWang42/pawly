@@ -68,7 +68,7 @@ class Signup extends Component {
             <Icon
               name={'envelope'}
               size={18}
-              color={'#292f33'}
+              color={'white'}
               style={{ paddingHorizontal: 13 }}
             />
             <TextInput
@@ -76,7 +76,7 @@ class Signup extends Component {
               autoCapitalize={'none'}
               returnKeyType={ 'next' }
               placeholder={'E-mail'}
-              placeholderTextColor={'gray'}
+              placeholderTextColor={'rgba(255, 255, 255, 0.3)'}
               value={this.state.email}
               style={styles.textInput}
               onChangeText={(text) => this.setState({ email: text })}
@@ -94,7 +94,7 @@ class Signup extends Component {
             <Icon
               name={'lock'}
               size={24}
-              color={'#292f33'}
+              color={'white'}
               style={{ paddingHorizontal: 14 }}
             />
             <TextInput
@@ -103,7 +103,7 @@ class Signup extends Component {
               returnKeyType={ 'go' }
               secureTextEntry
               placeholder={'Password'}
-              placeholderTextColor={'gray'}
+              placeholderTextColor={'rgba(255, 255, 255, 0.3)'}
               value={this.state.password}
               style={styles.textInput}
               onChangeText={(text) => this.setState({ password: text })}
@@ -124,11 +124,11 @@ class Signup extends Component {
           <TouchableOpacity
             style={{ alignItems: 'center', justifyContent: 'center', margin: 5 }}
             onPress={() => {
-            Linking.openURL('https:fabrichealth.files.wordpress.com/2017/07/terms-and-conditions-privacy-policy-fabric-pdf.pdf')
+              Linking.openURL('https:fabrichealth.files.wordpress.com/2017/07/terms-and-conditions-privacy-policy-fabric-pdf.pdf')
                 .catch(err => console.error('An error occurred', err));
             }}
           >
-            <Text style={{ color: 'black', fontSize: 13 }}>
+            <Text style={{ color: 'white', fontFamily: 'Lato', fontSize: 13 }}>
               I agree to Fabric's Terms of Use.
             </Text>
           </TouchableOpacity>
@@ -175,13 +175,13 @@ const styles = StyleSheet.create({
     height: height <= 480 ? 30 : 40,
     marginHorizontal: height <= 480 ? 30 : 40,
     marginVertical: height <= 480 ? 10 : 12,
-    backgroundColor: 'rgba(150, 150, 150, 0.3)',
+    backgroundColor: 'rgba(200, 200, 200, 0.3)',
     alignItems: 'center',
     borderRadius: 8,
   },
   textInput: {
     fontSize: height <= 480 ? 14 : 16,
-    color: '#292f33',
+    color: '#fff',
     height: height <= 480 ? 30 : 40,
     width: width - 120,
   },

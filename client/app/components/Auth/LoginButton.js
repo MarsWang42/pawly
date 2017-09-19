@@ -47,7 +47,10 @@ const styles = StyleSheet.create({
     height: height <= 480 ? 30 : 40,
     width: 175,
 
-    backgroundColor:'rgba(255, 196, 71, 0.9)',
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#F6F6F6',
+    borderRadius: 8,
   },
   loginButtonText: {
     color: 'white',

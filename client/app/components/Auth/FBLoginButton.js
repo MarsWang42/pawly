@@ -86,6 +86,9 @@ const styles = StyleSheet.create({
     width: 175,
 
     backgroundColor: 'rgba(66, 93, 174, 0.9)',
+    borderWidth: 2,
+    borderColor: '#F6F6F6',
+    borderRadius: 8,
   },
   FBLoginButtonText: {
     flex: 1,
