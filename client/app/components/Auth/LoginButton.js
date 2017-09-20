@@ -6,18 +6,31 @@ import {
   TouchableHighlight,
   Dimensions,
 } from 'react-native';
+import Spinner from 'react-native-spinkit';
 
 export default class LoginButton extends Component {
   render() {
     return (
       <View style={this.props.style}>
         <TouchableHighlight
+          disabled={this.props.isLoading}
+          activeOpacity={0.8}
           style={styles.container}
           onPress={this.props.onPress}
         >
           <View style={styles.loginButton}>
-            <Text style={styles.loginButtonText}
-              numberOfLines={1}>{ this.props.text }</Text>
+            { this.props.isLoading ? (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Spinner type={'Wave'} size={20} color={'#fff'} />
+              </View>
+            ) : (
+              <Text
+                style={styles.loginButtonText}
+                numberOfLines={1}
+              >
+                {this.props.text}
+              </Text>
+            )}
           </View>
         </TouchableHighlight>
       </View>
@@ -37,6 +50,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 8,
   },
   loginButton: {
     flex: 1,

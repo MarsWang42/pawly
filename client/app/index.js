@@ -6,6 +6,9 @@ import { install } from 'redux-loop';
 import { createLogger } from 'redux-logger';
 import reducer from './reducers';
 
+// Polyfill to get clarifai work
+process.nextTick = setImmediate;
+
 // middleware that logs actions
 const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__  });
 

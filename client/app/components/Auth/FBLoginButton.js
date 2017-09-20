@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FBSDK from 'react-native-fbsdk';
+import Spinner from 'react-native-spinkit';
 
 const { LoginManager, AccessToken } = FBSDK;
 
@@ -46,6 +47,8 @@ export default class FBLoginButton extends Component {
     return (
       <View style={this.props.style}>
         <TouchableHighlight
+          disabled={this.props.isLoading}
+          activeOpacity={0.8}
           style={styles.container}
           onPress={this.onPress}
         >
@@ -53,8 +56,19 @@ export default class FBLoginButton extends Component {
             <View style={styles.FBLogo}>
               <Icon name={'facebook-square'} color={'white'} size={20} />
             </View>
-            <Text style={styles.FBLoginButtonText}
-              numberOfLines={1}>{text}</Text>
+            { this.props.isLoading ? (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Spinner type={'Wave'} size={20} color={'#fff'} />
+              </View>
+              ) : (
+                <Text
+                  style={styles.FBLoginButtonText}
+                  numberOfLines={1}
+                >
+                  {text}
+                </Text>
+              )
+            }
           </View>
         </TouchableHighlight>
       </View>
@@ -76,6 +90,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 8,
   },
   FBLoginButton: {
     flex: 1,

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {
   Dimensions,
   Image,
@@ -17,6 +18,8 @@ import Login from './Login';
 import Signup from './Signup';
 import Avatar from './Avatar';
 import Pet from './Pet';
+
+const { height, width } = Dimensions.get('window');
 
 class Home extends Component {
   constructor() {
@@ -64,7 +67,7 @@ class Home extends Component {
 
   render() {
     const { isUploadingAvatar, isSettingPet, tab } = this.state;
-    const { currentUser } = this.props;
+    const { currentUser, isLoggingIn } = this.props;
 
     const text = tab === 0
       ? 'Sign up with your email!'
@@ -75,73 +78,78 @@ class Home extends Component {
       : this.navigateToLogin;
 
     return (
-      <View style={styles.container}>
-        <LinearGradient
-          colors={['#e63460', '#e6535a']}
-          style={[styles.overlay, {
-            zIndex: isUploadingAvatar ? 1 : isSettingPet ? 2 : 0
-          }]}
-        />
-        <Animatable.View
-          style={[styles.overlay, {
-            zIndex: isUploadingAvatar ? 2 : -1
-          }]}
-          ref={avatar => this.avatar = avatar}
-        >
-          <Avatar setUsername={this.setUsername} />
-        </Animatable.View>
-        <Animatable.View
-          style={[styles.overlay, {
-            zIndex: isSettingPet ? 3 : -1
-          }]}
-          ref={petView => this.petView = petView}
-        >
-          <Pet username={this.state.username} />
-        </Animatable.View>
-        <View style={styles.titleContainer} >
-          <Image
-            source={require('../../assets/img/logo.png')}
-            style={{ width: 125, height: 125, resizeMode: 'stretch' }}
+      <KeyboardAwareScrollView scrollEnabled={false} >
+        <View style={styles.container}>
+          <LinearGradient
+            colors={['#e63460', '#e6535a']}
+            style={[styles.overlay, {
+              zIndex: isUploadingAvatar ? 1 : isSettingPet ? 2 : 0
+            }]}
           />
+          <Animatable.View
+            style={[styles.overlay, {
+              zIndex: isUploadingAvatar ? 2 : -1
+            }]}
+            ref={avatar => this.avatar = avatar}
+          >
+            <Avatar setUsername={this.setUsername} />
+          </Animatable.View>
+          <Animatable.View
+            style={[styles.overlay, {
+              zIndex: isSettingPet ? 3 : -1
+            }]}
+            ref={petView => this.petView = petView}
+          >
+            <Pet username={this.state.username} />
+          </Animatable.View>
+          <View style={styles.titleContainer} >
+            <Image
+              source={require('../../assets/img/logo.png')}
+              style={{
+                width: width <= 325 ? 100 : 125,
+                height: width <= 325 ? 100 : 125,
+                resizeMode: 'stretch'
+              }}
+            />
+          </View>
+          <ScrollableTabView
+            prerenderingSiblingsNumber={1}
+            tabBarPosition='overlayBottom'
+            ref={tabview => this.tabview = tabview}
+            renderTabBar={() => <View />}
+            onChangeTab={index => this.setState({ tab: index.i })}
+            style={{ backgroundColor: 'transparent', flex: 0 }}
+          >
+            <Login tabLabel={'login'} { ...this.props } />
+            <Signup tabLabel={'signup'} { ...this.props } />
+          </ScrollableTabView>
+          <View style={styles.textContainer}>
+            <Text style={styles.text}>- or -</Text>
+          </View>
+          <FBLoginButton
+            style={styles.facebookButton}
+            isLoading={isLoggingIn === 'facebook'}
+            onLogin={
+              (data) => this.props.dispatch({
+                type: actions.LOGIN_USER,
+                strategy: 'facebook',
+                token: {
+                  access_token: data.accessToken,
+                }
+              })
+            }
+          />
+          <TouchableOpacity
+            style={{ backgroundColor: 'transparent' }}
+            onPress={() => navigate()}
+          >
+            <Text style={styles.signupText}>{ text }</Text>
+          </TouchableOpacity>
         </View>
-        <ScrollableTabView
-          prerenderingSiblingsNumber={1}
-          tabBarPosition='overlayBottom'
-          ref={tabview => this.tabview = tabview}
-          renderTabBar={() => <View />}
-          onChangeTab={index => this.setState({ tab: index.i })}
-          style={{ backgroundColor: 'transparent', flex: 0 }}
-        >
-          <Login tabLabel={'login'} { ...this.props } />
-          <Signup tabLabel={'signup'} { ...this.props } />
-        </ScrollableTabView>
-        <View style={styles.textContainer}>
-          <Text style={styles.text}>- or -</Text>
-        </View>
-        <FBLoginButton
-          style={styles.facebookButton}
-          onLogin={
-            (data) => this.props.dispatch({
-              type: actions.LOGIN_USER,
-              strategy: 'facebook',
-              token: {
-                access_token: data.accessToken,
-              }
-            })
-          }
-        />
-        <TouchableOpacity
-          style={{ backgroundColor: 'transparent' }}
-          onPress={() => navigate()}
-        >
-          <Text style={styles.signupText}>{ text }</Text>
-        </TouchableOpacity>
-      </View>
+      </KeyboardAwareScrollView>
     );
   }
 }
-
-const { height, width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   backgroundVideo: {
@@ -222,7 +230,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     marginTop: height >= 730 ? 100 : 50,
-    marginBottom: width <= 325 ? 25 : 35,
+    marginBottom: width <= 325 ? 15 : 35,
     backgroundColor: 'transparent',
     alignItems:'center',
     justifyContent:'center'
@@ -237,6 +245,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     isCheckingUser: state.session.isCheckingUser,
+    isLoggingIn: state.session.isLoggingIn,
     currentUser: state.session.currentUser,
   };
 };

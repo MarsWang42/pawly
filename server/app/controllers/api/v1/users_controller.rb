@@ -7,7 +7,7 @@ class Api::V1::UsersController < ApiController
       @token = Knock::AuthToken.new payload: { sub: @user.id }
       render :create
     else
-      render :json => @user.errors
+      render :json => @user.errors, :status => 422
     end
   end
 
@@ -25,7 +25,7 @@ class Api::V1::UsersController < ApiController
       end
 
       if !@pet.save
-        render :json => @user.errors
+        render :json => @pet.errors, :status => 422
       end
     end
 
@@ -33,7 +33,7 @@ class Api::V1::UsersController < ApiController
       @token = Knock::AuthToken.new payload: { sub: @user.id }
       render :create
     else
-      render :json => @user.errors
+      render :json => @user.errors, :status => 422
     end
   end
 

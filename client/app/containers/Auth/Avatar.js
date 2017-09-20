@@ -10,7 +10,6 @@ import {
   View,
 } from 'react-native';
 import uuidv4 from 'uuid/v4';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImageCropper from 'react-native-image-crop-picker';
 import ImagePicker from 'react-native-image-picker';
@@ -81,36 +80,34 @@ class Avatar extends Component {
       : require('../../assets/img/user-default.png');
 
     return (
-      <KeyboardAwareScrollView scrollEnabled={false} style={{ flex: 1 }} >
-        <View style={styles.container}>
-          { isLoadingImage && <View style={styles.overlay} /> }
-          <TouchableOpacity onPress={this.showImagePicker}>
-            <Image source={imageSource} style={styles.uploadAvatar} />
-          </TouchableOpacity>
-          <Text style={styles.title}>
-            Choose a unique username
-          </Text>
-          <View style={styles.textInputContainer}>
-            <Icon
-              name={'account'}
-              size={22}
-              color={'white'}
-              style={{ paddingHorizontal: 10 }}
-            />
-            <TextInput
-              blurOnSubmit={ false }
-              autoCapitalize={'none'}
-              returnKeyType={ 'go' }
-              placeholder={'8-20 characters'}
-              placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
-              value={this.state.username}
-              style={styles.textInput}
-              onChangeText={(text) => this.setState({ username: text })}
-              onSubmitEditing={this.updateUsername}
-            />
-          </View>
+      <View style={styles.container}>
+        { isLoadingImage && <View style={styles.overlay} /> }
+        <TouchableOpacity onPress={this.showImagePicker}>
+          <Image source={imageSource} style={styles.uploadAvatar} />
+        </TouchableOpacity>
+        <Text style={styles.title}>
+          Choose a unique username
+        </Text>
+        <View style={styles.textInputContainer}>
+          <Icon
+            name={'account'}
+            size={22}
+            color={'white'}
+            style={{ paddingHorizontal: 10 }}
+          />
+          <TextInput
+            blurOnSubmit={ true }
+            autoCapitalize={'none'}
+            returnKeyType={ 'go' }
+            placeholder={'8-20 characters'}
+            placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
+            value={this.state.username}
+            style={styles.textInput}
+            onChangeText={(text) => this.setState({ username: text })}
+            onSubmitEditing={this.updateUsername}
+          />
         </View>
-      </KeyboardAwareScrollView>
+      </View>
     );
   }
 }

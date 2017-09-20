@@ -10,13 +10,19 @@ import {
   View,
 } from 'react-native';
 import uuidv4 from 'uuid/v4';
+import Spinner from 'react-native-spinkit';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import ImageCropper from 'react-native-image-crop-picker';
 import ImagePicker from 'react-native-image-picker';
 import Modal from 'react-native-modal'
+const Clarifai = require('clarifai');
 import * as actions from '../../reducers/session';
+
+function ucfirst(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 const options = {
   title: 'Select Avatar',
@@ -25,6 +31,10 @@ const options = {
     path: 'images'
   }
 };
+
+const app = new Clarifai.App({
+  apiKey: 'c5dc272a19e141d8893da0ed6ba1658b'
+});
 
 class Avatar extends Component {
   constructor() {
@@ -63,11 +73,18 @@ class Avatar extends Component {
           compressImageQuality: 0.5,
           includeBase64: true,
         }).then(response => {
-          // Put image in a form to upload
+          this.setState({ isRecognizingImage: true });
           this.setState({
             petAvatar: response.path,
             isLoadingImage: false,
           });
+          app.models.predict(Clarifai.GENERAL_MODEL, { base64: response.data })
+            .then((response) => {
+              const petType = response.outputs[0].data.concepts[0].name;
+              this.setState({ petType, isRecognizingImage: false });
+            }).catch((response) => {
+              this.setState({ isRecognizingImage: false });
+            });
         }).catch(error => {
           this.setState({ isLoadingImage: false });
         });
@@ -93,7 +110,7 @@ class Avatar extends Component {
 
   render() {
     const { currentUser } = this.props;
-    const { isLoadingImage, petAvatar } = this.state;
+    const { isLoadingImage, petAvatar, petType, isRecognizingImage } = this.state;
 
     const userImageSource = petAvatar ? { uri: petAvatar }
       : require('../../assets/img/pet.png');
@@ -153,13 +170,13 @@ class Avatar extends Component {
             style={styles.textContainer}
             onPress={this.showModal}
           >
-            <Icon
-              name={'account'}
-              size={22}
-              color={'white'}
-              style={{ paddingHorizontal: 5 }}
-            />
-            <Text style={styles.text}>Cat</Text>
+            { isRecognizingImage ? (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Spinner type={'Wave'} size={20} color={'#fff'} />
+              </View>
+            ) : (
+              <Text style={styles.text}>{ ucfirst(petType) }</Text>
+            ) }
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.buttonContainer}

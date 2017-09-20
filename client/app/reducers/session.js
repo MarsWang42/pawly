@@ -50,10 +50,10 @@ const loginUserFailed = (respond) => ({
   value: respond,
 });
 
-const registerUserSucceed = (respond, action) => {
+const registerUserSucceed = (respond) => {
   return {
-    ...action,
     type: REGISTER_USER_SUCCEED,
+    currentUser: respond.data,
   };
 };
 
@@ -120,7 +120,7 @@ export const SessionReducer = createReducer({
   },
   [LOGIN_USER](state, action) {
     return loop(
-      { ...state, initStarted: true },
+      { ...state, initStarted: true, isLoggingIn: action.strategy },
       Cmd.run(apis.user.login, {
         successActionCreator: loginUserSucceed,
         failActionCreator: loginUserFailed,
@@ -131,42 +131,34 @@ export const SessionReducer = createReducer({
   [LOGIN_USER_SUCCEED](state, action) {
     return {
       ...state,
-      isLoggedIn: true,
-      isCheckingUser: false,
+      isLoggingIn: false,
       currentUser: action.currentUser,
       loginError: undefined,
-      registerError: undefined,
     };
   },
   [LOGIN_USER_FAILED](state, action) {
     return Object.assign({}, state, {
+      isLoggingIn: false,
       loginError: 'Login User Failed.'
     });
   },
   [REGISTER_USER](state, action) {
     return loop(
-      { ...state, registerError: undefined },
+      { ...state, registerError: undefined, isRegistering: false },
       Cmd.run(apis.user.register, {
-        successActionCreator: (response) =>
-          registerUserSucceed(response, action),
+        successActionCreator: registerUserSucceed,
         failActionCreator: registerUserFailed,
         args: [action.email, action.password],
       })
     );
   },
   [REGISTER_USER_SUCCEED](state, action) {
-    return loop(
-      state,
-      Cmd.run(apis.user.login, {
-        successActionCreator: loginUserSucceed,
-        failActionCreator: loginUserFailed,
-        args: ['local', { email: action.email, password: action.password }],
-      }),
-    );
+    return { ...state, isRegistering: false, currentUser: action.currentUser };
   },
   [REGISTER_USER_FAILED](state, action) {
     return {
       ...state,
+      isRegistering: false,
       registerError: 'Register User Failed.'
     };
   },

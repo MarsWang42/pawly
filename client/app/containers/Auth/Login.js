@@ -9,7 +9,6 @@ import {
   ImageBackground,
 } from 'react-native';
 import { connect } from 'react-redux';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import * as actions from '../../reducers/session';
 import FBLoginButton from '../../components/Auth/FBLoginButton';
 import LoginButton from '../../components/Auth/LoginButton';
@@ -27,67 +26,54 @@ class Login extends Component {
   }
 
   render(){
-    const { loginUserByFacebook, loginUserByEmail, loginError, navigation } = this.props;
+    const {
+      isLoggingIn,
+      loginUserByFacebook,
+      loginUserByEmail,
+      loginError,
+      navigation,
+    } = this.props;
     return (
-      <KeyboardAwareScrollView scrollEnabled={false} style={{ backgroundColor: 'transparent' }} >
-        <View style={styles.container}>
-          <View style={[styles.textInputContainer, { marginTop: 25 }]}>
-            <Icon
-              name={'envelope'}
-              size={18}
-              color={'white'}
-              style={{ marginHorizontal: 13 }}
-            />
-            <TextInput
-              blurOnSubmit={ false }
-              autoCapitalize={'none'}
-              returnKeyType={ 'next' }
-              placeholder={'E-mail'}
-              placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
-              value={this.state.email}
-              style={styles.textInput}
-              onChangeText={(text) => this.setState({ email: text })}
-              ref={input => { this.inputs[0] = input; }}
-              onSubmitEditing={() => this.inputs[1].focus()}
-            />
-          </View>
-          <View style={styles.textInputContainer}>
-            <Icon
-              name={'lock'}
-              size={24}
-              color={'white'}
-              style={{ paddingHorizontal: 14 }}
-            />
-            <TextInput
-              blurOnSubmit={ false }
-              autoCapitalize={'none'}
-              returnKeyType={ 'go' }
-              secureTextEntry
-              placeholder={'Password'}
-              placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
-              value={this.state.password}
-              style={styles.textInput}
-              onChangeText={(text) => this.setState({ password: text })}
-              ref={input => { this.inputs[1] = input; }}
-              onSubmitEditing={() => this.props.dispatch({
-                type: actions.LOGIN_USER,
-                strategy: 'local',
-                token: {
-                  email: this.state.email,
-                  password: this.state.password,
-                }
-              })}
-            />
-          </View>
-          <View style={{ height: 20, alignItems: 'center', justifyContent: 'center' }}>
-            { loginError ?
-              <Text style={{ color: 'red' }}>Can't find the email/password combination.</Text>
-              : null }
-          </View>
-          <LoginButton
-            style={styles.loginButton}
-            text={'Log In'}
-            onPress={() => this.props.dispatch({
+      <View style={styles.container}>
+        <View style={[styles.textInputContainer, { marginTop: 25 }]}>
+          <Icon
+            name={'envelope'}
+            size={18}
+            color={'white'}
+            style={{ marginHorizontal: 13 }}
+          />
+          <TextInput
+            blurOnSubmit={ false }
+            autoCapitalize={'none'}
+            returnKeyType={ 'next' }
+            placeholder={'E-mail'}
+            placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
+            value={this.state.email}
+            style={styles.textInput}
+            onChangeText={(text) => this.setState({ email: text })}
+            ref={input => { this.inputs[0] = input; }}
+            onSubmitEditing={() => this.inputs[1].focus()}
+          />
+        </View>
+        <View style={styles.textInputContainer}>
+          <Icon
+            name={'lock'}
+            size={24}
+            color={'white'}
+            style={{ paddingHorizontal: 14 }}
+          />
+          <TextInput
+            blurOnSubmit={ true }
+            autoCapitalize={'none'}
+            returnKeyType={ 'go' }
+            secureTextEntry
+            placeholder={'Password'}
+            placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
+            value={this.state.password}
+            style={styles.textInput}
+            onChangeText={(text) => this.setState({ password: text })}
+            ref={input => { this.inputs[1] = input; }}
+            onSubmitEditing={() => this.props.dispatch({
               type: actions.LOGIN_USER,
               strategy: 'local',
               token: {
@@ -97,7 +83,25 @@ class Login extends Component {
             })}
           />
         </View>
-      </KeyboardAwareScrollView>
+        <View style={{ height: 20, alignItems: 'center', justifyContent: 'center' }}>
+          { loginError ?
+            <Text style={{ color: 'yellow', fontFamily: 'Lato' }}>Can't find the email/password combination.</Text>
+            : null }
+        </View>
+        <LoginButton
+          style={styles.loginButton}
+          text={'Log In'}
+          isLoading={isLoggingIn === 'local'}
+          onPress={() => this.props.dispatch({
+            type: actions.LOGIN_USER,
+            strategy: 'local',
+            token: {
+              email: this.state.email,
+              password: this.state.password,
+            }
+          })}
+        />
+      </View>
     );
   }
 }
@@ -177,6 +181,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     loginError: state.session.loginError,
+    isLoggingIn: state.session.isLoggingIn,
   };
 };
 

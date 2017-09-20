@@ -9,7 +9,6 @@ import {
   ImageBackground,
 } from 'react-native';
 import { connect } from 'react-redux';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as actions from '../../reducers/session';
 import LoginButton from '../../components/Auth/LoginButton';
@@ -28,6 +27,7 @@ class Signup extends Component {
       email: '',
       password: '',
     };
+    this.submitForm = this.submitForm.bind(this);
   }
 
   submitForm() {
@@ -38,7 +38,7 @@ class Signup extends Component {
       passwordError,
     } = this.state;
 
-    if (!password) {
+    if (!password || password.length < 8 || password.length > 20) {
       this.setState({ passwordError: true })
     } else {
       this.setState({ passwordError: false })
@@ -50,7 +50,8 @@ class Signup extends Component {
       this.setState({ emailError: false })
     }
 
-    if (password && email && validateEmail(email)) {
+    if (password && password.length >= 8 && password.length <= 20
+      && email && validateEmail(email)) {
       this.props.dispatch({
         type: actions.REGISTER_USER,
         email,
@@ -60,90 +61,92 @@ class Signup extends Component {
   }
 
   render(){
-    const { loginUserByFacebook, loginUserByEmail, loginError, navigation } = this.props;
+    const {
+      isRegistering,
+      loginUserByFacebook,
+      loginUserByEmail,
+      loginError,
+      navigation,
+    } = this.props;
     return (
-      <KeyboardAwareScrollView scrollEnabled={false} >
-        <View style={styles.container}>
-          <View style={styles.textInputContainer}>
-            <Icon
-              name={'envelope'}
-              size={18}
-              color={'white'}
-              style={{ paddingHorizontal: 13 }}
-            />
-            <TextInput
-              blurOnSubmit={ false }
-              autoCapitalize={'none'}
-              returnKeyType={ 'next' }
-              placeholder={'E-mail'}
-              placeholderTextColor={'rgba(255, 255, 255, 0.3)'}
-              value={this.state.email}
-              style={styles.textInput}
-              onChangeText={(text) => this.setState({ email: text })}
-              ref={input => { this.inputs[0] = input; }}
-              onSubmitEditing={() => this.inputs[1].focus()}
-            />
-          </View>
-          <View style={styles.warningContainer}>
-            { this.state.emailError ?
-              <Text style={styles.warningText}>Please input a valid email.</Text>
-              : null
-            }
-          </View>
-          <View style={styles.textInputContainer}>
-            <Icon
-              name={'lock'}
-              size={24}
-              color={'white'}
-              style={{ paddingHorizontal: 14 }}
-            />
-            <TextInput
-              blurOnSubmit={ false }
-              autoCapitalize={'none'}
-              returnKeyType={ 'go' }
-              secureTextEntry
-              placeholder={'Password'}
-              placeholderTextColor={'rgba(255, 255, 255, 0.3)'}
-              value={this.state.password}
-              style={styles.textInput}
-              onChangeText={(text) => this.setState({ password: text })}
-              ref={input => { this.inputs[1] = input; }}
-              onSubmitEditing={() => loginUserByEmail({
-                email: this.state.email,
-                password: this.state.password,
-                navigate: navigation.navigate,
-              })}
-            />
-          </View>
-          <View style={styles.warningContainer}>
-            { this.state.passwordError ?
-              <Text style={styles.warningText}>Please give a password.</Text>
-              : null
-            }
-          </View>
-          <TouchableOpacity
-            style={{ alignItems: 'center', justifyContent: 'center', margin: 5 }}
-            onPress={() => {
-              Linking.openURL('https:fabrichealth.files.wordpress.com/2017/07/terms-and-conditions-privacy-policy-fabric-pdf.pdf')
-                .catch(err => console.error('An error occurred', err));
-            }}
-          >
-            <Text style={{ color: 'white', fontFamily: 'Lato', fontSize: 13 }}>
-              I agree to Fabric's Terms of Use.
-            </Text>
-          </TouchableOpacity>
-          <View style={{ height: 15, alignItems: 'center', justifyContent: 'center' }}>
-            { this.props.registerError ?
-              <Text style={{ color: 'red' }}>Can't register this user.</Text>
-              : null }
-          </View>
-          <LoginButton
-            style={styles.loginButton}
-            text={'Sign Up'}
-            onPress={() => this.submitForm()}
+      <View style={styles.container}>
+        <View style={styles.textInputContainer}>
+          <Icon
+            name={'envelope'}
+            size={18}
+            color={'white'}
+            style={{ paddingHorizontal: 13 }}
+          />
+          <TextInput
+            blurOnSubmit={ false }
+            autoCapitalize={'none'}
+            returnKeyType={ 'next' }
+            placeholder={'E-mail'}
+            placeholderTextColor={'rgba(255, 255, 255, 0.3)'}
+            value={this.state.email}
+            style={styles.textInput}
+            onChangeText={(text) => this.setState({ email: text })}
+            ref={input => { this.inputs[0] = input; }}
+            onSubmitEditing={() => this.inputs[1].focus()}
           />
         </View>
-      </KeyboardAwareScrollView>
+        <View style={styles.warningContainer}>
+          { this.state.emailError ?
+            <Text style={styles.warningText}>Please input a valid email.</Text>
+            : null
+          }
+        </View>
+        <View style={styles.textInputContainer}>
+          <Icon
+            name={'lock'}
+            size={24}
+            color={'white'}
+            style={{ paddingHorizontal: 14 }}
+          />
+          <TextInput
+            blurOnSubmit={ false }
+            autoCapitalize={'none'}
+            returnKeyType={ 'go' }
+            secureTextEntry
+            placeholder={'Password'}
+            placeholderTextColor={'rgba(255, 255, 255, 0.3)'}
+            value={this.state.password}
+            style={styles.textInput}
+            onChangeText={(text) => this.setState({ password: text })}
+            ref={input => { this.inputs[1] = input; }}
+            onSubmitEditing={this.submitForm}
+          />
+        </View>
+        <View style={styles.warningContainer}>
+          { this.state.passwordError ?
+            <Text style={styles.warningText}>Please give a password.</Text>
+            : null
+          }
+        </View>
+        <TouchableOpacity
+          style={{ alignItems: 'center', justifyContent: 'center', margin: 5 }}
+          onPress={() => {
+            Linking.openURL('https:fabrichealth.files.wordpress.com/2017/07/terms-and-conditions-privacy-policy-fabric-pdf.pdf')
+              .catch(err => console.error('An error occurred', err));
+          }}
+        >
+          <Text style={{ color: 'white', fontFamily: 'Lato', fontSize: 13 }}>
+            I agree to Fabric's Terms of Use.
+          </Text>
+        </TouchableOpacity>
+        <View style={styles.warningContainer}>
+          { this.props.registerError ?
+            <Text style={styles.warningText}>Can't register this email.</Text>
+            : null
+          }
+        </View>
+        <LoginButton
+          style={styles.loginButton}
+          text={'Sign Up'}
+          isLoading={isRegistering}
+          onPress={() => this.submitForm()}
+        />
+      </View>
     );
   }
 }
@@ -196,16 +199,19 @@ const styles = StyleSheet.create({
   warningContainer: {
     height: 12,
     marginHorizontal: height <= 480 ? 30 : 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   warningText: {
     fontSize: 12,
-    color: 'red',
+    color: 'yellow',
   },
 });
 
 const mapStateToProps = (state) => {
   return {
-    loginError: state.session.loginError,
+    registerError: state.session.registerError,
+    isRegistering: state.session.isRegistering,
   };
 };
 
