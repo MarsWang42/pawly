@@ -11,6 +11,14 @@ class Api::V1::UsersController < ApiController
     end
   end
 
+  def check_username
+    if User.exists?(username: register_params[:username])
+      render :json => { "exist": true }
+    else
+      render :json => { "exist": false }
+    end
+  end
+
   def update
     @user = current_user
     @user.username = register_params[:username]

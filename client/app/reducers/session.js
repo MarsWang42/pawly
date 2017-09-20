@@ -45,9 +45,9 @@ const loginUserSucceed = (respond) => {
   };
 };
 
-const loginUserFailed = (respond) => ({
+const loginUserFailed = (data) => ({
   type: LOGIN_USER_FAILED,
-  value: respond,
+  error: data.response,
 });
 
 const registerUserSucceed = (respond) => {
@@ -59,7 +59,7 @@ const registerUserSucceed = (respond) => {
 
 const registerUserFailed = (respond) => ({
   type: REGISTER_USER_FAILED,
-  value: respond,
+  error: respond,
 });
 
 const updateUserSucceed = (respond) => {
@@ -70,9 +70,9 @@ const updateUserSucceed = (respond) => {
   };
 };
 
-const updateUserFailed = (respond) => ({
+const updateUserFailed = (data) => ({
   type: UPDATE_USER_FAILED,
-  value: respond,
+  error: data.response,
 });
 
 const uploadAvatarSucceed = (respond, callback) => {
@@ -183,7 +183,7 @@ export const SessionReducer = createReducer({
     return {
       ...state,
       isUpdating: false,
-      updateError: 'Register User Failed.'
+      updateError: action.error.data,
     };
   },
   [UPLOAD_AVATAR](state, action) {

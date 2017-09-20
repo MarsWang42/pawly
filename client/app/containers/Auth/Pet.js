@@ -8,7 +8,9 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Picker,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import uuidv4 from 'uuid/v4';
 import Spinner from 'react-native-spinkit';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -22,6 +24,45 @@ import * as actions from '../../reducers/session';
 
 function ucfirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+function getPetType(concepts) {
+  for (let i = 0, l = concepts.length; i < l; i++) {
+    switch (concepts[i].name) {
+      case 'dog': {
+        return 'dog';
+      }
+      case 'cat': {
+        return 'cat';
+      }
+      case 'rabbit': {
+        return 'rabbit';
+      }
+      case 'hamster': {
+        return 'hamster';
+      }
+      case 'fish': {
+        return 'fish';
+      }
+      case 'parrot': {
+        return 'parrot';
+      }
+      case 'chinchilla': {
+        return 'chinchilla';
+      }
+      case 'lizard': {
+        return 'lizard';
+      }
+      case 'snake': {
+        return 'snake';
+      }
+      case 'rodent': {
+        return 'rodent';
+      }
+      default: {
+        return 'Others';
+      }
+    }
+  }
 }
 
 const options = {
@@ -43,12 +84,13 @@ class Avatar extends Component {
       isModalVisible: false,
       petAvatar: '',
       petName: '',
-      petType: 'dog',
+      petType: '',
     };
     this.showPetImagePicker = this.showPetImagePicker.bind(this);
     this.submitForm = this.submitForm.bind(this);
     this.showModal = this.showModal.bind(this);
     this.hideModal = this.hideModal.bind(this);
+    this.validate = this.validate.bind(this);
   }
 
   showModal() {
@@ -57,6 +99,20 @@ class Avatar extends Component {
 
   hideModal() {
     this.setState({ isModalVisible: false });
+  }
+
+  validate() {
+    const { petName } = this.state;
+    if (!petName) {
+      this.setState({ petNameError: 'Name is required.'});
+      return false;
+    } else if (petName.length > 20) {
+      this.setState({ petNameError: 'Name too long.'});
+      return false;
+    } else {
+      this.setState({ petNameError: undefined });
+      return true;
+    }
   }
 
   showPetImagePicker() {
@@ -80,7 +136,7 @@ class Avatar extends Component {
           });
           app.models.predict(Clarifai.GENERAL_MODEL, { base64: response.data })
             .then((response) => {
-              const petType = response.outputs[0].data.concepts[0].name;
+              const petType = getPetType(response.outputs[0].data.concepts);
               this.setState({ petType, isRecognizingImage: false });
             }).catch((response) => {
               this.setState({ isRecognizingImage: false });
@@ -93,24 +149,26 @@ class Avatar extends Component {
   }
 
   submitForm() {
-    const { petAvatar, petName, petType } = this.state;
-    const { username } = this.props;
-    let formData = new FormData();
-    formData.append('username', username)
-    formData.append('pet_name', petName);
-    formData.append('pet_type', petType);
-    formData.append('pet_avatar',
-      { uri: petAvatar, name: `${uuidv4()}.jpg`, type: 'multipart/formdata' });
-    this.props.dispatch({
-      type: actions.UPDATE_USER,
-      update: formData,
-      token: this.props.currentUser.accessToken,
-    });
+    if (this.validate()) {
+      const { petAvatar, petName, petType } = this.state;
+      const { username, currentUser } = this.props;
+      let formData = new FormData();
+      formData.append('username', username)
+      formData.append('pet_name', petName);
+      formData.append('pet_type', petType);
+      formData.append('pet_avatar',
+        { uri: petAvatar, name: `${uuidv4()}.jpg`, type: 'multipart/formdata' });
+      this.props.dispatch({
+        type: actions.UPDATE_USER,
+        update: formData,
+        token: currentUser.accessToken,
+      });
+    }
   }
 
   render() {
     const { currentUser } = this.props;
-    const { isLoadingImage, petAvatar, petType, isRecognizingImage } = this.state;
+    const { isLoadingImage, petAvatar, petType, isRecognizingImage, petNameError } = this.state;
 
     const userImageSource = petAvatar ? { uri: petAvatar }
       : require('../../assets/img/pet.png');
@@ -120,27 +178,59 @@ class Avatar extends Component {
         <View style={styles.container}>
           <Modal
             isVisible={this.state.isModalVisible}
-            backdropColor={'grey'}
-            backdropOpacity={0.8}
+            backdropColor={'black'}
+            backdropOpacity={0.3}
             animationIn={'zoomIn'}
             animationOut={'zoomOut'}
-            animationInTiming={500}
-            animationOutTiming={500}
-            backdropTransitionInTiming={500}
-            backdropTransitionOutTiming={500}
+            animationInTiming={300}
+            animationOutTiming={300}
+            backdropTransitionInTiming={300}
+            backdropTransitionOutTiming={300}
+            onBackdropPress={this.hideModal}
           >
-            <View style={styles.modalContent}>
-              <Text>Hello!</Text>
-              <TouchableOpacity onPress={this.hideModal}>
-                <View style={styles.button}>
-                  <Text>Hello</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+            <LinearGradient
+              colors={['#ECE9E6', '#ffffff']}
+              style={styles.modalContent}
+            >
+              <Text style={styles.petOptionsTitle}>
+                <MaterialIcon
+                  name={'pets'}
+                  size={24}
+                  color={'#141823'}
+                  style={{ marginHorizontal: 5 }}
+                />
+                &nbsp;Type
+              </Text>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  style={{ width: '100%' }}
+                  selectedValue={petType}
+                  itemStyle={{ color: '#141823', fontSize: 19 }}
+                  onValueChange={(itemValue) => this.setState({ petType: itemValue })}
+                >
+                  <Picker.Item label="Cat" value="cat" />
+                  <Picker.Item label="Dog" value="dog" />
+                  <Picker.Item label="Chinchilla" value="chinchilla" />
+                  <Picker.Item label="Fish" value="fish" />
+                  <Picker.Item label="Lizard" value="lizard" />
+                  <Picker.Item label="Parrot" value="parrot" />
+                  <Picker.Item label="Rabbit" value="rabbit" />
+                  <Picker.Item label="Rodent" value="rodent" />
+                  <Picker.Item label="Snake" value="snake" />
+                  <Picker.Item label="Others" value="others" />
+                </Picker>
+              </View>
+            </LinearGradient>
           </Modal>
           { isLoadingImage && <View style={styles.overlay} /> }
           <TouchableOpacity onPress={this.showPetImagePicker}>
             <Image source={userImageSource} style={styles.uploadAvatar} />
+            <LinearGradient
+              colors={['#1c92d2', '#f2fcfe']}
+              style={styles.plus}
+            >
+              <Text style={{ color: 'white', backgroundColor: 'transparent' }}>+</Text>
+            </LinearGradient>
           </TouchableOpacity>
           <Text style={styles.title}>
             Name of your pet?
@@ -155,27 +245,36 @@ class Avatar extends Component {
             <TextInput
               blurOnSubmit={ false }
               autoCapitalize={'none'}
-              returnKeyType={ 'go' }
-              placeholder={'8-20 characters'}
+              placeholder={'Pawly'}
               placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
               value={this.state.petName}
               style={styles.textInput}
               onChangeText={(text) => this.setState({ petName: text })}
             />
           </View>
+          <View style={styles.warningContainer}>
+            { petNameError ?
+              <Text style={styles.warningText}>{ petNameError }</Text>
+              : null
+            }
+          </View>
           <Text style={styles.title}>
             Type
+          </Text>
+          <Text style={{ fontFamily: 'Lato', color: 'white', textAlign: 'center' }}>
+            Try upload a photo of him/her, we can guess the type!
           </Text>
           <TouchableOpacity
             style={styles.textContainer}
             onPress={this.showModal}
           >
             { isRecognizingImage ? (
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={styles.text}>Guessing... </Text>
                 <Spinner type={'Wave'} size={20} color={'#fff'} />
               </View>
             ) : (
-              <Text style={styles.text}>{ ucfirst(petType) }</Text>
+            <Text style={styles.text}>{ ucfirst(petType) || 'No pic detected.' }</Text>
             ) }
           </TouchableOpacity>
           <TouchableOpacity
@@ -221,11 +320,42 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginBottom: 15,
   },
+  rowContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  petOptionsTitle: {
+    fontFamily: 'Lato',
+    color: '#141823',
+    fontSize: 26,
+    marginBottom: 15,
+  },
+  pickerContainer: {
+    height: 120,
+    width: width - 100,
+    padding: 10,
+    flexDirection: 'row',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   uploadAvatar: {
     height: 100,
     width: 100,
     borderRadius: 50,
     overflow: 'hidden',
+  },
+  plus: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textInputContainer: {
     flexDirection: 'row',
@@ -247,11 +377,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textInput: {
-    fontSize: 17,
-    color: 'white',
+    fontSize: 16,
+    color: '#fff',
     height: 40,
-    width: width - 150,
-    textAlign: 'center',
+    width: width - 200,
   },
   text: {
     fontSize: 17,
@@ -262,7 +391,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 30,
+    marginTop: 50,
 
     height: height <= 480 ? 30 : 40,
     width: 175,
@@ -273,12 +402,25 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   modalContent: {
-    backgroundColor: 'white',
     padding: 22,
+    height: 200,
+    borderWidth: 2,
+    borderColor: 'gray',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 4,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  warningContainer: {
+    height: 12,
+    marginHorizontal: height <= 480 ? 30 : 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  warningText: {
+    fontSize: 12,
+    color: 'yellow',
+    textAlign: 'center'
   },
 });
 

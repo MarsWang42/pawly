@@ -14,6 +14,8 @@ import FBLoginButton from '../../components/Auth/FBLoginButton';
 import LoginButton from '../../components/Auth/LoginButton';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+const { height, width } = Dimensions.get('window');
+
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -35,7 +37,7 @@ class Login extends Component {
     } = this.props;
     return (
       <View style={styles.container}>
-        <View style={[styles.textInputContainer, { marginTop: 25 }]}>
+        <View style={[styles.textInputContainer, { marginTop: 35 }]}>
           <Icon
             name={'envelope'}
             size={18}
@@ -111,8 +113,6 @@ Login.propTypes = {
   loginUserByFacebook: PropTypes.func,
   loginUser: PropTypes.func,
 };
-
-const { height, width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {

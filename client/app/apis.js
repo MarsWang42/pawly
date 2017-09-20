@@ -1,11 +1,12 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/api/v1';
+export const BASE_URL = 'http://localhost:3000/api/v1';
 // const BASE_URL = 'https://peaceful-woodland-53096.herokuapp.com/api/v1'
-const AUTH_URL = `${BASE_URL}/user_token`;
-const USER_URL = `${BASE_URL}/users`;
-const AVATAR_URL = `${BASE_URL}/user/avatar`;
-const PETS_URL = `${BASE_URL}/pets`;
+export const AUTH_URL = `${BASE_URL}/user_token`;
+export const USER_URL = `${BASE_URL}/users`;
+export const USERNAME_URL = `${BASE_URL}/username`;
+export const AVATAR_URL = `${BASE_URL}/user/avatar`;
+export const PETS_URL = `${BASE_URL}/pets`;
 
 
 export default {

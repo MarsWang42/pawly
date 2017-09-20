@@ -48,8 +48,8 @@ class Home extends Component {
     }
     if (nextState.username && nextState.username !== this.state.username) {
       this.setState({ isSettingPet: true });
-      this.avatar.fadeOut(800);
-      this.petView.fadeIn(800);
+      this.avatar.fadeOut(400);
+      this.petView.fadeIn(1500);
     }
   }
 
@@ -106,7 +106,7 @@ class Home extends Component {
             <Image
               source={require('../../assets/img/logo.png')}
               style={{
-                width: width <= 325 ? 100 : 125,
+                width: width <= 325 ? 95 : 115,
                 height: width <= 325 ? 100 : 125,
                 resizeMode: 'stretch'
               }}

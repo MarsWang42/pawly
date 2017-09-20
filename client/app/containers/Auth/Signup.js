@@ -119,7 +119,7 @@ class Signup extends Component {
         </View>
         <View style={styles.warningContainer}>
           { this.state.passwordError ?
-            <Text style={styles.warningText}>Please give a password.</Text>
+            <Text style={styles.warningText}>Passward should between 8 to 20 characters.</Text>
             : null
           }
         </View>
@@ -131,7 +131,7 @@ class Signup extends Component {
           }}
         >
           <Text style={{ color: 'white', fontFamily: 'Lato', fontSize: 13 }}>
-            I agree to Fabric's Terms of Use.
+            I agree to Pawly's Terms of Use.
           </Text>
         </TouchableOpacity>
         <View style={styles.warningContainer}>
@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
   warningText: {
     fontSize: 12,
     color: 'yellow',
+    textAlign: 'center'
   },
 });
 
