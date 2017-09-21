@@ -1,6 +1,7 @@
 class Pet < ApplicationRecord
   belongs_to :owner, class_name: "User"
-  mount_uploader :avatar, AvatarUploader
+  has_and_belongs_to_many :pictures
+  mount_uploader :avatar, PetAvatarUploader
 
   validates :name, length: { maximum: 20 }, presence: true
   validates :type, length: { maximum: 20 }, presence: true

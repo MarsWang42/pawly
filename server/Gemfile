@@ -36,6 +36,7 @@ gem 'dotenv-rails', groups: [:development, :test]
 gem 'validates_email_format_of', '~> 1.6.3'
 gem 'carrierwave', '~> 1.0'
 gem 'fog-aws', '~> 1.4.1'
+gem 'kaminari', '~> 1.0.1'
 
 
 # Use Capistrano for deployment

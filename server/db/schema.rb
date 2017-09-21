@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170919015039) do
+ActiveRecord::Schema.define(version: 20170921174322) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,31 @@ ActiveRecord::Schema.define(version: 20170919015039) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["owner_id"], name: "index_pets_on_owner_id"
+  end
+
+  create_table "pets_pictures", id: false, force: :cascade do |t|
+    t.bigint "pet_id"
+    t.bigint "picture_id"
+    t.index ["pet_id"], name: "index_pets_pictures_on_pet_id"
+    t.index ["picture_id"], name: "index_pets_pictures_on_picture_id"
+  end
+
+  create_table "pictures", force: :cascade do |t|
+    t.bigint "creator_id"
+    t.string "image"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["creator_id"], name: "index_pictures_on_creator_id"
+  end
+
+  create_table "relationships", force: :cascade do |t|
+    t.integer "follower_id"
+    t.integer "followed_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["followed_id"], name: "index_relationships_on_followed_id"
+    t.index ["follower_id", "followed_id"], name: "index_relationships_on_follower_id_and_followed_id", unique: true
+    t.index ["follower_id"], name: "index_relationships_on_follower_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -41,4 +66,5 @@ ActiveRecord::Schema.define(version: 20170919015039) do
   end
 
   add_foreign_key "pets", "users", column: "owner_id"
+  add_foreign_key "pictures", "users", column: "creator_id"
 end

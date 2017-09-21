@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { addNavigationHelpers } from 'react-navigation';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
+import { NavigatorApp } from '../navigators/App';
 import * as actions from '../reducers/session';
 import Auth from './Auth';
 
-class AppNavigation extends React.Component {
+class AppNavigation extends Component {
   componentWillMount() {
     this.props.dispatch({
       type: actions.GET_CURRENT_USER,
@@ -21,9 +22,18 @@ class AppNavigation extends React.Component {
     } = this.props;
 
     if (isCheckingUser) {
-      return <View />
+      return <View />;
     } else if (currentUser && currentUser.username) {
-      return <View />
+      return (
+        <NavigatorApp
+          navigation={
+            addNavigationHelpers({
+              dispatch: dispatch,
+              state: navigationState
+            })
+          }
+        />
+      );
     } else {
       return <Auth />;
     }

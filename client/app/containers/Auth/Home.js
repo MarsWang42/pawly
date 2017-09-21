@@ -106,7 +106,7 @@ class Home extends Component {
             <Image
               source={require('../../assets/img/logo.png')}
               style={{
-                width: width <= 325 ? 95 : 115,
+                width: width <= 325 ? 105 : 130,
                 height: width <= 325 ? 100 : 125,
                 resizeMode: 'stretch'
               }}
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     marginTop: height >= 730 ? 100 : 50,
-    marginBottom: width <= 325 ? 15 : 35,
+    marginBottom: width <= 325 ? 15 : 25,
     backgroundColor: 'transparent',
     alignItems:'center',
     justifyContent:'center'

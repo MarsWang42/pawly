@@ -258,11 +258,14 @@ class Avatar extends Component {
               : null
             }
           </View>
-          <Text style={styles.title}>
+          <Text style={[styles.title, { marginTop: 15 }]}>
             Type
           </Text>
           <Text style={{ fontFamily: 'Lato', color: 'white', textAlign: 'center' }}>
-            Try upload a photo of him/her, we can guess the type!
+            Try upload a photo of him/her
+          </Text>
+          <Text style={{ fontFamily: 'Lato', color: 'white', textAlign: 'center' }}>
+            We can guess the type!
           </Text>
           <TouchableOpacity
             style={styles.textContainer}

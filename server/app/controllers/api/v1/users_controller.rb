@@ -24,16 +24,21 @@ class Api::V1::UsersController < ApiController
     @user.username = register_params[:username]
 
     if register_params[:pet_name]
-      @pet = @user.pets.new(name: register_params[:pet_name])
+      pet = @user.pets.new(name: register_params[:pet_name])
       if register_params[:pet_type]
-        @pet.type = register_params[:pet_type]
+        pet.type = register_params[:pet_type]
       end
       if register_params[:pet_avatar]
-        @pet.avatar = register_params[:pet_avatar]
+        pet.avatar = register_params[:pet_avatar]
+        pic = pet.pictures.new(image: register_params[:pet_avatar])
+        pic.creator = @user
+        if !pic.save
+          render :json => pic.errors, :status => 422
+        end
       end
 
-      if !@pet.save
-        render :json => @pet.errors, :status => 422
+      if !pet.save
+        render :json => pet.errors, :status => 422
       end
     end
 

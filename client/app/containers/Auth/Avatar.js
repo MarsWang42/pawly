@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
     height: 40,
-    width: width - 200,
+    width: 175,
   },
   buttonContainer: {
     flexDirection: 'row',
