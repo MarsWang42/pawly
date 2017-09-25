@@ -15,6 +15,14 @@ ActiveRecord::Schema.define(version: 20170921174322) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "like_pictures", force: :cascade do |t|
+    t.integer "liker_id"
+    t.integer "liked_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["liker_id", "liked_id"], name: "index_like_pictures_on_liker_id_and_liked_id", unique: true
+  end
+
   create_table "pets", force: :cascade do |t|
     t.string "name", null: false
     t.string "type", null: false
@@ -28,6 +36,9 @@ ActiveRecord::Schema.define(version: 20170921174322) do
   create_table "pets_pictures", id: false, force: :cascade do |t|
     t.bigint "pet_id"
     t.bigint "picture_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pet_id", "picture_id"], name: "index_pets_pictures_on_pet_id_and_picture_id", unique: true
     t.index ["pet_id"], name: "index_pets_pictures_on_pet_id"
     t.index ["picture_id"], name: "index_pets_pictures_on_picture_id"
   end
@@ -35,6 +46,8 @@ ActiveRecord::Schema.define(version: 20170921174322) do
   create_table "pictures", force: :cascade do |t|
     t.bigint "creator_id"
     t.string "image"
+    t.integer "height"
+    t.integer "width"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["creator_id"], name: "index_pictures_on_creator_id"

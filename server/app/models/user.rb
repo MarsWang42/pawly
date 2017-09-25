@@ -8,8 +8,12 @@ class User < ApplicationRecord
   has_many :passive_relationships, class_name:  "Relationship",
                                  foreign_key: "followed_id",
                                  dependent:   :destroy
+  has_many :like_relationships, class_name:  "LikePicture",
+                                  foreign_key: "liker_id",
+                                  dependent:   :destroy
   has_many :following, through: :active_relationships, source: :followed
   has_many :followers, through: :passive_relationships, source: :follower
+  has_many :liked, through: :like_relationships, source: :liked
 
   mount_uploader :avatar, UserAvatarUploader
 
@@ -19,7 +23,7 @@ class User < ApplicationRecord
     if: :email?
   validates :password, length: { in: 6..20 }, on: :create
 
-    # Follows a user.
+  # Follows a user.
   def follow(other_user)
     following << other_user
   end
@@ -32,6 +36,25 @@ class User < ApplicationRecord
   # Returns true if the current user is following the other user.
   def following?(other_user)
     following.include?(other_user)
+  end
+
+  # Like a pic.
+  def like(picture)
+    if !liked?(picture)
+      liked << picture
+    end
+  end
+
+  # Unlike a pic.
+  def unlike(picture)
+    if liked?(picture)
+      liked.delete(picture)
+    end
+  end
+
+  # Returns true if the current user liked the pic.
+  def liked?(picture)
+    liked.include?(picture)
   end
 
   def feed

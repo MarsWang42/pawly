@@ -19,6 +19,12 @@ class Api::V1::UsersController < ApiController
     end
   end
 
+  def get_feed
+    @user = current_user
+    @feeds = @user.feed
+    render :feed
+  end
+
   def update
     @user = current_user
     @user.username = register_params[:username]

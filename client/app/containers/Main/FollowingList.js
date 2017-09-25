@@ -4,9 +4,10 @@ import {
   FlatList,
   Platform,
   StyleSheet,
-  View,
 } from 'react-native';
 import PictureCard from './PictureCard';
+import * as actions from '../../reducers/picture';
+
 const picList = [
   {
     image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
@@ -49,14 +50,29 @@ const picList = [
 ];
 
 class FollowingList extends Component {
+  componentDidMount() {
+    this.props.dispatch({
+      type: actions.FETCH_FEED,
+      token: this.props.currentUser.accessToken,
+    });
+    this.onRefresh = this.onRefresh.bind(this);
+  }
+
+  onRefresh() {
+    this.props.dispatch({
+      type: actions.FETCH_FEED,
+      token: this.props.currentUser.accessToken,
+    });
+  }
+
   render() {
-    const { isLoading, data, onRefresh } = this.props;
+    const { isLoading, followingList } = this.props;
     return (
       <FlatList
-        data={picList}
+        data={followingList.toJS()}
         removeClippedSubviews={false}
         refreshing={isLoading}
-        onRefresh={onRefresh}
+        onRefresh={this.onRefresh}
         style={styles.container}
         keyExtractor={(item) => (item.pictureId)}
         renderItem={({ item }) => (
@@ -99,6 +115,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     currentUser: state.session.currentUser,
+    followingList: state.picture.followingList,
+    isLoading: state.picture.isFetchingFeed,
   };
 };
 

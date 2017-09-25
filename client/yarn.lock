@@ -2484,6 +2484,10 @@ image-size@^0.6.0:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/image-size/-/image-size-0.6.1.tgz#98122a562d59dcc097ef1b2c8191866eb8f5d663"
 
+immutable@^3.8.1:
+  version "3.8.1"
+  resolved "https://registry.yarnpkg.com/immutable/-/immutable-3.8.1.tgz#200807f11ab0f72710ea485542de088075f68cd2"
+
 imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
@@ -3526,6 +3530,10 @@ minimist@^1.1.0, minimist@^1.1.1, minimist@^1.2.0, minimist@~1.2.0:
   dependencies:
     minimist "0.0.8"
 
+moment@^2.18.1:
+  version "2.18.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.18.1.tgz#c36193dd3ce1c2eed2adb7c802dbbc77a81b1c0f"
+
 morgan@~1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/morgan/-/morgan-1.6.1.tgz#5fd818398c6819cba28a7cd6664f292fe1c0bbf2"
@@ -4087,6 +4095,12 @@ react-native-image-picker@latest:
   version "0.26.7"
   resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-0.26.7.tgz#ad2ee957f7f6cc01396893ea03d84cb2adb2e376"
 
+react-native-image-progress@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-image-progress/-/react-native-image-progress-1.0.1.tgz#5ceb4cfefd39d7ebdffab802bc984b5a0fc41021"
+  dependencies:
+    prop-types "^15.5.10"
+
 react-native-keyboard-aware-scroll-view@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/react-native-keyboard-aware-scroll-view/-/react-native-keyboard-aware-scroll-view-0.3.0.tgz#b9d7b0d5b47d2bb4285fe50a3d274b10a3b5e1a7"
@@ -4107,6 +4121,12 @@ react-native-modal@^3.1.0:
   dependencies:
     prop-types "15.5.10"
     react-native-animatable "^1.2.3"
+
+react-native-progress@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/react-native-progress/-/react-native-progress-3.4.0.tgz#c002e6efb2f0b82dd6889510e669c492da2718ac"
+  dependencies:
+    prop-types "^15.5.8"
 
 react-native-scrollable-tab-view@^0.7.4:
   version "0.7.4"

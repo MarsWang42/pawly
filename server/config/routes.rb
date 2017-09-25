@@ -5,8 +5,12 @@ Rails.application.routes.draw do
       post 'users' => 'users#create'
       patch 'users' => 'users#update'
       post 'username' => 'users#check_username'
-      patch 'user/avatar' => 'users#upload_avatar'
+      get 'users/feed' => 'users#get_feed'
+      patch 'users/avatar' => 'users#upload_avatar'
       post 'user_token' => 'user_token#create', defaults: {format: :json}
+
+      post 'pictures/like' => 'pictures#like'
+      post 'pictures/unlike' => 'pictures#unlike'
     end
   end
 end

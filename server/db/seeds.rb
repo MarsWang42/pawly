@@ -21,21 +21,23 @@ user2.pets.create(name: 'Simba', type: 'cat')
 user3.pets.create(name: 'Lucky', type: 'cat')
 user3.pets.create(name: 'Ruby', type: 'cat')
 
-picture1 = user2.pictures.create(image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb')
+picture1 = user2.pictures.create(image: File.open(File.join(Rails.root, 'test.jpeg')), height: 300, width: 300)
 picture1.pets << user1.pets.first
-picture2 = user3.pictures.create(image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb')
+picture2 = user3.pictures.create(image: File.open(File.join(Rails.root, 'test1.jpeg')), height: 300, width: 300)
 picture2.pets << user3.pets.first
-picture3 = user1.pictures.create(image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb')
+picture3 = user1.pictures.create(image: File.open(File.join(Rails.root, 'test2.jpg')), height: 300, width: 300)
 picture3.pets << user1.pets.first
-picture4 = user1.pictures.create(image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb')
+picture4 = user1.pictures.create(image: File.open(File.join(Rails.root, 'test3.jpeg')), height: 300, width: 300)
 picture4.pets << user1.pets.first
-picture5 = user2.pictures.create(image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb')
+picture5 = user2.pictures.create(image: File.open(File.join(Rails.root, 'test4.jpeg')), height: 300, width: 300)
 picture5.pets << user2.pets.first
-picture5 = user2.pictures.create(image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb')
-picture5.pets << user2.pets.first
+picture6 = user2.pictures.create(image: File.open(File.join(Rails.root, 'test5.jpg')), height: 300, width: 300)
+picture6.pets << user2.pets.first
 
 user1.follow(user2)
 user1.follow(user3)
 user4.follow(user1)
 user4.follow(user2)
 user4.follow(user3)
+
+user4.like(picture1)

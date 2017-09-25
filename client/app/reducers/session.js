@@ -113,7 +113,7 @@ export const SessionReducer = createReducer({
   },
   [GET_CURRENT_USER_FAILED](state, action) {
     return {
-      state,
+      ...state,
       isLoggedIn: false,
       isCheckingUser: false,
     };
@@ -137,10 +137,11 @@ export const SessionReducer = createReducer({
     };
   },
   [LOGIN_USER_FAILED](state, action) {
-    return Object.assign({}, state, {
+    return {
+      ...state,
       isLoggingIn: false,
       loginError: 'Login User Failed.'
-    });
+    };
   },
   [REGISTER_USER](state, action) {
     return loop(
@@ -222,11 +223,12 @@ export const SessionReducer = createReducer({
   },
   [LOGOUT_USER](state, action) {
     db.AsyncStorage.setCurrentUser('');
-    return Object.assign({}, state, {
+    return {
+      state,
       isLoggedIn: false,
       isCheckingUser: false,
       currentUser: undefined,
-    });
+    };
   },
   ['START_ONBOARDING'](state, action) {
     return Object.assign({}, state, {
