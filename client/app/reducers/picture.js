@@ -1,25 +1,40 @@
 import createReducer from '../helpers/createReducer';
 import db from '../db';
 import apis from '../apis';
-import { fromJS, List } from 'immutable';
+import { fromJS, List, Map } from 'immutable';
 import { loop, Cmd } from 'redux-loop';
 
 export const FETCH_FEED = 'FETCH_FEED';
 export const FETCH_FEED_SUCCEED = 'FETCH_FEED_SUCCEED';
 export const FETCH_FEED_FAILED = 'FETCH_FEED_FAILED';
+export const FETCH_USER_DETAIL = 'FETCH_USER_DETAIL';
+export const FETCH_USER_DETAIL_SUCCEED = 'FETCH_USER_DETAIL_SUCCEED';
+export const FETCH_USER_DETAIL_FAILED = 'FETCH_USER_DETAIL_FAILED';
 export const TOGGLE_LIKE = 'TOGGLE_LIKE';
 export const TOGGLE_LIKE_SUCCEED = 'TOGGLE_LIKE_SUCCEED';
 export const TOGGLE_LIKE_FAILED = 'TOGGLE_LIKE_FAILED';
 
-const getFeedSucceed = (respond) => {
+const fetchFeedSucceed = (respond) => {
   return {
     type: FETCH_FEED_SUCCEED,
     followingList: respond.data.feeds,
   };
 };
 
-const getFeedFailed = () => ({
+const fetchFeedFailed = () => ({
   type: FETCH_FEED_FAILED,
+});
+
+const fetchUserDetailSucceed = (respond, action) => {
+  return {
+    type: FETCH_USER_DETAIL_SUCCEED,
+    currentUser: action.currentUser,
+    userDetail: respond.data,
+  };
+};
+
+const fetchUserDetailFailed = () => ({
+  type: FETCH_USER_DETAIL_FAILED,
 });
 
 const toggleLikeSucceed = (respond, { callback }) => {
@@ -42,8 +57,8 @@ export const PictureReducer = createReducer({
     return loop(
       { ...state, isFetchingFeed: true, fetchFeedError: undefined },
       Cmd.run(apis.picture.feed, {
-        successActionCreator: getFeedSucceed,
-        failActionCreator: getFeedFailed,
+        successActionCreator: fetchFeedSucceed,
+        failActionCreator: fetchFeedFailed,
         args: [action.token]
       })
     );
@@ -60,6 +75,37 @@ export const PictureReducer = createReducer({
       ...state,
       isFetchingFeed: false,
       fetchFeedError: 'Fetching failed.',
+    };
+  },
+  [FETCH_USER_DETAIL](state, action) {
+    return loop(
+      { ...state, isFetchingUserDetail: true, fetchUserDetailError: undefined },
+      Cmd.run(apis.picture.userDetail, {
+        successActionCreator: (respond) => fetchUserDetailSucceed(respond, action),
+        failActionCreator: fetchUserDetailFailed,
+        args: [action.id, action.token]
+      })
+    );
+  },
+  [FETCH_USER_DETAIL_SUCCEED](state, action) {
+    if (action.currentUser) {
+      return {
+        ...state,
+        isFetchingUserDetail: false,
+        currentUserDetail: fromJS(action.userDetail),
+      };
+    }
+    return {
+      ...state,
+      isFetchingUserDetail: false,
+      userDetail: fromJS(action.userDetail),
+    };
+  },
+  [FETCH_USER_DETAIL_FAILED](state, action) {
+    return {
+      ...state,
+      isFetchingUserDetail: false,
+      fetchUserDetailError: 'Fetching failed.',
     };
   },
   [TOGGLE_LIKE](state, action) {

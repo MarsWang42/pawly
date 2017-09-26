@@ -13,7 +13,13 @@ class Api::V1::UsersController < ApiController
 
   def show
     @user = current_user
+    @token = Knock::AuthToken.new payload: { sub: @user.id }
     render :show
+  end
+
+  def detail
+    @user = User.find(params[:id])
+    render :detail
   end
 
   def check_username

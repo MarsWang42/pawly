@@ -7,6 +7,7 @@ export const USER_URL = `${BASE_URL}/users`;
 export const USERNAME_URL = `${BASE_URL}/username`;
 export const AVATAR_URL = `${USER_URL}/avatar`;
 export const FEED_URL = `${USER_URL}/feed`;
+export const USER_DETAIL_URL = (userId) => `${USER_URL}/detail/${userId}`;
 export const PETS_URL = `${BASE_URL}/pets`;
 export const PICTURE_URL = `${BASE_URL}/pictures`;
 export const PICTURE_LIKE_URL = `${BASE_URL}/pictures/like`;
@@ -69,6 +70,14 @@ export default {
       axios({
         method: 'get',
         url: FEED_URL,
+        headers: {
+          Authorization: token,
+        },
+      }),
+    userDetail: (id, token) =>
+      axios({
+        method: 'get',
+        url: USER_DETAIL_URL(id),
         headers: {
           Authorization: token,
         },
