@@ -10,9 +10,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import PictureCard from '../Main/PictureCard';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import PictureCard from '../Main/PictureCard';
 import * as sessionActions from '../../reducers/session';
 import * as pictureActions from '../../reducers/picture';
 
@@ -160,15 +160,15 @@ class Profile extends Component {
               </View>
               <View style={styles.infoContainer}>
                 <View style={{ alignItems: 'center', width: 100 }}>
-                  <Text style={styles.infoNumber}>1</Text>
+                  <Text style={styles.infoNumber}>{ currentUserDetail.followers.length }</Text>
                   <Text style={styles.infoTitle}>Follower</Text>
                 </View>
                 <View style={{ alignItems: 'center', width: 100 }}>
-                  <Text style={styles.infoNumber}>1</Text>
+                  <Text style={styles.infoNumber}>{ currentUserDetail.following.length }</Text>
                   <Text style={styles.infoTitle}>Following</Text>
                 </View>
                 <View style={{ alignItems: 'center', width: 100 }}>
-                  <Text style={styles.infoNumber}>1</Text>
+                  <Text style={styles.infoNumber}>{ currentUserDetail.pictures.length }</Text>
                   <Text style={styles.infoTitle}>Post</Text>
                 </View>
               </View>

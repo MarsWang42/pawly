@@ -28,3 +28,11 @@ json.pictures(@user.pictures) do |picture|
     json.username liker.username
   end
 end
+
+json.followers(@user.followers) do |follower|
+  json.name follower.name
+end
+
+json.following(@user.following) do |following_user|
+  json.name following_user.name
+end
