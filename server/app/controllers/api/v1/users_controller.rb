@@ -5,10 +5,15 @@ class Api::V1::UsersController < ApiController
     @user = User.new(auth_params)
     if @user.save
       @token = Knock::AuthToken.new payload: { sub: @user.id }
-      render :create
+      render :show
     else
       render :json => @user.errors, :status => 422
     end
+  end
+
+  def show
+    @user = current_user
+    render :show
   end
 
   def check_username
@@ -37,6 +42,8 @@ class Api::V1::UsersController < ApiController
       if register_params[:pet_avatar]
         pet.avatar = register_params[:pet_avatar]
         pic = pet.pictures.new(image: register_params[:pet_avatar])
+        pic.width = 600
+        pic.height = 600
         pic.creator = @user
         if !pic.save
           render :json => pic.errors, :status => 422
@@ -50,7 +57,7 @@ class Api::V1::UsersController < ApiController
 
     if @user.save
       @token = Knock::AuthToken.new payload: { sub: @user.id }
-      render :create
+      render :show
     else
       render :json => @user.errors, :status => 422
     end

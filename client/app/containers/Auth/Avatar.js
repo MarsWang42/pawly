@@ -56,8 +56,8 @@ class Avatar extends Component {
       } else {
         ImageCropper.openCropper({
           path: response.uri,
-          width: 300,
-          height: 300,
+          width: 600,
+          height: 600,
           compressImageQuality: 0.5,
           includeBase64: true,
         }).then(response => {

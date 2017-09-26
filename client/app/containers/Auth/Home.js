@@ -106,7 +106,7 @@ class Home extends Component {
             <Image
               source={require('../../assets/img/logo.png')}
               style={{
-                width: width <= 325 ? 105 : 130,
+                width: width <= 325 ? 95 : 110,
                 height: width <= 325 ? 100 : 125,
                 resizeMode: 'stretch'
               }}

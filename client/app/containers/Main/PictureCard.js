@@ -10,7 +10,8 @@ import {
   View,
 } from 'react-native';
 import moment from 'moment';
-import ImageWithProgress from 'react-native-image-progress';
+import pluralize from 'pluralize';
+import ImageWithProgress from '../../components/Helpers/ImageWithProgress';
 import ProgressPie from 'react-native-progress/Pie';
 import * as actions from '../../reducers/picture';
 import * as Animatable from 'react-native-animatable';
@@ -62,9 +63,19 @@ class PictureCard extends Component {
       petNames = data.pets[0].name;
     }
     if (ll >= 2) {
-      likerNames = `${data.likers[0].username} and ${ll - 1} others`;
-    } else if (ll == 1) {
-      likerNames = data.likers[0].username;
+      likerNames = (
+        <Text style={styles.likername}>
+          <Text>{ data.likers[0].username }</Text>
+          <Text style={{ fontFamily: 'Lato' }}> and </Text>
+          <Text>{ pluralize('other', ll - 1, true) }.</Text>
+        </Text>
+      );
+    } else if (ll === 1) {
+      likerNames = (
+        <Text style={styles.likername}>
+          { data.likers[0].username }
+        </Text>
+      );
     }
     // if (cl >= 3) {
     //   comments = (
@@ -132,7 +143,7 @@ class PictureCard extends Component {
               { likerNames &&
                 <Text style={{ fontSize: 12, fontFamily: 'Lato' }}>Liked by </Text>
               }
-              <Text style={styles.likername}>{ likerNames }</Text>
+              { likerNames }
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <AnimatableTouchableOpacity

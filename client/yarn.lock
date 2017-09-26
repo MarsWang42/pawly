@@ -3942,6 +3942,10 @@ pluralize@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-1.2.1.tgz#d1a21483fd22bb41e58a12fa3421823140897c45"
 
+pluralize@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-7.0.0.tgz#298b89df8b93b0221dbf421ad2b1b1ea23fc6777"
+
 prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
@@ -4094,12 +4098,6 @@ react-native-image-crop-picker@^0.16.1:
 react-native-image-picker@latest:
   version "0.26.7"
   resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-0.26.7.tgz#ad2ee957f7f6cc01396893ea03d84cb2adb2e376"
-
-react-native-image-progress@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/react-native-image-progress/-/react-native-image-progress-1.0.1.tgz#5ceb4cfefd39d7ebdffab802bc984b5a0fc41021"
-  dependencies:
-    prop-types "^15.5.10"
 
 react-native-keyboard-aware-scroll-view@^0.3.0:
   version "0.3.0"

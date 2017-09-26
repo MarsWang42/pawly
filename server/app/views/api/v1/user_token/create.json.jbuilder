@@ -6,7 +6,8 @@ json.avatar @user.avatar
 json.accessToken @token.token
 
 json.pets(@user.pets) do |pet|
-  json.pets pet.name
+  json.id pet.id
+  json.name pet.name
   json.type pet.type
   json.avatar pet.avatar
 end

@@ -124,8 +124,8 @@ class Avatar extends Component {
       } else {
         ImageCropper.openCropper({
           path: response.uri,
-          width: 300,
-          height: 300,
+          width: 600,
+          height: 600,
           compressImageQuality: 0.5,
           includeBase64: true,
         }).then(response => {
@@ -170,7 +170,7 @@ class Avatar extends Component {
     const { currentUser } = this.props;
     const { isLoadingImage, petAvatar, petType, isRecognizingImage, petNameError } = this.state;
 
-    const userImageSource = petAvatar ? { uri: petAvatar }
+    const petImageSource = petAvatar ? { uri: petAvatar }
       : require('../../assets/img/pet.png');
 
     return (
@@ -224,8 +224,9 @@ class Avatar extends Component {
           </Modal>
           { isLoadingImage && <View style={styles.overlay} /> }
           <TouchableOpacity onPress={this.showPetImagePicker}>
-            <Image source={userImageSource} style={styles.uploadAvatar} />
+            <Image source={petImageSource} style={styles.uploadAvatar} />
             <LinearGradient
+              start={{x: 0.0, y: 0.25}} end={{x: 0.5, y: 1.0}}
               colors={['#1c92d2', '#f2fcfe']}
               style={styles.plus}
             >
