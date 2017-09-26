@@ -30,9 +30,9 @@ json.pictures(@user.pictures) do |picture|
 end
 
 json.followers(@user.followers) do |follower|
-  json.name follower.name
+  json.name follower.username
 end
 
 json.following(@user.following) do |following_user|
-  json.name following_user.name
+  json.name following_user.username
 end
