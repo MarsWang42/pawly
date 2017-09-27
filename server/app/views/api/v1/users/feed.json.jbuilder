@@ -1,8 +1,6 @@
 json.feeds(@feeds) do |feed|
   json.image feed.image.url
   json.timestamp feed.created_at
-  json.height feed.height
-  json.width feed.width
   json.creator do
     json.username feed.creator.username
     json.avatar feed.creator.avatar.url

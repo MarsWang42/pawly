@@ -14,8 +14,6 @@ end
 json.pictures(@user.pictures) do |picture|
   json.image picture.image.url
   json.timestamp picture.created_at
-  json.height picture.height
-  json.width picture.width
   json.creator do
     json.username picture.creator.username
     json.avatar picture.creator.avatar.url
