@@ -24,6 +24,20 @@ const AnimatableTouchableOpacity = Animatable.createAnimatableComponent(Touchabl
 class PictureCard extends Component {
   constructor() {
     super();
+    this.state = {
+      imageWidth: width,
+      imageHeight: width
+    };
+  }
+
+  componentDidMount() {
+    Image.getSize(
+      this.props.data.image,
+      (imageWidth, imageHeight) => {
+        this.setState({ imageWidth, imageHeight })
+      },
+      error => console.log(error),
+    )
   }
 
   likePic(id) {
@@ -49,6 +63,7 @@ class PictureCard extends Component {
 
   render() {
     const { data } = this.props;
+    const { imageWidth, imageHeight } = this.state;
 
     const pl = data.pets.length;
     const ll = data.likers.length;
@@ -105,19 +120,23 @@ class PictureCard extends Component {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={styles.petAvatarContainer}>
+            <View
+              style={[styles.petAvatarContainer,
+                { width: pl === 1 ? 60 : pl === 2 ? 70 : 80 }
+              ]}
+            >
               <Image
-                style={[styles.firstPetAvatar, { left: pl === 1 ? 15 : 2 ? 10 : 0 }]}
+                style={styles.firstPetAvatar}
                 source={{ uri: data.pets[0].avatar || PLACE_HOLDER }}
               />
               { data.pets[1] &&
                 <Image
-                  style={[styles.secondPetAvatar, { left: pl === 2 ? 21 : 16 }]}
+                  style={styles.secondPetAvatar}
                   source={{ uri: data.pets[1].avatar || PLACE_HOLDER }}
                 />
               }
               { data.pets[2] &&
-                <Image style={styles.thirdPetAvatar} source={{ uri: data.pets[2].avatar }}/>
+                <Image style={styles.thirdPetAvatar} source={{ uri: data.pets[2].avatar || PLACE_HOLDER }}/>
               }
             </View>
             <View style={styles.petInfoContainer}>
@@ -134,7 +153,7 @@ class PictureCard extends Component {
           source={{ uri: data.image }}
           indicator={ProgressPie}
           indicatorProps={{ color: 'rgba(230, 83, 90, 0.7)' }}
-          style={{ height: data.height / data.width * width, width: width }}
+          style={{ height: imageHeight / imageWidth * width, width: width }}
         />
         <View style={styles.footerContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -189,37 +208,38 @@ const styles = StyleSheet.create({
   },
   petAvatarContainer: {
     flexDirection: 'row',
-    height: 40,
-    width: 60,
+    height: 50,
     alignItems: 'center',
   },
   firstPetAvatar: {
-    height: 30,
-    width: 30,
-    borderRadius: 15,
+    height: 40,
+    width: 40,
+    borderRadius: 20,
     position: 'absolute',
     top: 5,
+    left: 10,
     zIndex: 3,
     borderWidth: 2,
     borderColor: 'white'
   },
   secondPetAvatar: {
-    height: 30,
-    width: 30,
-    borderRadius: 15,
+    height: 40,
+    width: 40,
+    borderRadius: 20,
     position: 'absolute',
     top: 5,
+    left: 20,
     zIndex: 2,
     borderWidth: 2,
     borderColor: 'white'
   },
   thirdPetAvatar: {
-    height: 30,
-    width: 30,
-    borderRadius: 15,
+    height: 40,
+    width: 40,
+    borderRadius: 20,
     position: 'absolute',
     top: 5,
-    left: 22,
+    left: 30,
     zIndex: 1,
     borderWidth: 2,
     borderColor: 'white'
@@ -231,11 +251,11 @@ const styles = StyleSheet.create({
   },
   petName: {
     fontFamily: 'Lato-Italic',
-    fontSize: 12,
+    fontSize: 14,
   },
   username: {
     fontFamily: 'Lato-Bold',
-    fontSize: 11,
+    fontSize: 12,
   },
   likername: {
     fontFamily: 'Lato-Bold',
@@ -247,7 +267,7 @@ const styles = StyleSheet.create({
   },
   time: {
     fontFamily: 'Lato',
-    fontSize: 11,
+    fontSize: 12,
     color: 'gray',
     marginLeft: 10,
   },

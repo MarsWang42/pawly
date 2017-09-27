@@ -29,6 +29,8 @@ picture3 = user1.pictures.create(image: File.open(File.join(Rails.root, 'test2.j
 picture3.pets << user1.pets.first
 picture4 = user1.pictures.create(image: File.open(File.join(Rails.root, 'test3.jpeg')), height: 300, width: 300)
 picture4.pets << user1.pets.first
+picture4.pets << user1.pets.last
+picture4.pets << user2.pets.first
 picture5 = user2.pictures.create(image: File.open(File.join(Rails.root, 'test4.jpeg')), height: 300, width: 300)
 picture5.pets << user2.pets.first
 picture6 = user2.pictures.create(image: File.open(File.join(Rails.root, 'test5.jpg')), height: 300, width: 300)

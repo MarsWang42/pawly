@@ -139,18 +139,21 @@ export const UserReducer = createReducer({
     };
   },
   [pictureActions.TOGGLE_PICTURE_LIKE_SUCCEED](state, { data }) {
-    const updatedUserDetails = state.userDetails.setIn(
-      [
-        data.creator.id,
-        'pictures',
-        state.userDetails.getIn([data.creator.id, 'pictures']).findIndex(item =>
-          item.get('pictureId') === data.pictureId)
-      ],
-      fromJS(data)
-    );
-    return {
-      ...state,
-      userDetails: updatedUserDetails,
-    };
+    if (state.userDetails.get(data.creator.id)) {
+      const updatedUserDetails = state.userDetails.setIn(
+        [
+          data.creator.id,
+          'pictures',
+          state.userDetails.getIn([data.creator.id, 'pictures']).findIndex(item =>
+            item.get('pictureId') === data.pictureId)
+        ],
+        fromJS(data)
+      );
+      return {
+        ...state,
+        userDetails: updatedUserDetails,
+      };
+    }
+    return state;
   },
 });

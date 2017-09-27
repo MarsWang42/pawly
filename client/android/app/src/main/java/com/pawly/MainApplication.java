@@ -3,6 +3,8 @@ package com.pawly;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.projectseptember.RNGL.RNGLPackage;
+import fr.bamlab.rnimageresizer.ImageResizerPackage;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.react.rnspinkit.RNSpinkitPackage;
@@ -31,6 +33,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNGLPackage(),
+            new ImageResizerPackage(),
             new RCTCameraPackage(),
             new MapsPackage(),
             new RNSpinkitPackage(),

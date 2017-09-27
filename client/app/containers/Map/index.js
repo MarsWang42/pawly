@@ -65,8 +65,8 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#e2e2e2',
-    height: 50,
-    paddingTop: 15,
+    height: 55,
+    paddingTop: 17,
     alignItems:'center',
     justifyContent:'center'
   },

@@ -64,8 +64,6 @@ class Api::V1::UsersController < ApiController
       if register_params[:pet_avatar]
         pet.avatar = register_params[:pet_avatar]
         pic = pet.pictures.new(image: register_params[:pet_avatar])
-        pic.width = 600
-        pic.height = 600
         pic.creator = @user
         if !pic.save
           render :json => pic.errors, :status => 422

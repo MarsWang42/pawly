@@ -4,8 +4,6 @@ class CreatePictures < ActiveRecord::Migration[5.1]
       t.references :creator, foreign_key: { to_table: :users }
       t.string :image
       t.text :note
-      t.integer :height
-      t.integer :width
 
       t.timestamps
     end
