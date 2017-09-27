@@ -52,8 +52,13 @@ export default class Filter extends Component {
     };
   }
   render() {
+    const { source, imageWidth } = this.props;
     return (
-      <Surface width={width} height={width}>
+      <Surface
+        width={width}
+        height={width}
+        pixelRatio={imageWidth / width}
+      >
         <GLFilter
           factor={this.state.saturation}
           image={this.props.source}

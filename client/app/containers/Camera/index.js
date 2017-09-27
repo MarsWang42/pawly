@@ -22,6 +22,7 @@ class AppCamera extends Component {
     super();
     this.state = {
       path: undefined,
+      imageWidth: width,
     };
     this.takePicture = this.takePicture.bind(this);
   }
@@ -49,7 +50,10 @@ class AppCamera extends Component {
                 response.uri,
                 cropData,
                 (successURI) => {
-                  this.setState({ path: successURI });
+                  this.setState({
+                    path: successURI,
+                    imageWidth,
+                  });
                 },
                 (error) => console.log('cropImage,',error)
               )
@@ -61,8 +65,12 @@ class AppCamera extends Component {
   }
 
   renderImage() {
+    const { path, imageWidth } = this.state;
     return (
-      <Filter source={this.state.path} />
+      <Filter
+        source={path}
+        imageWidth={imageWidth}
+      />
     );
   }
 
