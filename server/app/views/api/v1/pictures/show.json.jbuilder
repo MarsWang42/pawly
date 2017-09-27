@@ -3,6 +3,7 @@ json.timestamp @pic.created_at
 json.height @pic.height
 json.width @pic.width
 json.creator do
+  json.id @pic.creator.id
   json.username @pic.creator.username
   json.avatar @pic.creator.avatar.url
 end

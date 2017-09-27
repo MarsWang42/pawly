@@ -1,6 +1,11 @@
 class Api::V1::UsersController < ApiController
   before_action :authenticate_user, except: ['create']
 
+  def index
+    @users = User.starts_with(params[:keyword]).limit(10)
+    render :index
+  end
+
   def create
     @user = User.new(auth_params)
     if @user.save
@@ -18,8 +23,19 @@ class Api::V1::UsersController < ApiController
   end
 
   def detail
-    @user = User.find(params[:id])
+    @user = set_user
+    @current_user = current_user
     render :detail
+  end
+
+  def follow
+    current_user.follow(set_user)
+    render :json => { "followed": true, "followers": set_user.followers }
+  end
+
+  def unfollow
+    current_user.unfollow(set_user)
+    render :json => { "followed": false, "followers": set_user.followers }
   end
 
   def check_username
@@ -80,6 +96,10 @@ class Api::V1::UsersController < ApiController
   end
 
   private
+    def set_user
+      User.find(params[:id])
+    end
+
     def auth_params
       params.permit(:email, :password, :avatar)
     end

@@ -11,11 +11,11 @@ import {
 } from 'react-native';
 import moment from 'moment';
 import pluralize from 'pluralize';
+import * as Animatable from 'react-native-animatable';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImageWithProgress from '../../components/Helpers/ImageWithProgress';
 import ProgressPie from 'react-native-progress/Pie';
 import * as actions from '../../reducers/picture';
-import * as Animatable from 'react-native-animatable';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const PLACE_HOLDER = 'https://images.pexels.com/photos/7720/night-animal-dog-pet.jpg?w=1260&h=750&auto=compress&cs=tinysrgb';
 const { height, width } = Dimensions.get('window');
@@ -24,12 +24,11 @@ const AnimatableTouchableOpacity = Animatable.createAnimatableComponent(Touchabl
 class PictureCard extends Component {
   constructor() {
     super();
-    this.likePic = this.likePic.bind(this);
   }
 
   likePic(id) {
     this.props.dispatch({
-      type: actions.TOGGLE_LIKE,
+      type: actions.TOGGLE_PICTURE_LIKE,
       toggleType: 'like',
       picId: id,
       callback: () => {
@@ -41,7 +40,7 @@ class PictureCard extends Component {
 
   unlikePic(id) {
     this.props.dispatch({
-      type: actions.TOGGLE_LIKE,
+      type: actions.TOGGLE_PICTURE_LIKE,
       toggleType: 'unlike',
       picId: id,
       token: this.props.currentUser.accessToken,

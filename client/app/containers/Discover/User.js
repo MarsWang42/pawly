@@ -10,8 +10,9 @@ import {
   View,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import MapView from 'react-native-maps';
+import * as Animatable from 'react-native-animatable';
 import PictureCard from '../Main/PictureCard';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as sessionActions from '../../reducers/session';
 import * as userActions from '../../reducers/user';
 
@@ -21,13 +22,13 @@ const HEADER_MIN_HEIGHT = width <= 325 ? 50 : 60;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
-
+const AnimatableTouchableOpacity = Animatable.createAnimatableComponent(TouchableOpacity);
 
 function ucfirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-class Profile extends Component {
+class User extends Component {
   constructor() {
     super();
     this.state = {
@@ -35,19 +36,31 @@ class Profile extends Component {
     };
   }
 
-  componentDidMount() {
-    const { dispatch, currentUser } = this.props;
+  followUser(id) {
     this.props.dispatch({
-      type: userActions.FETCH_USER_DETAIL,
-      id: currentUser.id,
-      token: currentUser.accessToken,
+      type: userActions.TOGGLE_USER_FOLLOW,
+      toggleType: 'follow',
+      userId: id,
+      callback: () => {
+        this.follow.pulse();
+      },
+      token: this.props.currentUser.accessToken,
+    });
+  }
+
+  unfollowUser(id) {
+    this.props.dispatch({
+      type: userActions.TOGGLE_USER_FOLLOW,
+      toggleType: 'unfollow',
+      userId: id,
+      token: this.props.currentUser.accessToken,
     });
   }
 
   renderPets() {
-    const { currentUser, userDetails } = this.props;
-    const currentUserDetail = userDetails[currentUser.id];
-    const content = currentUserDetail.pets.slice(0, 2).map(pet => {
+    const { userDetails, userId } = this.props;
+    const userDetail = userDetails[userId];
+    const content = userDetail.pets.slice(0, 2).map(pet => {
       const petImageSource = pet.avatar.url ? { uri: pet.avatar.url }
         : require('../../assets/img/pet.png');
       return (
@@ -58,7 +71,7 @@ class Profile extends Component {
         </View>
       );
     });
-    if (currentUserDetail.pets.length >= 3) {
+    if (userDetail.pets.length >= 3) {
       content.push(
         <Text key={'...'} style={[styles.petType, { fontSize: 10 }]}>...</Text>
       );
@@ -67,11 +80,11 @@ class Profile extends Component {
   }
 
   render() {
-    const { currentUser, userDetails, dispatch } = this.props;
-    const currentUserDetail = userDetails[currentUser.id];
-    let avatarUrl = currentUserDetail && currentUserDetail.avatar.url;
-    if (!avatarUrl && currentUserDetail && currentUserDetail.facebookId) {
-      avatarUrl = `https://graph.facebook.com/${currentUserDetail.facebookId}/picture?width=9999`;
+    const { userDetails, dispatch, userId } = this.props;
+    const userDetail = userDetails[userId];
+    let avatarUrl = userDetail && userDetail.avatar.url;
+    if (!avatarUrl && userDetail && userDetail.facebookId) {
+      avatarUrl = `https://graph.facebook.com/${userDetail.facebookId}/picture?width=9999`;
     }
     const imageSource = avatarUrl ? { uri: avatarUrl }
       : require('../../assets/img/user-default.png');
@@ -104,7 +117,7 @@ class Profile extends Component {
       extrapolate: 'clamp',
     });
 
-    if (currentUserDetail) {
+    if (userDetail) {
       return (
         <View style={styles.container}>
           <Animated.View
@@ -118,7 +131,7 @@ class Profile extends Component {
               },
             ]}
           >
-            <Text style={styles.title}>{ currentUserDetail.username }</Text>
+            <Text style={styles.title}>{ userDetail.username }</Text>
           </Animated.View>
           <AnimatedLinearGradient
             style={[
@@ -139,7 +152,7 @@ class Profile extends Component {
                 },
               ]}
             >
-              <View style={styles.petsContainer}>
+              <View style={[styles.petsContainer, { justifyContent: 'center' }]}>
                 <Image source={imageSource} style={styles.userAvatar} />
                 <View style={{ alignItems: 'center', width: 200 }}>
                   <Text style={styles.petTitle}>
@@ -152,25 +165,43 @@ class Profile extends Component {
                         See all...
                       </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.petButton, { borderColor: '#aeffe1' }]}>
+                    <AnimatableTouchableOpacity
+                      style={[styles.petButton, { borderColor: '#aeffe1' }]}
+                      ref={follow => this.follow = follow}
+                      onPress={() => {
+                        if (!userDetail.followed) {
+                          this.followUser(userDetail.id);
+                        } else {
+                          this.unfollowUser(userDetail.id);
+                        }
+                      }}
+                    >
+                      { userDetail.followed &&
+                        <Icon
+                          name={'checkbox-marked-outline'}
+                          size={14}
+                          color={'#aeffe1'}
+                          style={{ marginRight: 3 }}
+                        />
+                      }
                       <Text style={[styles.petButtonText, { color: '#aeffe1' }]}>
-                        +
+                        { userDetail.followed ? 'Following' : 'Follow' }
                       </Text>
-                    </TouchableOpacity>
+                    </AnimatableTouchableOpacity>
                   </View>
                 </View>
               </View>
               <View style={styles.infoContainer}>
                 <View style={{ alignItems: 'center', width: 100 }}>
-                  <Text style={styles.infoNumber}>{ currentUserDetail.followers.length }</Text>
+                  <Text style={styles.infoNumber}>{ userDetail.followers.length }</Text>
                   <Text style={styles.infoTitle}>Follower</Text>
                 </View>
                 <View style={{ alignItems: 'center', width: 100 }}>
-                  <Text style={styles.infoNumber}>{ currentUserDetail.following.length }</Text>
+                  <Text style={styles.infoNumber}>{ userDetail.following.length }</Text>
                   <Text style={styles.infoTitle}>Following</Text>
                 </View>
                 <View style={{ alignItems: 'center', width: 100 }}>
-                  <Text style={styles.infoNumber}>{ currentUserDetail.pictures.length }</Text>
+                  <Text style={styles.infoNumber}>{ userDetail.pictures.length }</Text>
                   <Text style={styles.infoTitle}>Post</Text>
                 </View>
               </View>
@@ -185,7 +216,7 @@ class Profile extends Component {
             )}
           >
             <View style={styles.scrollViewContent}>
-              { currentUserDetail.pictures.map((item) => (
+              { userDetail.pictures.map((item) => (
                 <PictureCard data={item} key={item.pictureId} />
               )) }
             </View>
@@ -306,10 +337,11 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   petButton: {
-    width: 70,
+    flexDirection: 'row',
+    width: 80,
+    height: 28,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 5,
-    paddingVertical: 4,
     backgroundColor: 'transparent',
     borderWidth: 1,
     borderRadius: 4,
@@ -355,4 +387,4 @@ const mapStateToProps = (state) => {
 };
 
 
-export default connect(mapStateToProps)(Profile);
+export default connect(mapStateToProps)(User);

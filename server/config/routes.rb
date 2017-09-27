@@ -4,9 +4,13 @@ Rails.application.routes.draw do
     namespace :v1 do
       post 'users' => 'users#create'
       patch 'users' => 'users#update'
-      post 'username' => 'users#check_username'
+      get 'users/search/:keyword' => 'users#index'
       get 'users/feed' => 'users#get_feed'
       get 'users/detail/:id' => 'users#detail'
+      post 'users/follow' => 'users#follow'
+      post 'users/unfollow' => 'users#unfollow'
+
+      post 'username' => 'users#check_username'
       patch 'users/avatar' => 'users#upload_avatar'
       post 'user_token' => 'user_token#create', defaults: {format: :json}
 

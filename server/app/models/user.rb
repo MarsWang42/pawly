@@ -23,18 +23,24 @@ class User < ApplicationRecord
     if: :email?
   validates :password, length: { in: 6..20 }, on: :create
 
+  scope :starts_with, -> (username) { where("username like ?", "#{username}%")}
+
   # Follows a user.
   def follow(other_user)
-    following << other_user
+    if !followed?(other_user)
+      following << other_user
+    end
   end
 
   # Unfollows a user.
   def unfollow(other_user)
-    following.delete(other_user)
+    if followed?(other_user)
+      following.delete(other_user)
+    end
   end
 
   # Returns true if the current user is following the other user.
-  def following?(other_user)
+  def followed?(other_user)
     following.include?(other_user)
   end
 
@@ -60,8 +66,10 @@ class User < ApplicationRecord
   def feed
     following_ids = "SELECT followed_id FROM relationships
                      WHERE  follower_id = :user_id"
-    Picture.where("creator_id IN (#{following_ids})
-                     OR creator_id = :user_id", user_id: id)
+    Picture
+      .where("creator_id IN (#{following_ids})
+              OR creator_id = :user_id", user_id: id)
+      .order("created_at DESC")
   end
 
 end

@@ -14,7 +14,7 @@ const routeConfiguration = {
 };
 
 const tabBarConfiguration = {
-  lazyLoad: false,
+  lazyLoad: true,
   swipeEnabled: false,
   //...other configs
   tabBarOptions:{

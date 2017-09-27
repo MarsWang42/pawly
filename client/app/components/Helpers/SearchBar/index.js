@@ -371,7 +371,7 @@ class Search extends PureComponent {
 
 const styles = {
   container: {
-    backgroundColor: 'grey',
+    backgroundColor: '#c5c5c5',
     height: containerHeight,
     flexDirection: 'row',
     justifyContent: 'flex-start',
