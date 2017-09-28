@@ -66,7 +66,6 @@ class PictureCard extends Component {
     const { imageWidth, imageHeight } = this.state;
 
     const pl = data.pets.length;
-    const ll = data.likers.length;
     // const cl = data.comments.length;
     let petNames, likerNames, comments;
     if (pl >= 3) {
@@ -76,45 +75,6 @@ class PictureCard extends Component {
     } else {
       petNames = data.pets[0].name;
     }
-    if (ll >= 2) {
-      likerNames = (
-        <Text style={styles.likername}>
-          <Text>{ data.likers[0].username }</Text>
-          <Text style={{ fontFamily: 'Lato' }}> and </Text>
-          <Text>{ pluralize('other', ll - 1, true) }.</Text>
-        </Text>
-      );
-    } else if (ll === 1) {
-      likerNames = (
-        <Text style={styles.likername}>
-          { data.likers[0].username }
-        </Text>
-      );
-    }
-    // if (cl >= 3) {
-    //   comments = (
-    //     <View style={styles.commentContainer}>
-    //       { data.comments.slice(0, 3).map((comment, i) => (
-    //         <View key={i} style={{ flexDirection: 'row', alignItems: 'center' }}>
-    //           <Text style={{ fontFamily: 'Lato-Italic', fontSize: 12 }}>{ comment.username }: </Text>
-    //           <Text style={{ fontFamily: 'Lato', fontSize: 12 }}>{ comment.text }</Text>
-    //         </View>
-    //       )) }
-    //       <Text>See more</Text>
-    //     </View>
-    //   );
-    // } else {
-    //   comments = (
-    //     <View style={styles.commentContainer}>
-    //       { data.comments.map((comment, i) => (
-    //         <View key={i} style={{ flexDirection: 'row', alignItems: 'center' }}>
-    //           <Text style={{ fontFamily: 'Lato-Italic', fontSize: 12 }}>{ comment.username }: </Text>
-    //           <Text style={{ fontFamily: 'Lato', fontSize: 12 }}>{ comment.text }</Text>
-    //         </View>
-    //       )) }
-    //     </View>
-    //   );
-    // }
 
     return (
       <View style={styles.container}>
@@ -149,44 +109,48 @@ class PictureCard extends Component {
             </View>
           </View>
         </View>
-        <ImageWithProgress
-          source={{ uri: data.image }}
-          indicator={ProgressPie}
-          indicatorProps={{ color: 'rgba(230, 83, 90, 0.7)' }}
+        <View
           style={{ height: imageHeight / imageWidth * width, width: width }}
-        />
-        <View style={styles.footerContainer}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              { likerNames &&
-                <Text style={{ fontSize: 12, fontFamily: 'Lato' }}>Liked by </Text>
-              }
-              { likerNames }
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <AnimatableTouchableOpacity
-                onPress={() => {
-                  if (!data.liked) {
-                    this.likePic(data.pictureId);
-                  } else {
-                    this.unlikePic(data.pictureId);
-                  }
-                }}
-                ref={like => this.like = like}
-              >
-                <Icon
-                  name={data.liked ? 'heart' : 'heart-outline'}
-                  size={24}
-                  color={'#e6535a'}
-                  style={{ marginTop: 3 }}
-                />
-              </AnimatableTouchableOpacity>
-              <Icon name={'message-outline'} size={22} style={{ marginTop: 2, marginLeft: 5 }} />
+        >
+          <ImageWithProgress
+            source={{ uri: data.image }}
+            indicator={ProgressPie}
+            indicatorProps={{ color: 'rgba(230, 83, 90, 0.7)' }}
+            style={{ height: '100%', width: '100%' }}
+          />
+          <View style={styles.labelContainer}>
+            <View style={styles.label}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <AnimatableTouchableOpacity
+                    style={{ flexDirection: 'row', alignItems: 'center' }}
+                    ref={like => this.like = like}
+                    onPress={() => {
+                      if (!data.liked) {
+                        this.likePic(data.pictureId);
+                      } else {
+                        this.unlikePic(data.pictureId);
+                      }
+                    }}
+                  >
+                    <Icon
+                      name={data.liked ? 'heart' : 'heart-outline'}
+                      size={24}
+                      color={'#e6535a'}
+                      style={{ marginTop: 3 }}
+                    />
+                    <Text style={{ fontFamily: 'Lato', fontSize: 16, marginHorizontal: 5 }}>
+                      { data.likers.length }
+                    </Text>
+                  </AnimatableTouchableOpacity>
+                  <Icon name={'message-outline'} size={22} style={{ marginTop: 2, marginLeft: 5 }} />
+                  <Text style={{ fontFamily: 'Lato', fontSize: 16, marginHorizontal: 5 }}>
+                    158
+                  </Text>
+                </View>
+              </View>
             </View>
           </View>
-          {/* <View style={{ flexDirection: 'row', alignItems: 'center' }}> */}
-          {/*   { comments } */}
-          {/* </View> */}
         </View>
       </View>
     );
@@ -203,7 +167,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: 'row',
-    height: 50,
+    height: 55,
     alignItems: 'center',
   },
   petAvatarContainer: {
@@ -271,9 +235,20 @@ const styles = StyleSheet.create({
     color: 'gray',
     marginLeft: 10,
   },
-  footerContainer: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+  labelContainer: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    zIndex: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  label: {
+    height: 30,
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
   }
 });
 

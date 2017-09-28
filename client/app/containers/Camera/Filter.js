@@ -8,6 +8,8 @@ import {
   View,
 } from 'react-native';
 import GL from 'gl-react';
+import { Nashville } from "../../components/Helpers/Filters";
+import ScrollableTabView from 'react-native-scrollable-tab-view';
 import { Surface } from 'gl-react-native';
 
 const { width, height } = Dimensions.get('window');
@@ -18,13 +20,9 @@ const shaders = GL.Shaders.create({
 precision highp float;
 varying vec2 uv;
 uniform sampler2D image;
-uniform float factor;
 
 void main () {
-  vec4 c = texture2D(image, uv);
-  // Algorithm from Chapter 16 of OpenGL Shading Language
-  const vec3 W = vec3(0.2125, 0.7154, 0.0721);
-  gl_FragColor = vec4(mix(vec3(dot(c.rgb, W)), c.rgb, factor), c.a);
+  gl_FragColor = texture2D(image, uv);
 }
     `
   }
@@ -34,35 +32,30 @@ const GLFilter = GL.createComponent(
   ({ factor, image }) => (
     <GL.Node
       shader={shaders.filter}
-      uniforms={{ factor, image }}
+      uniforms={{ image }}
     />
   ), { displayName: 'Filter' });
 
 export default class Filter extends Component {
   constructor() {
     super();
-    this.state = {
-      saturation: 1,
-      brightness: 1,
-      contrast: 1,
-      hue: 0,
-      sepia: 0,
-      gray: 0,
-      mixFactor: 0
-    };
   }
+
   render() {
-    const { source, imageWidth } = this.props;
+    const { source, imageWidth, imageHeight } = this.props;
     return (
       <Surface
         width={width}
-        height={width}
+        height={parseInt(imageHeight / imageWidth * width, 10)}
         pixelRatio={imageWidth / width}
       >
-        <GLFilter
-          factor={this.state.saturation}
-          image={this.props.source}
-        />
+        <Nashville>
+          <GLFilter
+            image={this.props.source}
+            width={width}
+            height={parseInt(imageHeight / imageWidth * width, 10)}
+          />
+        </Nashville>
       </Surface>
     );
   }
