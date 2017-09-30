@@ -72,4 +72,19 @@ class User < ApplicationRecord
       .order("created_at DESC")
   end
 
+  def available_pets(name)
+    following_ids = "SELECT followed_id FROM relationships
+                     WHERE  follower_id = :user_id"
+    if name
+      Pet
+        .where("owner_id IN (#{following_ids})
+                OR owner_id = :user_id", user_id: id)
+        .where("name like ?", "#{name}%")
+    else
+      Pet
+        .where("owner_id IN (#{following_ids})
+                OR owner_id = :user_id", user_id: id)
+    end
+  end
+
 end

@@ -2,15 +2,22 @@ import React, { Component } from 'react';
 import {
   Dimensions,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import GL from 'gl-react';
-import { Nashville } from "../../components/Helpers/Filters";
-import ScrollableTabView from 'react-native-scrollable-tab-view';
 import { Surface } from 'gl-react-native';
+import ImageFilter from 'gl-react-imagefilters';
+import RNFS from 'react-native-fs';
+import {
+  Sierra,
+  Amaro,
+  Earlybird
+} from '../../components/Helpers/Filters';
+import Carousel from '../../components/Helpers/Carousel';
 
 const { width, height } = Dimensions.get('window');
 
@@ -39,24 +46,108 @@ const GLFilter = GL.createComponent(
 export default class Filter extends Component {
   constructor() {
     super();
+    this.state = {
+      selectedFilter: 0,
+    };
+    this.filters = [];
+    this.renderFilter = this.renderFilter.bind(this);
+    this.selectFilter = this.selectFilter.bind(this);
+  }
+
+  selectFilter() {
+    const { pickPicture } = this.props;
+    const config = {
+      quality: 1,
+      type: 'jpg',
+      format: 'file',
+      filePath: `${RNFS.DocumentDirectoryPath}/${(new Date()).getTime()}.jpg`,
+    };
+
+    this.filters[this.state.selectedFilter].captureFrame(config)
+      .then(function(data){
+        pickPicture(data);
+      })
+      .catch(function(err){
+        console.log(err);
+      });
+  }
+
+  renderFilter({ item, index }) {
+    const { source, imageWidth, imageHeight } = this.props;
+    const filterWidth = width - 40;
+    if (item === 'Original') {
+      return (
+        <Surface
+          width={filterWidth}
+          height={filterWidth}
+          pixelRatio={imageWidth / filterWidth}
+          ref={filter => this.filters[index] = filter}
+        >
+          <GLFilter
+            image={source}
+          />
+        </Surface>
+      )
+    }
+    const Components = {
+      'Earlybird': Earlybird,
+      'Amaro': Amaro,
+      'Sierra': Sierra,
+    };
+    const FilterComponent = Components[item];
+    return (
+      <Surface
+        width={filterWidth}
+        height={filterWidth}
+        pixelRatio={imageWidth / filterWidth}
+        ref={filter => this.filters[index] = filter}
+      >
+        <ImageFilter brightness={1.2}>
+          <FilterComponent>
+            <GLFilter
+              image={source}
+            />
+          </FilterComponent>
+        </ImageFilter>
+      </Surface>
+    );
   }
 
   render() {
-    const { source, imageWidth, imageHeight } = this.props;
+    const { selectedFilter } = this.state;
+    const filterWidth = width - 40;
+    const filters = [
+      'Original',
+      'Earlybird',
+      'Sierra',
+      'Amaro',
+    ];
     return (
-      <Surface
-        width={width}
-        height={parseInt(imageHeight / imageWidth * width, 10)}
-        pixelRatio={imageWidth / width}
-      >
-        <Nashville>
-          <GLFilter
-            image={this.props.source}
-            width={width}
-            height={parseInt(imageHeight / imageWidth * width, 10)}
-          />
-        </Nashville>
-      </Surface>
+      <View style={styles.container}>
+        <Carousel
+          sliderWidth={width}
+          itemWidth={filterWidth}
+          enableSnap
+          containerCustomStyle={{ flexGrow: 0, marginTop: 10 }}
+          onSnapToItem={(i) => this.setState({ selectedFilter: i })}
+          ref={(carousel) => { this._carousel = carousel; }}
+          data={filters}
+          renderItem={this.renderFilter}
+        />
+        <View style={styles.infoContainer}>
+          <Text style={styles.text}>
+            { filters[selectedFilter] }
+          </Text>
+          <TouchableOpacity
+            style={styles.buttonContainer}
+            onPress={() => this.selectFilter()}
+          >
+            <Text style={styles.buttonText}>
+              Choose
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     );
   }
 }
@@ -65,28 +156,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  image: {
-    height: width,
-    width,
+  infoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  header: {
-    height: 55,
-    paddingTop: 17,
-    alignItems:'center',
-    justifyContent:'center'
-  },
-  title: {
-    fontSize: 18,
+  text: {
+    fontFamily: 'Berlin-italic',
+    fontSize: 22,
     color: 'black',
-    fontFamily: 'Berlin Bold',
-    letterSpacing: 1,
-    fontWeight: '600',
-    backgroundColor: 'transparent',
   },
   buttonContainer: {
-    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 35,
+
+    height: 30,
+    width: 100,
+
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: 'gray',
+    borderRadius: 8,
   },
+  buttonText: {
+    fontFamily: 'Lato-bold',
+    fontSize: 18,
+    color: 'gray',
+  }
 });

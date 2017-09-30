@@ -8,6 +8,7 @@ export const USERNAME_URL = `${BASE_URL}/username`;
 export const USER_SEARCH_URL = (keyword) => `${USER_URL}/search/${keyword}`;
 export const USER_FOLLOW_URL = `${USER_URL}/follow`;
 export const USER_UNFOLLOW_URL = `${USER_URL}/unfollow`;
+export const PETS_SEARCH_URL = (keyword) => `${USER_URL}/pets/${keyword}`;
 export const AVATAR_URL = `${USER_URL}/avatar`;
 export const FEED_URL = `${USER_URL}/feed`;
 export const USER_DETAIL_URL = (userId) => `${USER_URL}/detail/${userId}`;
@@ -78,6 +79,12 @@ export default {
           'Content-Type': 'multipart/form-data',
         },
         data: image
+      }),
+    petsSearch: (keyword, token) =>
+      axios({
+        method: 'get',
+        url: PETS_SEARCH_URL(keyword),
+        headers: { Authorization: token },
       }),
   },
 

@@ -282,6 +282,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 17,
     color: 'white',
+    fontFamily: 'Lato',
     marginHorizontal: 5,
   },
   warningContainer: {

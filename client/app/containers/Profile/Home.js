@@ -185,14 +185,14 @@ class Profile extends Component {
             )}
           >
             <View style={styles.scrollViewContent}>
+              <TouchableOpacity onPress={() => dispatch({ type: sessionActions.LOGOUT_USER })}>
+                <Text>Logout</Text>
+              </TouchableOpacity>
               { currentUserDetail.pictures.map((item) => (
                 <PictureCard data={item} key={item.pictureId} />
               )) }
             </View>
           </Animated.ScrollView>
-          <TouchableOpacity onPress={() => dispatch({ type: sessionActions.LOGOUT_USER })}>
-            <Text>Logout</Text>
-          </TouchableOpacity>
         </View>
       );
     }

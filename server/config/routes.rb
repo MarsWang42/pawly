@@ -5,10 +5,11 @@ Rails.application.routes.draw do
       post 'users' => 'users#create'
       patch 'users' => 'users#update'
       get 'users/search/:keyword' => 'users#index'
-      get 'users/feed' => 'users#get_feed'
       get 'users/detail/:id' => 'users#detail'
       post 'users/follow' => 'users#follow'
       post 'users/unfollow' => 'users#unfollow'
+      get 'users/feed' => 'users#get_feed'
+      get 'users/pets/(:keyword)' => 'users#get_available_pets'
 
       post 'username' => 'users#check_username'
       patch 'users/avatar' => 'users#upload_avatar'

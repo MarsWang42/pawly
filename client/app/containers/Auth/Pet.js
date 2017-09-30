@@ -18,7 +18,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import ImageCropper from 'react-native-image-crop-picker';
 import ImagePicker from 'react-native-image-picker';
-import Modal from 'react-native-modal'
+import Modal from 'react-native-modal';
 const Clarifai = require('clarifai');
 import * as actions from '../../reducers/session';
 

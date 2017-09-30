@@ -52,6 +52,12 @@ class Api::V1::UsersController < ApiController
     render :feed
   end
 
+  def get_available_pets
+    @user = current_user
+    @pets = @user.available_pets(params[:keyword])
+    render :pets
+  end
+
   def update
     @user = current_user
     @user.username = register_params[:username]
