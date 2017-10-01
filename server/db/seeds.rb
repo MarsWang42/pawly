@@ -23,9 +23,9 @@ user3.pets.create(name: 'Ruby', type: 'cat')
 
 picture1 = user2.pictures.create(
   image: File.open(File.join(Rails.root, 'test.jpeg')),
-  latitude: 33.6880546,
-  longitude: -117.8341277,
-  place_name: '85°C Bakery Cafe - Irvine',
+  latitude: 33.6486,
+  longitude: -117.8426,
+  place_name: 'UCI Housing'
 )
 picture1.pets << user1.pets.first
 picture2 = user3.pictures.create(
@@ -37,9 +37,9 @@ picture2 = user3.pictures.create(
 picture2.pets << user3.pets.first
 picture3 = user1.pictures.create(
   image: File.open(File.join(Rails.root, 'test2.jpg')),
-  latitude: 33.68813470000001,
-  longitude: -117.8340868,
-  place_name: '2700 Alton Pkwy, Irvine, CA 92606, USA'
+  latitude: 33.6159,
+  longitude: -117.8758,
+  place_name: 'Fashion Island'
 )
 picture3.pets << user1.pets.first
 picture4 = user1.pictures.create(image: File.open(File.join(Rails.root, 'test3.jpeg')))
