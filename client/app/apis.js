@@ -14,8 +14,9 @@ export const FEED_URL = `${USER_URL}/feed`;
 export const USER_DETAIL_URL = (userId) => `${USER_URL}/detail/${userId}`;
 export const PETS_URL = `${BASE_URL}/pets`;
 export const PICTURE_URL = `${BASE_URL}/pictures`;
-export const PICTURE_LIKE_URL = `${BASE_URL}/pictures/like`;
-export const PICTURE_UNLIKE_URL = `${BASE_URL}/pictures/unlike`;
+export const NEARBY_URL = `${PICTURE_URL}/nearby`;
+export const PICTURE_LIKE_URL = `${PICTURE_URL}/like`;
+export const PICTURE_UNLIKE_URL = `${PICTURE_URL}/unlike`;
 
 
 export default {
@@ -98,6 +99,15 @@ export default {
           Authorization: token,
         },
         data: { picId },
+      }),
+    nearby: (latitude, longitude, radius, token) =>
+      axios({
+        method: 'post',
+        url: NEARBY_URL,
+        headers: {
+          Authorization: token,
+        },
+        data: { latitude, longitude, radius },
       }),
     feed: (token) =>
       axios({

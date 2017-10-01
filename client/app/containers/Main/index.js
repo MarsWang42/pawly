@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import Icon from 'react-native-vector-icons/Octicons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import MainTabBar from '../../components/Main/TabBar';
 import FollowingList from './FollowingList';
 import NearbyList from './NearbyList';
@@ -15,14 +15,13 @@ class Main extends Component {
   static navigationOptions = {
     tabBarIcon: ({ tintColor }) => (
       <Icon
-        size={ 26 }
+        size={ 30 }
         style={styles.icon}
-        name={ 'home' }
+        name={ 'home-outline' }
         color={ tintColor }
       />
     )
   };
-
   render() {
     return (
       <View style={styles.container}>
@@ -49,7 +48,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   icon: {
-    marginTop: 2,
   },
   header: {
     width: '100%',

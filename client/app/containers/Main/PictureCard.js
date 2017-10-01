@@ -13,8 +13,8 @@ import moment from 'moment';
 import pluralize from 'pluralize';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import ImageWithProgress from '../../components/Helpers/ImageWithProgress';
 import ProgressPie from 'react-native-progress/Pie';
+import ImageWithProgress from '../../components/Helpers/ImageWithProgress';
 import * as actions from '../../reducers/picture';
 
 const PLACE_HOLDER = 'https://images.pexels.com/photos/7720/night-animal-dog-pet.jpg?w=1260&h=750&auto=compress&cs=tinysrgb';
@@ -78,7 +78,7 @@ class PictureCard extends Component {
 
     return (
       <View style={styles.container}>
-        <View style={styles.headerContainer}>
+        <View style={[styles.headerContainer, { height: data.placeName ? 65 : 55 }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View
               style={[styles.petAvatarContainer,
@@ -106,6 +106,17 @@ class PictureCard extends Component {
                 <Text style={styles.username}>{ data.creator.username }</Text>
                 <Text style={styles.time}> { moment(data.timestamp).fromNow() }</Text>
               </View>
+              { data.placeName && (
+                <View style={styles.locationContainer}>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode={'tail'}
+                    style={styles.locationText}
+                  >
+                    At { data.placeName }
+                  </Text>
+                </View>
+              ) }
             </View>
           </View>
         </View>
@@ -167,7 +178,6 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: 'row',
-    height: 55,
     alignItems: 'center',
   },
   petAvatarContainer: {
@@ -220,6 +230,21 @@ const styles = StyleSheet.create({
   username: {
     fontFamily: 'Lato-Bold',
     fontSize: 12,
+  },
+  locationContainer: {
+    backgroundColor: '#f4f4f4',
+    width: 200,
+    height: 15,
+    borderRadius: 8,
+    marginVertical: 3,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  locationText: {
+    fontFamily: 'Lato',
+    fontSize: 11,
+    color: 'grey',
   },
   likername: {
     fontFamily: 'Lato-Bold',

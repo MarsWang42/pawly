@@ -46,7 +46,10 @@ ActiveRecord::Schema.define(version: 20170921174322) do
   create_table "pictures", force: :cascade do |t|
     t.bigint "creator_id"
     t.string "image"
-    t.text "note"
+    t.text "caption"
+    t.string "place_name"
+    t.float "latitude"
+    t.float "longitude"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["creator_id"], name: "index_pictures_on_creator_id"

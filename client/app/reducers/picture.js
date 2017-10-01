@@ -7,6 +7,9 @@ import { loop, Cmd } from 'redux-loop';
 export const FETCH_FEED = 'FETCH_FEED';
 export const FETCH_FEED_SUCCEED = 'FETCH_FEED_SUCCEED';
 export const FETCH_FEED_FAILED = 'FETCH_FEED_FAILED';
+export const FETCH_NEARBY = 'FETCH_NEARBY';
+export const FETCH_NEARBY_SUCCEED = 'FETCH_NEARBY_SUCCEED';
+export const FETCH_NEARBY_FAILED = 'FETCH_NEARBY_FAILED';
 export const TOGGLE_PICTURE_LIKE = 'TOGGLE_PICTURE_LIKE';
 export const TOGGLE_PICTURE_LIKE_SUCCEED = 'TOGGLE_PICTURE_LIKE_SUCCEED';
 export const TOGGLE_PICTURE_LIKE_FAILED = 'TOGGLE_PICTURE_LIKE_FAILED';
@@ -20,6 +23,17 @@ const fetchFeedSucceed = (respond) => {
 
 const fetchFeedFailed = () => ({
   type: FETCH_FEED_FAILED,
+});
+
+const fetchNearbySucceed = (respond) => {
+  return {
+    type: FETCH_NEARBY_SUCCEED,
+    nearbyList: respond.data.pictures,
+  };
+};
+
+const fetchNearbyFailed = () => ({
+  type: FETCH_NEARBY_FAILED,
 });
 
 const toggleLikeSucceed = (respond, { callback }) => {
@@ -36,6 +50,7 @@ const toggleLikeFailed = () => ({
 
 export const PictureReducer = createReducer({
   followingList: List(),
+  nearbyList: List(),
   isFetchingFeed: false,
 }, {
   [FETCH_FEED](state, action) {
@@ -60,6 +75,30 @@ export const PictureReducer = createReducer({
       ...state,
       isFetchingFeed: false,
       fetchFeedError: 'Fetching failed.',
+    };
+  },
+  [FETCH_NEARBY](state, action) {
+    return loop(
+      { ...state, isFetchingNearby: true, fetchNearbyError: undefined },
+      Cmd.run(apis.picture.nearby, {
+        successActionCreator: fetchNearbySucceed,
+        failActionCreator: fetchNearbyFailed,
+        args: [action.latitude, action.longitude, action.radius, action.token]
+      })
+    );
+  },
+  [FETCH_NEARBY_SUCCEED](state, action) {
+    return {
+      ...state,
+      isFetchingNearby: false,
+      nearbyList: fromJS(action.nearbyList),
+    };
+  },
+  [FETCH_NEARBY_FAILED](state, action) {
+    return {
+      ...state,
+      isFetchingNearby: false,
+      fetchNearbyError: 'Fetching failed.',
     };
   },
   [TOGGLE_PICTURE_LIKE](state, action) {

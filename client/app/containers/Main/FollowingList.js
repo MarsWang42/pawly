@@ -8,47 +8,6 @@ import {
 import PictureCard from './PictureCard';
 import * as actions from '../../reducers/picture';
 
-const picList = [
-  {
-    image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
-    creator: { name: 'marswang92', avatar: 'https://static.pexels.com/photos/212286/pexels-photo-212286.jpeg' },
-    pets: [
-      {
-        name: 'Zoey',
-        avatar: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
-      },
-      {
-        name: 'Zoey',
-        avatar: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
-      },
-      {
-        name: 'Zoey',
-        avatar: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
-      }
-    ],
-    pictureId: 1,
-    likers: ['sunghian79'],
-    comments: [
-      { username: 'sunghian79', text: 'She is so cute!' },
-      { username: 'sunghian79', text: 'She is so cute!' },
-    ]
-  },
-  {
-    image: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
-    creator: { name: 'marswang92', avatar: 'https://static.pexels.com/photos/212286/pexels-photo-212286.jpeg' },
-    pets: [{
-      name: 'Zoey',
-      avatar: 'https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb',
-    }],
-    pictureId: 2,
-    likers: ['sunghian79', 'nat'],
-    comments: [
-      { username: 'sunghian79', text: 'She is so cute!' },
-      { username: 'sunghian79', text: 'She is so cute!' },
-    ]
-  }
-];
-
 class FollowingList extends Component {
   componentDidMount() {
     this.props.dispatch({

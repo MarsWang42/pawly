@@ -18,6 +18,9 @@ json.pictures(@user.pictures) do |picture|
     json.username picture.creator.username
     json.avatar picture.creator.avatar.url
   end
+  json.placeName picture.place_name
+  json.latitude picture.latitude
+  json.longitude picture.longitude
   json.pets(picture.pets) do |pet|
     json.name pet.name
     json.avatar pet.avatar.url

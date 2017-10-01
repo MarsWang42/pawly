@@ -19,6 +19,8 @@ export const LOGOUT_USER = 'LOGOUT_USER';
 export const UPLOAD_AVATAR = 'UPLOAD_AVATAR';
 export const UPLOAD_AVATAR_SUCCEED = 'UPLOAD_AVATAR_SUCCEED';
 export const UPLOAD_AVATAR_FAILED = 'UPLOAD_AVATAR_FAILED';
+export const SET_CURRENT_LOCATION = 'SET_CURRENT_LOCATION';
+export const SET_LOCATION_AUTH = 'SET_LOCATION_AUTH';
 
 const getCurrentUserSucceed = (value) => {
   value = JSON.parse(value);
@@ -93,6 +95,8 @@ const uploadAvatarFailed = (respond, callback) => {
 
 export const SessionReducer = createReducer({
   isCheckingUser: true,
+  currentLocation: { coords: { longitude: -122.4194, latitude: 37.7749 } },
+  isLocationAuthed: false,
 }, {
   [GET_CURRENT_USER](state, action) {
     return loop(
@@ -230,6 +234,18 @@ export const SessionReducer = createReducer({
       currentUser: undefined,
     };
   },
+  [SET_LOCATION_AUTH](state, action) {
+    return {
+      ...state,
+      isLocationAuthed: action.isLocationAuthed,
+    };
+  },
+  [SET_CURRENT_LOCATION](state, action) {
+    return {
+      ...state,
+      currentLocation: action.loc,
+    };
+  },
   ['START_ONBOARDING'](state, action) {
     return Object.assign({}, state, {
       currentUser: action.currentUser,
@@ -242,11 +258,6 @@ export const SessionReducer = createReducer({
     return Object.assign({}, state, {
       isLoggedIn: true,
       isCheckingUser: false,
-    });
-  },
-  ['SET_LAST_POSITION'](state, action) {
-    return Object.assign({}, state, {
-      lastPosition: action.loc,
     });
   },
   ['SET_FILTER_LOCATION'](state, action) {

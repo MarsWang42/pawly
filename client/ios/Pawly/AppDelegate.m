@@ -14,6 +14,9 @@
 
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
 
+@import GooglePlaces;
+@import GoogleMaps;
+
 @implementation AppDelegate
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -22,6 +25,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  [GMSPlacesClient provideAPIKey:@"AIzaSyAJcZC-UQljbFfpmEHKrIkKEzlkIVVvexw"];
+  [GMSServices provideAPIKey:@"AIzaSyAJcZC-UQljbFfpmEHKrIkKEzlkIVVvexw"];
+  
   NSURL *jsCodeLocation;
 
   [[FBSDKApplicationDelegate sharedInstance] application:application

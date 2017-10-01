@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import ImageResizer from 'react-native-image-resizer';
 import {
   CameraRoll,
   Dimensions,
   FlatList,
   Image,
   ImageEditor,
+  Linking,
   LayoutAnimation,
   Platform,
   ScrollView,
@@ -17,6 +17,9 @@ import {
   View,
   UIManager,
 } from 'react-native';
+import Spinner from 'react-native-spinkit';
+import RNGooglePlaces from 'react-native-google-places';
+import ImageResizer from 'react-native-image-resizer';
 import _ from 'lodash';
 import { InputGroup, Input } from 'native-base';
 import ImageCropper from 'react-native-image-crop-picker';
@@ -24,7 +27,7 @@ import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import Camera from 'react-native-camera';
-import KeyboardAvoidView from '../../components/Helpers/KeyboardAvoidView';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import SortableGrid from '../../components/Helpers/SortableGrid';
 import Filter from './Filter';
 import apis from '../../apis';
@@ -54,6 +57,7 @@ class AppCamera extends Component {
     this.pickPicture = this.pickPicture.bind(this);
     this.searchPets = this.searchPets.bind(this);
     this.renderSelectedPet = this.renderSelectedPet.bind(this);
+    this.openSearchModal = this.openSearchModal.bind(this);
   }
 
   componentDidMount() {
@@ -70,6 +74,7 @@ class AppCamera extends Component {
     );
   }
 
+  // Api related methods
   searchPets(keyword) {
     apis.user.petsSearch(keyword, this.props.currentUser.accessToken).then(
       (response) => this.setState({ petList: response.data.pets })
@@ -78,6 +83,7 @@ class AppCamera extends Component {
     this.setState({ isPetListOpen: true });
   }
 
+  // Image related methods
   takePicture() {
     const options = {
       // metadata: {
@@ -139,12 +145,17 @@ class AppCamera extends Component {
   }
 
   pickPicture(url) {
+    this.setState({ isFetchingPlace: true });
+    RNGooglePlaces.getCurrentPlace()
+      .then(places => this.setState({ places, isFetchingPlace: false }))
+      .catch(error => this.setState({ placeError: error, isFetchingPlace: false }));
     this.setState({
       pickedPicture: url,
       view: 'image',
     });
   }
 
+  // Camera Roll related methods
   tryPhotoLoad() {
     if (!this.state.loadingMore) {
       this.setState({ loadingMore: true }, () => { this.loadPhotos(); });
@@ -193,12 +204,22 @@ class AppCamera extends Component {
     }
   }
 
+  // Modal related methods
   openImageModal(id) {
     this.setState({
       isImageModalOpen: true,
       modalPicture: id,
     });
   }
+
+  openSearchModal() {
+    RNGooglePlaces.openPlacePickerModal()
+      .then((place) => {
+        this.setState({ selectedPlace: place });
+      })
+      .catch(error => console.log(error.message));  // error is a Javascript Error object
+  }
+
 
   renderPet(pet) {
     const petAvatar = pet.avatar.url;
@@ -233,7 +254,7 @@ class AppCamera extends Component {
       <View
         style={styles.selectedPetContainer}
         key={pet.id}
-        doubleTapTreshold={200}
+        doubleTapTreshold={500}
         onDoubleTap={() => {
           this.setState({
             selectedPets: this.state.selectedPets.filter(o => o.id !== pet.id)
@@ -253,16 +274,87 @@ class AppCamera extends Component {
     );
   }
 
+  renderLocationButtons() {
+    const { isLocationAuthed } = this.props;
+    const { isFetchingPlace, places } = this.state;
+    // If location is not authorized, navigate to settings
+    if (!isLocationAuthed) {
+      return (
+        <TouchableOpacity
+          style={styles.locationButton}
+          onPress={() => {
+            Linking.canOpenURL('app-settings:').then(supported => {
+              if (!supported) {
+                console.log('Can\'t handle settings url');
+              } else {
+                return Linking.openURL('app-settings:');
+              }
+            }).catch(err => console.error('An error occurred', err))
+          }}
+        >
+          <Text
+            numberOfLines={1}
+            ellipsizeMode={'tail'}
+            style={{ fontFamily: 'Lato', fontSize: 13, color: 'grey' }}
+          >
+            Authroize location now!
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+
+    if (isFetchingPlace) {
+      return <Spinner type={'Pulse'} size={20} color={'#fff'} />;
+    }
+
+    const placeButtons = places && places.slice(0, 10).map(place => (
+      <TouchableOpacity
+        key={place.placeID}
+        style={styles.locationButton}
+        onPress={() => this.setState({ selectedPlace: place })}
+      >
+        <Text
+          numberOfLines={1}
+          ellipsizeMode={'tail'}
+          style={{ fontFamily: 'Lato', fontSize: 13, color: 'grey' }}
+        >
+          { place.name }
+        </Text>
+      </TouchableOpacity>
+    ));
+    placeButtons.push(
+      <TouchableOpacity
+        key={'add-place'}
+        style={[ styles.locationButton, { height: 40 }]}
+        onPress={this.openSearchModal}
+      >
+        <Icon
+          name={'search'}
+          style={{ fontSize: 14, marginRight: 10 }}
+          color={'grey'}
+        />
+        <Text
+          numberOfLines={1}
+          ellipsizeMode={'tail'}
+          style={{ fontFamily: 'Lato', fontSize: 13, color: 'grey' }}
+        >
+          Search your place
+        </Text>
+      </TouchableOpacity>
+    );
+    return placeButtons;
+  }
+
   // A form to fill before upload the post.
   renderImage() {
-    const { pickedPicture, isLocationModalOpen, isPetListOpen, selectedPets } = this.state;
+    const { pickedPicture, isLocationModalOpen, isPetListOpen, selectedPets, selectedPlace } = this.state;
     // Filter out the selected pets.
     const petList = this.state.petList.filter(pet =>
       selectedPets.findIndex(selectedPet =>
         selectedPet.id === pet.id) === -1
     );
     return (
-      <KeyboardAvoidView>
+      <View style={{ flex: 1 }}>
         { isPetListOpen &&
           <TouchableOpacity
             style={styles.overlay}
@@ -284,7 +376,7 @@ class AppCamera extends Component {
               <Text
                 style={{
                   fontFamily: 'Lato-italic',
-                  fontSize: 14,
+                  fontSize: 15,
                   textAlign: 'center',
                   flex: 1,
                   margin: 5,
@@ -295,15 +387,15 @@ class AppCamera extends Component {
             )}
           />
         }
-        <View>
+        <KeyboardAwareScrollView style={{ flex: 1 }}>
           <InputGroup style={{ paddingLeft: 16 }}
           >
             <Icon
               name={'search'}
-              style={{ fontSize: 16 }}
+              style={{ fontSize: 18 }}
             />
             <TextInput
-              placeholder={'Add a pet'}
+              placeholder={'Add pets from you or your following list!'}
               placeholderTextColor={'grey'}
               style={styles.searchInput}
               onFocus={() => {
@@ -314,95 +406,112 @@ class AppCamera extends Component {
               ref={petSearchBar => this.petSearchBar = petSearchBar}
             />
           </InputGroup>
-        </View>
-        { selectedPets.length !== 0 && (
-          <Text style={{ width, textAlign: 'center', fontFamily: 'Lato', color: 'grey', fontSize: 12 }}>
-            Double Tap to remove a pet.
-          </Text>
-        ) }
-        { selectedPets.length !== 0 && (
-          <Text style={{ width, textAlign: 'center', fontFamily: 'Lato', color: 'grey', fontSize: 12 }}>
-            Drag and drop to change the order.
-          </Text>
-        ) }
-        { selectedPets.length === 0 ? (
-          <TouchableOpacity
-            style={{
-              height: 100,
-              width,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderBottomWidth: 1,
-              borderColor: 'grey'
-            }}
-            onPress={() => this.petSearchBar.focus()}
-          >
-            <Icon
-              name={'plus'}
-              style={{ fontSize: 30 }}
-              color={'grey'}
-            />
-            <Text style={{
-              fontFamily: 'Lato-bold',
-              fontSize: 16,
-              textAlign: 'center',
-              color: 'grey'
-            }}>
-              Add pets from your or the people you following.
+          { selectedPets.length !== 0 && (
+            <Text style={{ width, textAlign: 'center', fontFamily: 'Lato', color: 'grey', fontSize: 12 }}>
+              Double Tap to remove a pet.
             </Text>
-          </TouchableOpacity>
-        ) : (
-          <SortableGrid
-            style={styles.selectedPetList}
-            onDragRelease = {({ itemOrder }) => {
-              const selectedPetList = [...selectedPets];
-              for (let i = 0; i < itemOrder.length; i++) {
-                selectedPetList.find(pet => pet.id.toString() === itemOrder[i].key).order = i;
-              }
-              selectedPetList.sort((a, b) => a.order - b.order);
-              this.setState({ selectedPets: selectedPetList });
-            }}
-          >
-            { selectedPets.map(this.renderSelectedPet) }
-          </SortableGrid>
-        ) }
-        <TextInput
-          multiline
-          style={styles.textInput}
-          placeholderTextColor={'grey'}
-          placeholder={'Say something! Maximum 200 charactres.'}
-          maxLength={200}
-        />
-        <View style={{ flexDirection: 'row', width }}>
-          <TouchableOpacity
-            style={{ margin: 10 }}
-            onPress={() => this.openImageModal()}
-          >
-            <Image
-              style={{ height: 80, width: 80, borderRadius: 4, overflow: 'hidden' }}
-              source={{ uri: pickedPicture }}
-            />
-          </TouchableOpacity>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontFamily: 'Lato', fontSize: 18 }}>Your location</Text>
-            <TouchableOpacity style={styles.locationButton}>
-              <Text
-                numberOfLines={1}
-                ellipsizeMode={'head'}
-              >
-                Cool
+          ) }
+          { selectedPets.length === 0 ? (
+            <TouchableOpacity
+              style={{
+                height: 100,
+                width,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() => this.petSearchBar.focus()}
+            >
+              <Icon
+                name={'plus'}
+                style={{ fontSize: 30 }}
+                color={'grey'}
+              />
+              <Text style={{
+                fontFamily: 'Lato-bold',
+                fontSize: 16,
+                textAlign: 'center',
+                color: 'grey'
+              }}>
+                Add pets from your or the people you following.
               </Text>
             </TouchableOpacity>
+          ) : (
+            <SortableGrid
+              onDragRelease = {({ itemOrder }) => {
+                const selectedPetList = [...selectedPets];
+                for (let i = 0; i < itemOrder.length; i++) {
+                  selectedPetList.find(pet => pet.id.toString() === itemOrder[i].key).order = i;
+                }
+                selectedPetList.sort((a, b) => a.order - b.order);
+                this.setState({ selectedPets: selectedPetList });
+              }}
+            >
+              { selectedPets.map(this.renderSelectedPet) }
+            </SortableGrid>
+          ) }
+          <View
+            style={{
+              flexDirection: 'row',
+              flex: 1,
+              paddingVertical: 10,
+              alignItems: 'center',
+              justifyContent: 'space-around',
+              borderBottomWidth: 1,
+              borderColor: 'grey',
+            }}
+          >
+            <TouchableOpacity onPress={() => this.openImageModal()}>
+              <Image
+                style={{ height: 80, width: 80, borderRadius: 4, overflow: 'hidden' }}
+                source={{ uri: pickedPicture }}
+              />
+            </TouchableOpacity>
+            <View style={{ width: width / 2, justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={{ fontFamily: 'Lato', fontSize: 18 }}>Your location</Text>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={{ height: 90, flexGrow: 0 }}
+              >
+                { !selectedPlace && this.renderLocationButtons() }
+                { selectedPlace && (
+                  <View style={{ height: 90, justifyContent: 'center', alignItems: 'center' }}>
+                    <TouchableOpacity onPress={() => this.openSearchModal()}>
+                      <Text style={{ textAlign: 'center', fontFamily: 'Lato', fontSize: 18, color: 'grey' }}>
+                        { selectedPlace.name }
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{ marginTop: 10 }}
+                      onPress={() => this.setState({ selectedPlace: undefined })}
+                    >
+                      <Icon
+                        name={ 'remove' }
+                        color={ 'grey' }
+                        size={20}
+                        style={{ textAlign: 'center' }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                ) }
+              </ScrollView>
+            </View>
           </View>
-        </View>
-        <View style={{ width, justifyContent: 'center', alignItems: 'center' }}>
+          <TextInput
+            multiline
+            style={styles.textInput}
+            placeholderTextColor={'grey'}
+            placeholder={'Say something! Maximum 200 charactres.'}
+            maxLength={200}
+          />
+        </KeyboardAwareScrollView>
+        <View style={styles.uploadButtonContainer}>
           <TouchableOpacity style={styles.uploadButton}>
             <Text style={{ fontFamily: 'Lato-bold', fontSize: 20, color: '#107896' }}>
-              Upload!
+              Upload !
             </Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidView>
+      </View>
     );
   }
 
@@ -561,14 +670,10 @@ const styles = StyleSheet.create({
     maxHeight: 200,
     backgroundColor: '#fff',
   },
-  selectedPetList: {
-    borderBottomWidth: 1,
-    borderColor: 'grey',
-  },
   petContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 30,
+    height: 40,
     padding: 5,
   },
   selectedPetContainer: {
@@ -583,8 +688,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   petAvatar: {
-    height: 20,
-    width: 20,
+    height: 30,
+    width: 30,
     borderRadius: 4,
     marginRight: 10,
     overflow: 'hidden',
@@ -600,27 +705,27 @@ const styles = StyleSheet.create({
   },
   petName: {
     fontFamily: 'Lato',
+    fontSize: 15,
   },
   username: {
     fontFamily: 'Lato-Italic',
-    fontSize: 12,
+    fontSize: 13,
     color: 'gray',
     backgroundColor: 'transparent',
     marginLeft: 5
   },
   textInput: {
-    flex: 1,
     fontSize: 15,
     fontFamily: 'Lato',
+    flex: 1,
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
   searchInput: {
     flex: 1,
     height: 40,
-    fontSize: 15,
     fontFamily: 'Lato',
-    fontSize: 13,
+    fontSize: 15,
     padding: 10,
   },
   contain: {
@@ -633,15 +738,21 @@ const styles = StyleSheet.create({
     width,
   },
   locationButton: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#107896',
-    width: 100,
-    height: 25,
-    borderRadius: 10,
+    width: 150,
+    height: 20,
+    borderRadius: 8,
+    margin: 3,
+    paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   uploadButton: {
+    position: 'absolute',
+    bottom: 30,
+    left: 25,
+    right: 25,
     borderWidth: 3,
     borderColor: '#107896',
     width: 250,
@@ -649,8 +760,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 10,
-    marginBottom: 30,
   },
   header: {
     height: 55,
@@ -682,6 +791,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     currentUser: state.session.currentUser,
+    currentLocation: state.session.currentLocation,
+    isLocationAuthed: state.session.isLocationAuthed,
   };
 };
 

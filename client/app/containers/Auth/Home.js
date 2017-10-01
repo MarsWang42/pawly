@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {
   Dimensions,
   Image,
@@ -9,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
@@ -106,9 +106,8 @@ class Home extends Component {
             <Image
               source={require('../../assets/img/logo.png')}
               style={{
-                width: width <= 325 ? 90 : 110,
                 height: width <= 325 ? 100 : 125,
-                resizeMode: 'stretch'
+                resizeMode: 'contain'
               }}
             />
           </View>

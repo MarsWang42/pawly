@@ -1,5 +1,5 @@
 class Api::V1::PicturesController < ApiController
-  before_action :authenticate_user, except: ['create']
+  before_action :authenticate_user
 
   def create
     @user = User.new(auth_params)
@@ -9,6 +9,12 @@ class Api::V1::PicturesController < ApiController
     else
       render :json => @user.errors, :status => 422
     end
+  end
+
+  def nearby
+    @user = current_user
+    @pictures = Picture.near([params[:latitude], params[:longitude]], params[:radius])
+    render :list
   end
 
   def like

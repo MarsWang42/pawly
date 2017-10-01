@@ -21,11 +21,26 @@ user2.pets.create(name: 'Simba', type: 'cat')
 user3.pets.create(name: 'Lucky', type: 'cat')
 user3.pets.create(name: 'Ruby', type: 'cat')
 
-picture1 = user2.pictures.create(image: File.open(File.join(Rails.root, 'test.jpeg')))
+picture1 = user2.pictures.create(
+  image: File.open(File.join(Rails.root, 'test.jpeg')),
+  latitude: 33.6880546,
+  longitude: -117.8341277,
+  place_name: '85°C Bakery Cafe - Irvine',
+)
 picture1.pets << user1.pets.first
-picture2 = user3.pictures.create(image: File.open(File.join(Rails.root, 'test1.jpeg')))
+picture2 = user3.pictures.create(
+  image: File.open(File.join(Rails.root, 'test1.jpeg')),
+  latitude: 33.6875054,
+  longitude: -117.8338896,
+  place_name: 'Meet Fresh'
+)
 picture2.pets << user3.pets.first
-picture3 = user1.pictures.create(image: File.open(File.join(Rails.root, 'test2.jpg')))
+picture3 = user1.pictures.create(
+  image: File.open(File.join(Rails.root, 'test2.jpg')),
+  latitude: 33.68813470000001,
+  longitude: -117.8340868,
+  place_name: '2700 Alton Pkwy, Irvine, CA 92606, USA'
+)
 picture3.pets << user1.pets.first
 picture4 = user1.pictures.create(image: File.open(File.join(Rails.root, 'test3.jpeg')))
 picture4.pets << user1.pets.first

@@ -167,7 +167,7 @@ class Avatar extends Component {
   }
 
   render() {
-    const { currentUser } = this.props;
+    const { currentUser, isLoading } = this.props;
     const { isLoadingImage, petAvatar, petType, isRecognizingImage, petNameError } = this.state;
 
     const petImageSource = petAvatar ? { uri: petAvatar }
@@ -285,13 +285,21 @@ class Avatar extends Component {
             style={styles.buttonContainer}
             onPress={this.submitForm}
           >
-            <MaterialIcon
-              name={'pets'}
-              size={22}
-              color={'white'}
-              style={{ paddingHorizontal: 5 }}
-            />
-            <Text style={styles.text}>Let's Go!</Text>
+            { isLoading ? (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Spinner type={'Wave'} size={20} color={'#fff'} />
+              </View>
+            ) : (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <MaterialIcon
+                  name={'pets'}
+                  size={22}
+                  color={'white'}
+                  style={{ paddingHorizontal: 5 }}
+                />
+                <Text style={styles.text}>Let's Go!</Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>
@@ -430,8 +438,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
   return {
-    isCheckingUser: state.session.isCheckingUser,
     currentUser: state.session.currentUser,
+    isLoading: state.session.isUpdating,
   };
 };
 

@@ -1,6 +1,18 @@
 # Acknowledgements
 This application makes use of the following third party libraries:
 
+## GoogleMaps
+
+Copyright 2017 Google
+
+## GooglePlacePicker
+
+Copyright 2017 Google
+
+## GooglePlaces
+
+Copyright 2017 Google
+
 ## QBImagePickerController
 
 Copyright (c) 2015 Katsuma Tanaka

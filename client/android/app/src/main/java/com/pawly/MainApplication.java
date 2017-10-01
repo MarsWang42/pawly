@@ -3,6 +3,7 @@ package com.pawly;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.arttitude360.reactnative.rngoogleplaces.RNGooglePlacesPackage;
 import com.rnfs.RNFSPackage;
 import com.projectseptember.RNGL.RNGLPackage;
 import fr.bamlab.rnimageresizer.ImageResizerPackage;
@@ -34,6 +35,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNGooglePlacesPackage(),
             new RNFSPackage(),
             new RNGLPackage(),
             new ImageResizerPackage(),
