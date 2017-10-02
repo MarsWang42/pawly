@@ -4,9 +4,6 @@ class CreatePictures < ActiveRecord::Migration[5.1]
       t.references :creator, foreign_key: { to_table: :users }
       t.string :image
       t.text :caption
-      t.string :place_name
-      t.float :latitude
-      t.float :longitude
 
       t.timestamps
     end

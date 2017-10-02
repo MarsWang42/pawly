@@ -2,19 +2,30 @@ class Api::V1::PicturesController < ApiController
   before_action :authenticate_user
 
   def create
-    @user = User.new(auth_params)
-    if @user.save
-      @token = Knock::AuthToken.new payload: { sub: @user.id }
-      render :create
-    else
-      render :json => @user.errors, :status => 422
-    end
-  end
-
-  def nearby
     @user = current_user
-    @pictures = Picture.near([params[:latitude], params[:longitude]], params[:radius])
-    render :list
+    @picture = Picture.new image: params[:image]
+    @picture.creator = @user
+    JSON.parse(params[:pets]).each do |pet|
+      @picture.pets << Pet.find(pet)
+    end
+    if (params[:place_name] &&
+      params[:google_place_id] &&
+      params[:longitude] &&
+      params[:latitude])
+      @place = Place.find_or_create_by google_place_id: params[:google_place_id]
+      @place.longitude = params[:longitude]
+      @place.latitude = params[:latitude]
+      @place.name = params[:place_name]
+      if !@place.save
+        render :json => @place.errors, :status => 422
+      end
+      @picture.place = @place
+    end
+    if @picture.save
+      render :json => @picture.place
+    else
+      render :json => @picture.errors, :status => 422
+    end
   end
 
   def like

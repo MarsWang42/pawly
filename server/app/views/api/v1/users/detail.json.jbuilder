@@ -11,16 +11,21 @@ json.pets(@user.pets) do |pet|
   json.avatar pet.avatar
 end
 
-json.pictures(@user.pictures) do |picture|
+json.pictures(@pictures) do |picture|
   json.image picture.image.url
   json.timestamp picture.created_at
   json.creator do
     json.username picture.creator.username
     json.avatar picture.creator.avatar.url
   end
-  json.placeName picture.place_name
-  json.latitude picture.latitude
-  json.longitude picture.longitude
+  if picture.place.present?
+    json.place do |place|
+      json.placeId picture.place.id
+      json.name picture.place.name
+      json.latitude picture.place.latitude
+      json.longitude picture.place.longitude
+    end
+  end
   json.pets(picture.pets) do |pet|
     json.name pet.name
     json.avatar pet.avatar.url

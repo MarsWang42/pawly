@@ -25,6 +25,7 @@ class Api::V1::UsersController < ApiController
   def detail
     @user = set_user
     @current_user = current_user
+    @pictures = @user.pictures.order("created_at DESC").all
     render :detail
   end
 

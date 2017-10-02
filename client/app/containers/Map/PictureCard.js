@@ -119,7 +119,7 @@ class PictureCard extends Component {
             </View>
           </View>
         </View>
-        <View style={[styles.headerContainer, { height: data.placeName ? 65 : 55 }]}>
+        <View style={styles.headerContainer}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View
               style={[styles.petAvatarContainer,
@@ -142,14 +142,14 @@ class PictureCard extends Component {
             </View>
             <View style={styles.petInfoContainer}>
               <Text style={styles.petName}>{ petNames }</Text>
-              { data.placeName && (
+              { data.place.name && (
                 <View style={styles.locationContainer}>
                   <Text
                     numberOfLines={1}
                     ellipsizeMode={'tail'}
                     style={styles.locationText}
                   >
-                    At { data.placeName }
+                    At { data.place.name }
                   </Text>
                 </View>
               ) }
@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    height: 50,
   },
   petAvatarContainer: {
     flexDirection: 'row',

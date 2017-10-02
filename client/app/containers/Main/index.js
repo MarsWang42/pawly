@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MainTabBar from '../../components/Main/TabBar';
 import FollowingList from './FollowingList';
 import NearbyList from './NearbyList';

@@ -9,9 +9,14 @@ json.pictures(@pictures) do |picture|
     json.name pet.name
     json.avatar pet.avatar.url
   end
-  json.placeName picture.place_name
-  json.latitude picture.latitude
-  json.longitude picture.longitude
+  if picture.place.present?
+    json.place do |place|
+      json.placeId picture.place.id
+      json.name picture.place.name
+      json.latitude picture.place.latitude
+      json.longitude picture.place.longitude
+    end
+  end
   json.pictureId picture.id
   json.liked @user.liked?(picture)
   json.likers(picture.likers) do |liker|

@@ -21,31 +21,28 @@ user2.pets.create(name: 'Simba', type: 'cat')
 user3.pets.create(name: 'Lucky', type: 'cat')
 user3.pets.create(name: 'Ruby', type: 'cat')
 
-picture1 = user2.pictures.create(
-  image: File.open(File.join(Rails.root, 'test.jpeg')),
-  latitude: 33.6486,
-  longitude: -117.8426,
-  place_name: 'UCI Housing'
-)
+place1 = Place.create(google_place_id: '1', name: 'Fashion Island', latitude: 33.6486, longitude: -117.8426)
+place2 = Place.create(google_place_id: '2', name: 'UCI Housing', latitude: 33.6875054, longitude: -117.8338896)
+place3 = Place.create(google_place_id: '3', name: 'Meet Fresh', latitude: 33.6159, longitude: -117.8758)
+
+picture1 = user2.pictures.create(image: File.open(File.join(Rails.root, 'test.jpeg')))
+picture1.place = place1
 picture1.pets << user1.pets.first
-picture2 = user3.pictures.create(
-  image: File.open(File.join(Rails.root, 'test1.jpeg')),
-  latitude: 33.6875054,
-  longitude: -117.8338896,
-  place_name: 'Meet Fresh'
-)
+picture1.save
+picture2 = user3.pictures.create(image: File.open(File.join(Rails.root, 'test1.jpeg')))
+picture2.place = place2
 picture2.pets << user3.pets.first
-picture3 = user1.pictures.create(
-  image: File.open(File.join(Rails.root, 'test2.jpg')),
-  latitude: 33.6159,
-  longitude: -117.8758,
-  place_name: 'Fashion Island'
-)
+picture2.save
+picture3 = user1.pictures.create(image: File.open(File.join(Rails.root, 'test2.jpg')))
+picture3.place = place3
 picture3.pets << user1.pets.first
+picture3.save
 picture4 = user1.pictures.create(image: File.open(File.join(Rails.root, 'test3.jpeg')))
+picture4.place = place1
 picture4.pets << user1.pets.first
 picture4.pets << user1.pets.last
 picture4.pets << user2.pets.first
+picture4.save
 picture5 = user2.pictures.create(image: File.open(File.join(Rails.root, 'test4.jpeg')))
 picture5.pets << user2.pets.first
 picture6 = user2.pictures.create(image: File.open(File.join(Rails.root, 'test5.jpg')))

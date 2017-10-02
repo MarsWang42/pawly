@@ -1,33 +1,58 @@
 import React, { Component } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons'
 
 export default class MapPin extends Component {
   render() {
     const { data, isSelected } = this.props;
-
     return (
       <View
-        style={[styles.container, {
-          height: 70,
-          width: 70,
-        }]}
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          borderWidth: 4,
+          borderColor: isSelected ? 'blue' : '#e6535a',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#fff',
+          overflow: 'hidden',
+        }}
       >
-        <Image
-          source={require('../../assets/img/map-marker.png')}
-          style={{
-            width: 70,
-            height: 70,
-            resizeMode: 'stretch'
-          }}
+        <Icon
+          name={'pets'}
+          size={26}
+          style={{ backgroundColor: 'transparent' }}
         />
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: data.image }}
-            style={styles.image}
-          />
-        </View>
       </View>
     );
+    // return (
+    //   <View
+    //     style={[styles.container, {
+    //       height: 70,
+    //       width: 70,
+    //     }]}
+    //   >
+    //     <Image
+    //       source={
+    //         isSelected ?
+    //         require('../../assets/img/map-marker-s.png')
+    //         : require('../../assets/img/map-marker.png')
+    //       }
+    //       style={{
+    //         width: 70,
+    //         height: 70,
+    //         resizeMode: 'stretch'
+    //       }}
+    //     />
+    //     <View style={styles.imageContainer}>
+    //       <Image
+    //         source={{ uri: data.pictures[0].image }}
+    //         style={styles.image}
+    //       />
+    //     </View>
+    //   </View>
+    // );
   }
 }
 

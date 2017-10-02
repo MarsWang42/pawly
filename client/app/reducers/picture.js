@@ -4,6 +4,9 @@ import apis from '../apis';
 import { fromJS, List, Map } from 'immutable';
 import { loop, Cmd } from 'redux-loop';
 
+export const CREATE_PICTURE = 'CREATE_PICTURE';
+export const CREATE_PICTURE_SUCCEED = 'CREATE_PICTURE_SUCCEED';
+export const CREATE_PICTURE_FAILED = 'CREATE_PICTURE_FAILED';
 export const FETCH_FEED = 'FETCH_FEED';
 export const FETCH_FEED_SUCCEED = 'FETCH_FEED_SUCCEED';
 export const FETCH_FEED_FAILED = 'FETCH_FEED_FAILED';
@@ -13,6 +16,18 @@ export const FETCH_NEARBY_FAILED = 'FETCH_NEARBY_FAILED';
 export const TOGGLE_PICTURE_LIKE = 'TOGGLE_PICTURE_LIKE';
 export const TOGGLE_PICTURE_LIKE_SUCCEED = 'TOGGLE_PICTURE_LIKE_SUCCEED';
 export const TOGGLE_PICTURE_LIKE_FAILED = 'TOGGLE_PICTURE_LIKE_FAILED';
+
+const createPictureSucceed = (respond, action) => {
+  action.callback && action.callback();
+  return {
+    type: CREATE_PICTURE_SUCCEED,
+    followingList: respond.data.feeds,
+  };
+};
+
+const createPictureFailed = () => ({
+  type: CREATE_PICTURE_FAILED,
+});
 
 const fetchFeedSucceed = (respond) => {
   return {
@@ -28,7 +43,7 @@ const fetchFeedFailed = () => ({
 const fetchNearbySucceed = (respond) => {
   return {
     type: FETCH_NEARBY_SUCCEED,
-    nearbyList: respond.data.pictures,
+    placeList: respond.data.places,
   };
 };
 
@@ -51,8 +66,32 @@ const toggleLikeFailed = () => ({
 export const PictureReducer = createReducer({
   followingList: List(),
   nearbyList: List(),
+  placeList: List(),
   isFetchingFeed: false,
 }, {
+  [CREATE_PICTURE](state, action) {
+    return loop(
+      { ...state, isCreatingPicture: true, createPictureError: undefined },
+      Cmd.run(apis.picture.create, {
+        successActionCreator: response => createPictureSucceed(response, action),
+        failActionCreator: createPictureFailed,
+        args: [action.body, action.token]
+      })
+    );
+  },
+  [CREATE_PICTURE_SUCCEED](state, action) {
+    return {
+      ...state,
+      isCreatingPicture: false,
+    };
+  },
+  [CREATE_PICTURE_FAILED](state, action) {
+    return {
+      ...state,
+      isCreatingPicture: false,
+      createPictureError: 'Creating failed.',
+    };
+  },
   [FETCH_FEED](state, action) {
     return loop(
       { ...state, isFetchingFeed: true, fetchFeedError: undefined },
@@ -88,10 +127,13 @@ export const PictureReducer = createReducer({
     );
   },
   [FETCH_NEARBY_SUCCEED](state, action) {
+    const nearbyList = action.placeList.reduce((acc, cur) =>
+      [...acc, ...cur.pictures], []);
     return {
       ...state,
       isFetchingNearby: false,
-      nearbyList: fromJS(action.nearbyList),
+      placeList: fromJS(action.placeList),
+      nearbyList: fromJS(nearbyList),
     };
   },
   [FETCH_NEARBY_FAILED](state, action) {

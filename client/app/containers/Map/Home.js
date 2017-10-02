@@ -122,8 +122,8 @@ class Home extends Component {
     });
   };
 
-  selectPicture(picture, i) {
-    this.setState({ selectedPicture: picture, selectedPictureId: i });
+  selectPlace(place) {
+    this.setState({ selectedPlace: place });
     this.isSelecting = true;
     Animated.spring(
       this.state.opacityAnim,
@@ -135,16 +135,18 @@ class Home extends Component {
     ).start(() => {
       this.isSelecting = false;
     });
+    const { latitudeDelta, longitudeDelta } = this.state.region;
+
     this.map.animateToRegion({
-      longitude: picture.longitude,
-      latitude: picture.latitude - 0.005,
-      latitudeDelta: 0.0222,
-      longitudeDelta: 0.0111,
+      longitude: place.longitude,
+      latitude: place.latitude - latitudeDelta / 3,
+      latitudeDelta,
+      longitudeDelta,
     });
   }
 
-  deselectPicture(picture, i) {
-    this.setState({ selectedPicture: undefined });
+  deselectPlace() {
+    this.setState({ selectedPlace: undefined });
     this._carousel && this._carousel.snapToItem(-1);
     if (!this.isSelecting) {
       Animated.timing(
@@ -155,48 +157,58 @@ class Home extends Component {
           useNativeDriver: true,
         },
       ).start(() => this.setState({
-        selectedPictureId: -1,
-        selectedPicture: null,
+        selectedPlace: undefined,
       }) );
+    }
+  }
+
+  snapCarousel(picture, i) {
+    if (this.state.selectedPlace && picture.place.placeId !== this.state.selectedPlace.placeId) {
+      this.selectPlace(picture.place);
     }
   }
 
   renderMarkers() {
     const {
+      placeList,
       nearbyList,
       currentLocation,
       mainTab,
     } = this.props;
-    const markers = nearbyList &&
-      nearbyList.map((picture) => ({
+    const { selectedPlace } = this.state;
+    const markers = placeList &&
+      placeList.map((place) => ({
         latlng: {
-          latitude: picture.latitude,
-          longitude: picture.longitude,
+          latitude: place.latitude,
+          longitude: place.longitude,
         },
-        key: picture.pictureId,
-        data: picture,
+        key: place.placeId,
+        data: place,
     }));
 
-    return  markers && markers.map((marker, i) => (
-      <MapView.Marker
-        coordinate={marker.latlng}
-        key={marker.key}
-        style={{
-          zIndex:  this.state.selectedPictureId === i ? 100 : 0
-        }}
-        onPress={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.selectPicture(marker.data, i);
-          this._carousel && this._carousel.snapToItem(i);
-        }}
-      >
-        <MapPin
-          data={marker.data}
-          isSelected={ this.state.selectedPicture === i }
-        />
-      </MapView.Marker>
-    ));
+    return  markers && markers.map((marker, i) => {
+      const isSelected = (selectedPlace && selectedPlace.placeId) === marker.key;
+      return (
+        <MapView.Marker
+          coordinate={marker.latlng}
+          key={marker.key}
+          style={{ zIndex: isSelected ? 100 : 0 }}
+          onPress={(e) => {
+            const pictureId = nearbyList.findIndex(picture =>
+              picture.place.placeId === marker.key);
+            e.preventDefault();
+            e.stopPropagation();
+            this.selectPlace(marker.data);
+            this._carousel && this._carousel.snapToItem(pictureId);
+          }}
+        >
+          <MapPin
+            data={marker.data}
+            isSelected={isSelected}
+          />
+        </MapView.Marker>
+        );
+    });
   }
 
   renderPicture({ item, index }) {
@@ -209,7 +221,7 @@ class Home extends Component {
 
   render() {
     const { nearbyList } = this.props;
-    const { region, selectedPicture, selectedPictureId, opacityAnim } = this.state;
+    const { region, selectedPlace, opacityAnim } = this.state;
     const cardWidth = width - 30;
     return (
       <View style={styles.container}>
@@ -224,14 +236,14 @@ class Home extends Component {
           <Animated.View
             style={[styles.cardContainer, {
               opacity: opacityAnim,
-              bottom: selectedPictureId === -1 ? -300 : 60,
+              bottom: selectedPlace ? 60 : -300,
             }]}
           >
             <Carousel
               sliderWidth={width}
               itemWidth={cardWidth}
               enableSnap
-              onSnapToItem={(i) => this.selectPicture(nearbyList[i], i)}
+              onSnapToItem={(i) => this.snapCarousel(nearbyList[i], i)}
               ref={(carousel) => { this._carousel = carousel; }}
               data={nearbyList}
               renderItem={this.renderPicture}
@@ -245,7 +257,7 @@ class Home extends Component {
             pitchEnabled={false}
             ref={map => this.map = map}
             onRegionChange={region => this.setState({ region })}
-            onPress={() => this.deselectPicture()}
+            onPress={() => this.deselectPlace()}
           >
             { nearbyList && this.renderMarkers() }
           </MapView>
@@ -307,6 +319,7 @@ const mapStateToProps = (state) => {
     currentUser: state.session.currentUser,
     currentLocation: state.session.currentLocation,
     nearbyList: state.picture.nearbyList.toJS(),
+    placeList: state.picture.placeList.toJS(),
   };
 };
 

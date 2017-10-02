@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170921174322) do
+ActiveRecord::Schema.define(version: 20171001163849) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,12 +47,21 @@ ActiveRecord::Schema.define(version: 20170921174322) do
     t.bigint "creator_id"
     t.string "image"
     t.text "caption"
-    t.string "place_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "place_id"
+    t.index ["creator_id"], name: "index_pictures_on_creator_id"
+    t.index ["place_id"], name: "index_pictures_on_place_id"
+  end
+
+  create_table "places", force: :cascade do |t|
+    t.string "google_place_id"
+    t.string "name"
     t.float "latitude"
     t.float "longitude"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["creator_id"], name: "index_pictures_on_creator_id"
+    t.index ["google_place_id"], name: "index_places_on_google_place_id"
   end
 
   create_table "relationships", force: :cascade do |t|
@@ -81,5 +90,6 @@ ActiveRecord::Schema.define(version: 20170921174322) do
   end
 
   add_foreign_key "pets", "users", column: "owner_id"
+  add_foreign_key "pictures", "places"
   add_foreign_key "pictures", "users", column: "creator_id"
 end

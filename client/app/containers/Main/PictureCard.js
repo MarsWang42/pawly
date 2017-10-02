@@ -78,7 +78,7 @@ class PictureCard extends Component {
 
     return (
       <View style={styles.container}>
-        <View style={[styles.headerContainer, { height: data.placeName ? 65 : 55 }]}>
+        <View style={[styles.headerContainer, { height: data.place ? 65 : 55 }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View
               style={[styles.petAvatarContainer,
@@ -106,14 +106,14 @@ class PictureCard extends Component {
                 <Text style={styles.username}>{ data.creator.username }</Text>
                 <Text style={styles.time}> { moment(data.timestamp).fromNow() }</Text>
               </View>
-              { data.placeName && (
+              { data.place && (
                 <View style={styles.locationContainer}>
                   <Text
                     numberOfLines={1}
                     ellipsizeMode={'tail'}
                     style={styles.locationText}
                   >
-                    At { data.placeName }
+                    At { data.place.name }
                   </Text>
                 </View>
               ) }

@@ -9,9 +9,14 @@ json.feeds(@feeds) do |feed|
     json.name pet.name
     json.avatar pet.avatar.url
   end
-  json.placeName feed.place_name
-  json.latitude feed.latitude
-  json.longitude feed.longitude
+  if feed.place.present?
+    json.place do |place|
+      json.placeId feed.place.id
+      json.name feed.place.name
+      json.latitude feed.place.latitude
+      json.longitude feed.place.longitude
+    end
+  end
   json.pictureId feed.id
   json.liked @user.liked?(feed)
   json.likers(feed.likers) do |liker|

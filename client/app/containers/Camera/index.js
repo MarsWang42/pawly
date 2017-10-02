@@ -20,6 +20,7 @@ import {
 import Spinner from 'react-native-spinkit';
 import RNGooglePlaces from 'react-native-google-places';
 import ImageResizer from 'react-native-image-resizer';
+import uuidv4 from 'uuid/v4';
 import _ from 'lodash';
 import { InputGroup, Input } from 'native-base';
 import ImageCropper from 'react-native-image-crop-picker';
@@ -27,6 +28,7 @@ import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import Camera from 'react-native-camera';
+import * as actions from '../../reducers/picture';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import SortableGrid from '../../components/Helpers/SortableGrid';
 import Filter from './Filter';
@@ -58,6 +60,7 @@ class AppCamera extends Component {
     this.searchPets = this.searchPets.bind(this);
     this.renderSelectedPet = this.renderSelectedPet.bind(this);
     this.openSearchModal = this.openSearchModal.bind(this);
+    this.uploadPicture = this.uploadPicture.bind(this);
   }
 
   componentDidMount() {
@@ -145,13 +148,34 @@ class AppCamera extends Component {
   }
 
   pickPicture(url) {
-    this.setState({ isFetchingPlace: true });
+    this.setState({ isFetchingPlaces: true });
     RNGooglePlaces.getCurrentPlace()
-      .then(places => this.setState({ places, isFetchingPlace: false }))
-      .catch(error => this.setState({ placeError: error, isFetchingPlace: false }));
+      .then(places => this.setState({ places, isFetchingPlaces: false }))
+      .catch(error => this.setState({ placeError: error, isFetchingPlaces: false }));
     this.setState({
       pickedPicture: url,
       view: 'image',
+    });
+  }
+
+  uploadPicture() {
+    const { pickedPicture, selectedPlace, selectedPets } = this.state;
+    const { currentUser, dispatch, navigation } = this.props;
+    let formData = new FormData();
+    if (selectedPlace) {
+      formData.append('place_name', selectedPlace.name);
+      formData.append('google_place_id', selectedPlace.placeID);
+      formData.append('longitude', selectedPlace.longitude);
+      formData.append('latitude', selectedPlace.latitude);
+    }
+    formData.append('pets', JSON.stringify(selectedPets.map(pet => pet.id)));
+    formData.append('image',
+      { uri: pickedPicture, name: `${uuidv4()}.jpg`, type: 'multipart/formdata' });
+    dispatch({
+      type: actions.CREATE_PICTURE,
+      body: formData,
+      token: currentUser.accessToken,
+      callback: () => navigation.goBack(),
     });
   }
 
@@ -276,7 +300,7 @@ class AppCamera extends Component {
 
   renderLocationButtons() {
     const { isLocationAuthed } = this.props;
-    const { isFetchingPlace, places } = this.state;
+    const { places } = this.state;
     // If location is not authorized, navigate to settings
     if (!isLocationAuthed) {
       return (
@@ -303,11 +327,7 @@ class AppCamera extends Component {
       );
     }
 
-    if (isFetchingPlace) {
-      return <Spinner type={'Pulse'} size={20} color={'#fff'} />;
-    }
-
-    const placeButtons = places && places.slice(0, 10).map(place => (
+    const placeButtons = places ? places.slice(0, 10).map(place => (
       <TouchableOpacity
         key={place.placeID}
         style={styles.locationButton}
@@ -321,7 +341,7 @@ class AppCamera extends Component {
           { place.name }
         </Text>
       </TouchableOpacity>
-    ));
+    )) : [];
     placeButtons.push(
       <TouchableOpacity
         key={'add-place'}
@@ -347,7 +367,13 @@ class AppCamera extends Component {
 
   // A form to fill before upload the post.
   renderImage() {
-    const { pickedPicture, isLocationModalOpen, isPetListOpen, selectedPets, selectedPlace } = this.state;
+    const {
+      isFetchingPlaces,
+      pickedPicture,
+      isPetListOpen,
+      selectedPets,
+      selectedPlace,
+    } = this.state;
     // Filter out the selected pets.
     const petList = this.state.petList.filter(pet =>
       selectedPets.findIndex(selectedPet =>
@@ -355,9 +381,9 @@ class AppCamera extends Component {
     );
     return (
       <View style={{ flex: 1 }}>
-        { isPetListOpen &&
+        { isPetListOpen && (
           <TouchableOpacity
-            style={styles.overlay}
+            style={[styles.overlay, { top: 40 }]}
             activeOpacity={1}
             onPress={() => {
               LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -365,7 +391,7 @@ class AppCamera extends Component {
               this.petSearchBar.blur();
             }}
           />
-        }
+        ) }
         { isPetListOpen &&
           <FlatList
             style={styles.petList}
@@ -468,32 +494,39 @@ class AppCamera extends Component {
             </TouchableOpacity>
             <View style={{ width: width / 2, justifyContent: 'center', alignItems: 'center' }}>
               <Text style={{ fontFamily: 'Lato', fontSize: 18 }}>Your location</Text>
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                style={{ height: 90, flexGrow: 0 }}
-              >
-                { !selectedPlace && this.renderLocationButtons() }
-                { selectedPlace && (
-                  <View style={{ height: 90, justifyContent: 'center', alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => this.openSearchModal()}>
-                      <Text style={{ textAlign: 'center', fontFamily: 'Lato', fontSize: 18, color: 'grey' }}>
-                        { selectedPlace.name }
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{ marginTop: 10 }}
-                      onPress={() => this.setState({ selectedPlace: undefined })}
-                    >
-                      <Icon
-                        name={ 'remove' }
-                        color={ 'grey' }
-                        size={20}
-                        style={{ textAlign: 'center' }}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                ) }
-              </ScrollView>
+              { !selectedPlace && !isFetchingPlaces && (
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  style={{ height: 90, flexGrow: 0 }}
+                >
+                  { this.renderLocationButtons() }
+                </ScrollView>
+              ) }
+              { isFetchingPlaces && (
+                <View style={{ height: 90, justifyContent: 'center', alignItems: 'center' }}>
+                  <Spinner type={'Pulse'} size={30} color={'grey'} />
+                </View>
+              ) }
+              { selectedPlace && (
+                <View style={{ height: 90, justifyContent: 'center', alignItems: 'center' }}>
+                  <TouchableOpacity onPress={() => this.openSearchModal()}>
+                    <Text style={{ textAlign: 'center', fontFamily: 'Lato', fontSize: 18, color: 'grey' }}>
+                      { selectedPlace.name }
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ marginTop: 10 }}
+                    onPress={() => this.setState({ selectedPlace: undefined })}
+                  >
+                    <Icon
+                      name={ 'remove' }
+                      color={ 'grey' }
+                      size={20}
+                      style={{ textAlign: 'center' }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) }
             </View>
           </View>
           <TextInput
@@ -505,7 +538,7 @@ class AppCamera extends Component {
           />
         </KeyboardAwareScrollView>
         <View style={styles.uploadButtonContainer}>
-          <TouchableOpacity style={styles.uploadButton}>
+          <TouchableOpacity style={styles.uploadButton} onPress={this.uploadPicture}>
             <Text style={{ fontFamily: 'Lato-bold', fontSize: 20, color: '#107896' }}>
               Upload !
             </Text>
@@ -597,8 +630,24 @@ class AppCamera extends Component {
 
   render() {
     const { view, pickedPicture, isImageModalOpen, modalPicture } = this.state;
+    const { isLoading } = this.props;
     return (
       <View style={styles.container}>
+        { isLoading && (
+          <View
+            style={styles.overlay}
+            activeOpacity={1}
+            onPress={() => {
+              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+              this.setState({ isPetListOpen: false });
+              this.petSearchBar.blur();
+            }}
+          >
+            <View style={styles.spinnerContainer}>
+              <Spinner type={'ChasingDots'} size={60} color={'white'} />
+            </View>
+          </View>
+        ) }
         <LinearGradient
           style={styles.header}
           start={{x: 0.0, y: 0.25}} end={{x: 0.5, y: 1.0}}
@@ -648,12 +697,22 @@ const styles = StyleSheet.create({
   },
   overlay: {
     position: 'absolute',
-    top: 40,
+    top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     zIndex: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  spinnerContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 100,
+    width: 100,
+    borderRadius: 8,
+    backgroundColor: '#ffb438'
   },
   petList: {
     position: 'absolute',
@@ -793,6 +852,7 @@ const mapStateToProps = (state) => {
     currentUser: state.session.currentUser,
     currentLocation: state.session.currentLocation,
     isLocationAuthed: state.session.isLocationAuthed,
+    isLoading: state.picture.isCreatingPicture,
   };
 };
 
