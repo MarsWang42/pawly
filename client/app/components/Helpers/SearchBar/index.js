@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import {
+  ActivityIndicator,
   Text,
   TouchableWithoutFeedback,
   TextInput,
@@ -313,6 +314,9 @@ class Search extends PureComponent {
                 ]}
               />}
         </TouchableWithoutFeedback>
+        { this.props.isLoading && (
+          <ActivityIndicator style={styles.spinner} />
+        ) }
         <TouchableWithoutFeedback onPress={this.onDelete}>
           {this.props.iconDelete
             ? <Animated.View
@@ -398,6 +402,11 @@ const styles = {
   },
   iconSearchDefault: {
     tintColor: 'grey'
+  },
+  spinner: {
+    position: 'absolute',
+    right: 90,
+    top: middleHeight - 10,
   },
   iconDelete: {
     position: 'absolute',
@@ -531,7 +540,7 @@ Search.defaultProps = {
   searchIconCollapsedMargin: 25,
   searchIconExpandedMargin: 10,
   placeholderCollapsedMargin: 15,
-  placeholderExpandedMargin: 20,
+  placeholderExpandedMargin: 23,
   shadowOffsetWidth: 0,
   shadowOffsetHeightCollapsed: 2,
   shadowOffsetHeightExpanded: 4,

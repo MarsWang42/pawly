@@ -2,22 +2,25 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   Dimensions,
+  FlatList,
   Image,
+  LayoutAnimation,
   Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  UIManager,
 } from 'react-native';
 import moment from 'moment';
-import pluralize from 'pluralize';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ProgressPie from 'react-native-progress/Pie';
 import ImageWithProgress from '../../components/Helpers/ImageWithProgress';
-import * as actions from '../../reducers/picture';
+import * as pictureActions from '../../reducers/picture';
+import * as petActions from '../../reducers/pet';
 
-const PLACE_HOLDER = 'https://images.pexels.com/photos/7720/night-animal-dog-pet.jpg?w=1260&h=750&auto=compress&cs=tinysrgb';
+UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
 const { height, width } = Dimensions.get('window');
 const AnimatableTouchableOpacity = Animatable.createAnimatableComponent(TouchableOpacity);
 
@@ -26,8 +29,11 @@ class PictureCard extends Component {
     super();
     this.state = {
       imageWidth: width,
-      imageHeight: width
+      imageHeight: width,
+      isPetListOpen: false,
     };
+    this.togglePetModal = this.togglePetModal.bind(this);
+    this.selectPet = this.selectPet.bind(this);
   }
 
   componentDidMount() {
@@ -42,7 +48,7 @@ class PictureCard extends Component {
 
   likePic(id) {
     this.props.dispatch({
-      type: actions.TOGGLE_PICTURE_LIKE,
+      type: pictureActions.TOGGLE_PICTURE_LIKE,
       toggleType: 'like',
       picId: id,
       callback: () => {
@@ -54,16 +60,51 @@ class PictureCard extends Component {
 
   unlikePic(id) {
     this.props.dispatch({
-      type: actions.TOGGLE_PICTURE_LIKE,
+      type: pictureActions.TOGGLE_PICTURE_LIKE,
       toggleType: 'unlike',
       picId: id,
       token: this.props.currentUser.accessToken,
     });
   }
 
+  togglePetModal() {
+    if (this.props.data.pets.length >= 2) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      this.setState({ isPetModalOpen: !this.state.isPetModalOpen });
+    } else {
+      this.selectPet(this.props.data.pets[0].id);
+    }
+  }
+
+  selectPet(id) {
+    this.props.navigateToPet(id);
+    this.props.dispatch({
+      type: petActions.FETCH_PET_DETAIL,
+      id: id,
+      token: this.props.currentUser.accessToken,
+    });
+  }
+
+  renderPet(pet) {
+    const petImageSource = pet.avatar ? { uri: pet.avatar } : require('../../assets/img/pet.png');
+    return (
+      <View style={{ justifyContent: 'center', alignItems: 'center', margin: 3 }}>
+        <Image
+          style={{
+            height: 30,
+            width: 30,
+            borderRadius: 15,
+          }}
+          source={petImageSource}
+        />
+        <Text style={{ fontFamily: 'Lato', fontSize: 14 }}>{ pet.name }</Text>
+      </View>
+    );
+  }
+
   render() {
     const { data } = this.props;
-    const { imageWidth, imageHeight } = this.state;
+    const { imageWidth, imageHeight, isPetModalOpen } = this.state;
 
     const pl = data.pets.length;
     // const cl = data.comments.length;
@@ -76,29 +117,29 @@ class PictureCard extends Component {
       petNames = data.pets[0].name;
     }
 
+    const petImageSource = (url) => (
+      url ? { uri: url } : require('../../assets/img/pet.png')
+    );
+
     return (
       <View style={styles.container}>
         <View style={[styles.headerContainer, { height: data.place ? 65 : 55 }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View
+            <TouchableOpacity
+              onPress={this.togglePetModal}
+              activeOpacity={0.6}
               style={[styles.petAvatarContainer,
                 { width: pl === 1 ? 60 : pl === 2 ? 70 : 80 }
               ]}
             >
-              <Image
-                style={styles.firstPetAvatar}
-                source={{ uri: data.pets[0].avatar || PLACE_HOLDER }}
-              />
+              <Image style={styles.firstPetAvatar} source={petImageSource(data.pets[0].avatar)} />
               { data.pets[1] &&
-                <Image
-                  style={styles.secondPetAvatar}
-                  source={{ uri: data.pets[1].avatar || PLACE_HOLDER }}
-                />
+                <Image style={styles.secondPetAvatar} source={petImageSource(data.pets[1].avatar)} />
               }
               { data.pets[2] &&
-                <Image style={styles.thirdPetAvatar} source={{ uri: data.pets[2].avatar || PLACE_HOLDER }}/>
+                <Image style={styles.thirdPetAvatar} source={petImageSource(data.pets[2].avatar)} />
               }
-            </View>
+            </TouchableOpacity>
             <View style={styles.petInfoContainer}>
               <Text style={styles.petName}>{ petNames }</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
@@ -123,12 +164,32 @@ class PictureCard extends Component {
         <View
           style={{ height: imageHeight / imageWidth * width, width: width }}
         >
-          <ImageWithProgress
-            source={{ uri: data.image }}
-            indicator={ProgressPie}
-            indicatorProps={{ color: 'rgba(230, 83, 90, 0.7)' }}
-            style={{ height: '100%', width: '100%' }}
-          />
+          <TouchableOpacity
+            style={{ flex: 1 }}
+            activeOpacity={1}
+            onPress={() => {
+              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+              this.setState({ isPetModalOpen: false });
+            }}
+          >
+            <ImageWithProgress
+              source={{ uri: data.image }}
+              indicator={ProgressPie}
+              indicatorProps={{ color: 'rgba(230, 83, 90, 0.7)' }}
+              style={{ height: '100%', width: '100%', backgroundColor: '#eeeeee' }}
+            />
+          </TouchableOpacity>
+          { isPetModalOpen && (
+            <View style={styles.petModal}>
+              <FlatList
+                horizontal
+                style={{ padding: 5 }}
+                data={data.pets}
+                renderItem={({ item }) => this.renderPet(item)}
+                keyExtractor={(item) => item.id}
+              />
+            </View>
+          ) }
           <View style={styles.labelContainer}>
             <View style={styles.label}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
@@ -172,6 +233,15 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     backgroundColor:'#fff',
+  },
+  petModal: {
+    position: 'absolute',
+    top: 10,
+    left: 15,
+    width: width - 30,
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
   },
   image: {
     width: '100%',

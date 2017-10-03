@@ -3,6 +3,7 @@ package com.pawly;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.cmcewen.blurview.BlurViewPackage;
 import com.arttitude360.reactnative.rngoogleplaces.RNGooglePlacesPackage;
 import com.rnfs.RNFSPackage;
 import com.projectseptember.RNGL.RNGLPackage;
@@ -35,6 +36,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new BlurViewPackage(),
             new RNGooglePlacesPackage(),
             new RNFSPackage(),
             new RNGLPackage(),

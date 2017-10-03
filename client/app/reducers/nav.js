@@ -5,6 +5,7 @@ import { tabBarReducer } from '../navigators/TabBar';
 
 import { NavigatorAuth } from '../navigators/Auth';
 
+import { NavigatorMain } from '../navigators/Main';
 import { NavigatorMap } from '../navigators/Map';
 import { NavigatorDiscover } from '../navigators/Discover';
 import { NavigatorProfile } from '../navigators/Profile';
@@ -15,6 +16,7 @@ export const NavReducer = combineReducers({
 
   auth: (state, action) => (NavigatorAuth.router.getStateForAction(action,state) || state),
 
+  main: (state, action) => (NavigatorMain.router.getStateForAction(action,state) || state),
   map: (state, action) => (NavigatorMap.router.getStateForAction(action,state) || state),
   profile: (state, action) => (NavigatorProfile.router.getStateForAction(action,state) || state),
   discover: (state, action) => (NavigatorDiscover.router.getStateForAction(action,state) || state),

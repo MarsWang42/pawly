@@ -15,6 +15,8 @@ Rails.application.routes.draw do
       patch 'users/avatar' => 'users#upload_avatar'
       post 'user_token' => 'user_token#create', defaults: {format: :json}
 
+      get 'pets/:id' => 'pets#show'
+
       post 'places/nearby' => 'places#nearby'
 
       post 'pictures' => 'pictures#create'

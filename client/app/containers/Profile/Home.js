@@ -84,7 +84,7 @@ class Profile extends Component {
 
     const imageOpacity = this.state.scrollY.interpolate({
       inputRange: [0, HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE],
-      outputRange: [1, 1, 0],
+      outputRange: [1, 0.2, 0],
       extrapolate: 'clamp',
     });
     const imageTranslate = this.state.scrollY.interpolate({

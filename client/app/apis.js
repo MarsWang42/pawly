@@ -1,18 +1,21 @@
 import axios from 'axios';
 
-export const BASE_URL = 'http://localhost:3000/api/v1';
-// export const BASE_URL = 'https://pawly.herokuapp.com/api/v1';
+// export const BASE_URL = 'http://localhost:3000/api/v1';
+export const BASE_URL = 'https://pawly.herokuapp.com/api/v1';
 export const AUTH_URL = `${BASE_URL}/user_token`;
 export const USER_URL = `${BASE_URL}/users`;
 export const USERNAME_URL = `${BASE_URL}/username`;
 export const USER_SEARCH_URL = (keyword) => `${USER_URL}/search/${keyword}`;
 export const USER_FOLLOW_URL = `${USER_URL}/follow`;
 export const USER_UNFOLLOW_URL = `${USER_URL}/unfollow`;
-export const PETS_SEARCH_URL = (keyword) => `${USER_URL}/pets/${keyword}`;
-export const AVATAR_URL = `${USER_URL}/avatar`;
-export const FEED_URL = `${USER_URL}/feed`;
 export const USER_DETAIL_URL = (userId) => `${USER_URL}/detail/${userId}`;
+export const AVATAR_URL = `${USER_URL}/avatar`;
+
 export const PETS_URL = `${BASE_URL}/pets`;
+export const PETS_SEARCH_URL = (keyword) => `${PETS_URL}/${keyword}`;
+export const PET_DETAIL_URL = (petId) => `${PETS_URL}/${petId}`;
+
+export const FEED_URL = `${USER_URL}/feed`;
 export const PICTURE_URL = `${BASE_URL}/pictures`;
 export const NEARBY_URL = `${BASE_URL}/places/nearby`;
 export const PICTURE_LIKE_URL = `${PICTURE_URL}/like`;
@@ -86,6 +89,18 @@ export default {
         method: 'get',
         url: PETS_SEARCH_URL(keyword),
         headers: { Authorization: token },
+      }),
+  },
+
+  /* Pet APIs */
+  pet: {
+    detail: (id, token) =>
+      axios({
+        method: 'get',
+        url: PET_DETAIL_URL(id),
+        headers: {
+          Authorization: token,
+        },
       }),
   },
 

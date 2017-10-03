@@ -18,6 +18,7 @@ json.places(@places) do |place|
       json.avatar picture.creator.avatar.url
     end
     json.pets(picture.pets) do |pet|
+      json.id pet.id
       json.name pet.name
       json.avatar pet.avatar.url
     end

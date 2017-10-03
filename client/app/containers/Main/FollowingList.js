@@ -25,7 +25,7 @@ class FollowingList extends Component {
   }
 
   render() {
-    const { isLoading, followingList } = this.props;
+    const { isLoading, followingList, navigation } = this.props;
     return (
       <FlatList
         data={followingList.toJS()}
@@ -35,7 +35,10 @@ class FollowingList extends Component {
         style={styles.container}
         keyExtractor={(item) => (item.pictureId)}
         renderItem={({ item }) => (
-          <PictureCard data={item} />
+          <PictureCard
+            data={item}
+            navigateToPet={(id) => navigation.navigate('Pet', { petId: id })}
+          />
         )}
       />
     );
@@ -50,24 +53,6 @@ const styles = StyleSheet.create({
   icon: {
     marginLeft: (Platform.OS === 'ios') ? 40 : 20,
     marginTop: -2,
-  },
-  titleContainer: {
-    backgroundColor:'#2e2e2e',
-    padding: 12,
-    alignItems:'center',
-    justifyContent:'center'
-  },
-  title: {
-    fontSize: 18,
-    color: 'white',
-    letterSpacing: 2,
-    fontWeight: '600'
-  },
-  bgImg: {
-    flex: 1,
-    width: '100%',
-    alignItems:'center',
-    justifyContent:'center'
   },
 });
 

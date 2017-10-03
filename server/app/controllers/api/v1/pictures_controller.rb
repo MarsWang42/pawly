@@ -48,7 +48,6 @@ class Api::V1::PicturesController < ApiController
     end
 
     def set_pic
-      logger.debug pic_params
       Picture.find(pic_params[:pic_id])
     end
 end

@@ -1,12 +1,14 @@
 import { StackNavigator } from 'react-navigation';
 
 import mapNavigationStateParamsToProps from '../helpers/mapNavigationStateParamsToProps';
-import Home from '../containers/Discover/Home';
+import Home from '../containers/Main/Home';
 import User from '../containers/Shared/User';
+import Pet from '../containers/Shared/Pet';
 
 const routeConfiguration = {
   Home: { screen: Home },
-  DiscoverUser: { screen: mapNavigationStateParamsToProps(User) },
+  User: { screen: mapNavigationStateParamsToProps(User) },
+  Pet: { screen: mapNavigationStateParamsToProps(Pet) },
 };
 
 const stackNavigatorConfiguration = {
@@ -14,4 +16,4 @@ const stackNavigatorConfiguration = {
   initialRouteName: 'Home'
 };
 
-export const NavigatorDiscover = StackNavigator(routeConfiguration, stackNavigatorConfiguration);
+export const NavigatorMain = StackNavigator(routeConfiguration, stackNavigatorConfiguration);

@@ -27,7 +27,7 @@ class NearbyList extends Component {
   }
 
   render() {
-    const { isLoading, nearbyList } = this.props;
+    const { isLoading, nearbyList, navigation } = this.props;
     return (
       <FlatList
         data={nearbyList.toJS()}
@@ -37,7 +37,10 @@ class NearbyList extends Component {
         style={styles.container}
         keyExtractor={(item) => (item.pictureId)}
         renderItem={({ item }) => (
-          <PictureCard data={item} />
+          <PictureCard
+            data={item}
+            navigateToPet={(id) => navigation.navigate('Pet', { petId: id })}
+          />
         )}
       />
     );

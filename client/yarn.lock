@@ -3827,6 +3827,10 @@ npmlog@^4.0.2:
     gauge "~2.7.3"
     set-blocking "~2.0.0"
 
+nt-transmit-transparently@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/nt-transmit-transparently/-/nt-transmit-transparently-1.0.7.tgz#345cf3ffda06ba1bd629935bafac9e7820385076"
+
 number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
@@ -4252,6 +4256,12 @@ react-native-animatable@^1.2.3, react-native-animatable@^1.2.4:
   dependencies:
     prop-types "^15.5.10"
 
+react-native-blur@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-blur/-/react-native-blur-3.2.0.tgz#7a27d66c995e994611041a191b94ec290a7d99fb"
+  dependencies:
+    prop-types "^15.5.10"
+
 react-native-camera@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/react-native-camera/-/react-native-camera-0.10.0.tgz#5d973c9a8aab95f68aede395ba310eae0c3cecdd"
@@ -4310,6 +4320,10 @@ react-native-image-crop-picker@^0.16.1:
   version "0.16.1"
   resolved "https://registry.yarnpkg.com/react-native-image-crop-picker/-/react-native-image-crop-picker-0.16.1.tgz#37efb419276c691ac0f99d497ef787b53e652fc2"
 
+react-native-image-pan-zoom@^2.0.5:
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/react-native-image-pan-zoom/-/react-native-image-pan-zoom-2.0.7.tgz#76605310626c965895e9fe285d353feb47da6ec1"
+
 react-native-image-picker@latest:
   version "0.26.7"
   resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-0.26.7.tgz#ad2ee957f7f6cc01396893ea03d84cb2adb2e376"
@@ -4317,6 +4331,13 @@ react-native-image-picker@latest:
 react-native-image-resizer@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-native-image-resizer/-/react-native-image-resizer-1.0.0.tgz#d47e14943c37938e287fbd639e4db7ceb7fd8917"
+
+react-native-image-zoom-viewer@^2.0.10:
+  version "2.0.10"
+  resolved "https://registry.yarnpkg.com/react-native-image-zoom-viewer/-/react-native-image-zoom-viewer-2.0.10.tgz#792c4cb7ff0145c36390e4c6703bfe45aa492bd3"
+  dependencies:
+    nt-transmit-transparently "^1.0.7"
+    react-native-image-pan-zoom "^2.0.5"
 
 react-native-keyboard-aware-scroll-view@^0.3.0:
   version "0.3.0"

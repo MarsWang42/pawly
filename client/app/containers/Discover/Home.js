@@ -94,7 +94,7 @@ class Home extends Component {
             id: user.id,
             token: this.props.currentUser.accessToken,
           });
-          this.props.navigation.navigate('User', { userId: user.id });
+          this.props.navigation.navigate('DiscoverUser', { userId: user.id });
         }}
       >
         <Image source={imageSource} style={styles.userAvatar} />
@@ -112,7 +112,7 @@ class Home extends Component {
   }
 
   render() {
-    const { followingList, userList, dispatch } = this.props;
+    const { isLoading, followingList, userList, dispatch } = this.props;
     const { isUserListShow } = this.state;
 
     const headerTranslate = this.state.scrollY.interpolate({
@@ -137,6 +137,7 @@ class Home extends Component {
         <View style={styles.searchBarContainer}>
           <SearchBar
             ref={o => this.searchBar = o}
+            isLoading={isLoading}
             onFocus={this.focusSearchBar}
             onCancel={this.cancelSearchBar}
             onSearch={this.searchUsers}
@@ -145,22 +146,36 @@ class Home extends Component {
           />
         </View>
         <View style={styles.container}>
-          { isUserListShow &&
+          { isUserListShow && (
             <TouchableOpacity
               style={styles.userList}
               activeOpacity={1}
               onPress={this.searchBar.onCancel}
             >
-              <FlatList
-                data={userList}
-                removeClippedSubviews={false}
-                keyExtractor={(item) => (item.id)}
-                renderItem={({ item }) => (
-                  this.renderUser(item)
-                )}
-              />
+              { (userList && userList.length) !== 0 ? (
+                <FlatList
+                  data={userList}
+                  removeClippedSubviews={false}
+                  keyExtractor={(item) => (item.id)}
+                  renderItem={({ item }) => (
+                    this.renderUser(item)
+                  )}
+                />
+                ) : (
+                <View style={{ height: 200, justifyContent: 'center', alignItems: 'center' }}>
+                  <Icon
+                    size={ 40 }
+                    style={{ marginBottom: 5, backgroundColor: 'transparent', textAlign: 'center' }}
+                    name={'account-search'}
+                    color={'grey'}
+                  />
+                  <Text style={{ fontFamily: 'Lato', fontSize: 20, color: 'grey' }}>
+                    No User Found.
+                  </Text>
+                </View>
+              ) }
             </TouchableOpacity>
-          }
+          ) }
           <AnimatedLinearGradient
             style={[
               styles.header,
@@ -317,6 +332,7 @@ const mapStateToProps = (state) => {
     currentUser: state.session.currentUser,
     followingList: state.picture.followingList,
     userList: state.user.userList,
+    isLoading: state.user.isSearchingUsers,
   };
 };
 

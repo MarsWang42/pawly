@@ -13,6 +13,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import PictureCard from '../Main/PictureCard';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconM from 'react-native-vector-icons/MaterialIcons';
 import * as sessionActions from '../../reducers/session';
 import * as userActions from '../../reducers/user';
 
@@ -21,6 +22,7 @@ const HEADER_MAX_HEIGHT = width <= 325 ? 250 : 270;
 const HEADER_MIN_HEIGHT = width <= 325 ? 50 : 60;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 const AnimatableTouchableOpacity = Animatable.createAnimatableComponent(TouchableOpacity);
 
@@ -80,8 +82,9 @@ class User extends Component {
   }
 
   render() {
-    const { userDetails, dispatch, userId } = this.props;
+    const { userDetails, dispatch, userId, currentUser, navigation } = this.props;
     const userDetail = userDetails[userId];
+    const isCurrentUser = userDetail.id === currentUser.id;
     let avatarUrl = userDetail && userDetail.avatar.url;
     if (!avatarUrl && userDetail && userDetail.facebookId) {
       avatarUrl = `https://graph.facebook.com/${userDetail.facebookId}/picture?width=9999`;
@@ -97,12 +100,18 @@ class User extends Component {
 
     const imageOpacity = this.state.scrollY.interpolate({
       inputRange: [0, HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE],
-      outputRange: [1, 1, 0],
+      outputRange: [1, 0.2, 0],
       extrapolate: 'clamp',
     });
     const imageTranslate = this.state.scrollY.interpolate({
       inputRange: [0, HEADER_SCROLL_DISTANCE],
       outputRange: [0, 75],
+      extrapolate: 'clamp',
+    });
+
+    const backTranslate = this.state.scrollY.interpolate({
+      inputRange: [0, HEADER_SCROLL_DISTANCE],
+      outputRange: [0, -20],
       extrapolate: 'clamp',
     });
 
@@ -120,6 +129,15 @@ class User extends Component {
     if (userDetail) {
       return (
         <View style={styles.container}>
+          <AnimatedTouchableOpacity
+            style={[
+              styles.back,
+              { transform: [{ translateY: backTranslate }] },
+            ]}
+            onPress={() => navigation.goBack()}
+          >
+            <IconM name={'arrow-back'} size={24} color={'white'} />
+          </AnimatedTouchableOpacity>
           <Animated.View
             style={[
               styles.titleBar,
@@ -160,34 +178,40 @@ class User extends Component {
                   </Text>
                   { this.renderPets() }
                   <View style={styles.petButtons}>
-                    <TouchableOpacity style={[styles.petButton, { borderColor: '#ffe1af' }]}>
+                    <TouchableOpacity
+                      style={[styles.petButton,
+                        { width: isCurrentUser ? 160 : 80, borderColor: '#ffe1af' }
+                      ]}
+                    >
                       <Text style={[styles.petButtonText, { color: '#ffe1af' }]}>
                         See all...
                       </Text>
                     </TouchableOpacity>
-                    <AnimatableTouchableOpacity
-                      style={[styles.petButton, { borderColor: '#aeffe1' }]}
-                      ref={follow => this.follow = follow}
-                      onPress={() => {
-                        if (!userDetail.followed) {
-                          this.followUser(userDetail.id);
-                        } else {
-                          this.unfollowUser(userDetail.id);
+                    { !isCurrentUser && (
+                      <AnimatableTouchableOpacity
+                        style={[styles.petButton, { borderColor: '#aeffe1' }]}
+                        ref={follow => this.follow = follow}
+                        onPress={() => {
+                          if (!userDetail.followed) {
+                            this.followUser(userDetail.id);
+                          } else {
+                            this.unfollowUser(userDetail.id);
+                          }
+                        }}
+                      >
+                        { userDetail.followed &&
+                          <Icon
+                            name={'checkbox-marked-outline'}
+                            size={14}
+                            color={'#aeffe1'}
+                            style={{ marginRight: 3 }}
+                          />
                         }
-                      }}
-                    >
-                      { userDetail.followed &&
-                        <Icon
-                          name={'checkbox-marked-outline'}
-                          size={14}
-                          color={'#aeffe1'}
-                          style={{ marginRight: 3 }}
-                        />
-                      }
-                      <Text style={[styles.petButtonText, { color: '#aeffe1' }]}>
-                        { userDetail.followed ? 'Following' : 'Follow' }
-                      </Text>
-                    </AnimatableTouchableOpacity>
+                        <Text style={[styles.petButtonText, { color: '#aeffe1' }]}>
+                          { userDetail.followed ? 'Following' : 'Follow' }
+                        </Text>
+                      </AnimatableTouchableOpacity>
+                    ) }
                   </View>
                 </View>
               </View>
@@ -264,6 +288,14 @@ const styles = StyleSheet.create({
     zIndex: 2,
     backgroundColor: 'transparent',
     height: HEADER_MIN_HEIGHT,
+  },
+  back: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    zIndex: 10,
+    width: 80,
+    backgroundColor: 'transparent',
   },
   userAvatar: {
     height: width <= 325 ? 100 : 120,
