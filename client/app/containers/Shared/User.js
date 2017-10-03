@@ -60,7 +60,7 @@ class User extends Component {
   }
 
   renderPets() {
-    const { userDetails, userId } = this.props;
+    const { userDetails, userId, view } = this.props;
     const userDetail = userDetails[userId];
     const content = userDetail.pets.slice(0, 2).map(pet => {
       const petImageSource = pet.avatar ? { uri: pet.avatar }
@@ -82,9 +82,9 @@ class User extends Component {
   }
 
   render() {
-    const { userDetails, dispatch, userId, currentUser, navigation } = this.props;
+    const { view, userDetails, dispatch, userId, currentUser, navigation } = this.props;
     const userDetail = userDetails[userId];
-    const isCurrentUser = userDetail.id === currentUser.id;
+    const isCurrentUser = userDetail ? userDetail.id === currentUser.id : false;
     let avatarUrl = userDetail && userDetail.avatar;
     if (!avatarUrl && userDetail && userDetail.facebookId) {
       avatarUrl = `https://graph.facebook.com/${userDetail.facebookId}/picture?width=9999`;
@@ -111,7 +111,7 @@ class User extends Component {
 
     const backTranslate = this.state.scrollY.interpolate({
       inputRange: [0, HEADER_SCROLL_DISTANCE],
-      outputRange: [0, -20],
+      outputRange: [0, width <= 325 ? -15 : -10],
       extrapolate: 'clamp',
     });
 
@@ -216,16 +216,44 @@ class User extends Component {
                 </View>
               </View>
               <View style={styles.infoContainer}>
-                <View style={{ alignItems: 'center', width: 100 }}>
-                  <Text style={styles.infoNumber}>{ userDetail.followers.length }</Text>
+                <TouchableOpacity
+                  disabled={!userDetail || (userDetail && userDetail.followingLength === 0)}
+                  onPress={() => {
+                    dispatch({
+                      type: userActions.FETCH_FOLLOWER_LIST,
+                      id: currentUser.id,
+                      token: currentUser.accessToken,
+                    });
+                    navigation.navigate(`${view}FollowerList`, { userId: currentUser.id, view });
+                  }}
+                  style={{ alignItems: 'center', width: 100 }}
+                >
+                  <Text style={styles.infoNumber}>
+                    { userDetail ? userDetail.followerLength : '-' }
+                  </Text>
                   <Text style={styles.infoTitle}>Follower</Text>
-                </View>
-                <View style={{ alignItems: 'center', width: 100 }}>
-                  <Text style={styles.infoNumber}>{ userDetail.following.length }</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  disabled={!userDetail || (userDetail && userDetail.followingLength === 0)}
+                  onPress={() => {
+                    dispatch({
+                      type: userActions.FETCH_FOLLOWING_LIST,
+                      id: currentUser.id,
+                      token: currentUser.accessToken,
+                    });
+                    navigation.navigate(`${view}FollowingList`, { userId: currentUser.id, view });
+                  }}
+                  style={{ alignItems: 'center', width: 100 }}
+                >
+                  <Text style={styles.infoNumber}>
+                    { userDetail ? userDetail.followingLength : '-' }
+                  </Text>
                   <Text style={styles.infoTitle}>Following</Text>
-                </View>
+                </TouchableOpacity>
                 <View style={{ alignItems: 'center', width: 100 }}>
-                  <Text style={styles.infoNumber}>{ userDetail.pictures.length }</Text>
+                  <Text style={styles.infoNumber}>
+                    { userDetail ? userDetail.pictures.length : '-' }
+                  </Text>
                   <Text style={styles.infoTitle}>Post</Text>
                 </View>
               </View>
@@ -291,8 +319,8 @@ const styles = StyleSheet.create({
   },
   back: {
     position: 'absolute',
-    top: 40,
-    left: 20,
+    top: 35,
+    left: 25,
     zIndex: 10,
     width: 80,
     backgroundColor: 'transparent',

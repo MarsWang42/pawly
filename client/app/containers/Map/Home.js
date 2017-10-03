@@ -292,17 +292,16 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   header: {
-    backgroundColor: '#e2e2e2',
-    height: 55,
-    paddingTop: 17,
+    height: 60,
+    paddingTop: 19,
     alignItems:'center',
     justifyContent:'center'
   },
   title: {
-    fontSize: 18,
     color: 'black',
     fontFamily: 'Berlin Bold',
     letterSpacing: 1,
+    fontSize: 20,
     fontWeight: '600',
     backgroundColor: 'transparent',
   },

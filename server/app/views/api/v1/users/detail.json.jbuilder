@@ -37,10 +37,5 @@ json.pictures(@pictures) do |picture|
   end
 end
 
-json.followers(@user.followers) do |follower|
-  json.name follower.username
-end
-
-json.following(@user.following) do |following_user|
-  json.name following_user.username
-end
+json.followerLength @user.followers.size
+json.followingLength @user.following.size

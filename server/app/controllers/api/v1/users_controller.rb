@@ -3,6 +3,19 @@ class Api::V1::UsersController < ApiController
 
   def index
     @users = User.starts_with(params[:keyword]).limit(10)
+    @current_user = current_user
+    render :index
+  end
+
+  def followers
+    @users = set_user.followers
+    @current_user = current_user
+    render :index
+  end
+
+  def following
+    @users = set_user.following
+    @current_user = current_user
     render :index
   end
 

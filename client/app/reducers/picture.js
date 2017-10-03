@@ -159,9 +159,16 @@ export const PictureReducer = createReducer({
         item.get('pictureId') === action.data.pictureId),
       item => fromJS(action.data)
     );
+    const updatedNearbyList = state.nearbyList.update(
+      state.nearbyList.findIndex(item =>
+        item.get('pictureId') === action.data.pictureId),
+      item => fromJS(action.data)
+    );
+
     return {
       ...state,
       followingList: updatedFollowingList,
+      nearbyList: updatedNearbyList,
       isTogglingLike: false,
     };
   },

@@ -18,7 +18,7 @@ class Main extends Component {
           tabBarPosition='top'
           prerenderingSiblingsNumber={1}
           renderTabBar={() => <MainTabBar />}
-          tabBarTextStyle={{ marginBottom: 12, fontFamily: 'Lato' }}
+          tabBarTextStyle={{ marginBottom: 14, fontFamily: 'Lato', fontSize: 16 }}
         >
           <FollowingList
             tabLabel={'Following'}

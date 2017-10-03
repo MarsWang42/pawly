@@ -8,6 +8,12 @@ import { loop, Cmd } from 'redux-loop';
 export const FETCH_USER_DETAIL = 'FETCH_USER_DETAIL';
 export const FETCH_USER_DETAIL_SUCCEED = 'FETCH_USER_DETAIL_SUCCEED';
 export const FETCH_USER_DETAIL_FAILED = 'FETCH_USER_DETAIL_FAILED';
+export const FETCH_FOLLOWING_LIST = 'FETCH_FOLLOWING_LIST';
+export const FETCH_FOLLOWING_LIST_SUCCEED = 'FETCH_FOLLOWING_LIST_SUCCEED';
+export const FETCH_FOLLOWING_LIST_FAILED = 'FETCH_FOLLOWING_LIST_FAILED';
+export const FETCH_FOLLOWER_LIST = 'FETCH_FOLLOWER_LIST';
+export const FETCH_FOLLOWER_LIST_SUCCEED = 'FETCH_FOLLOWER_LIST_SUCCEED';
+export const FETCH_FOLLOWER_LIST_FAILED = 'FETCH_FOLLOWER_LIST_FAILED';
 export const SEARCH_USERS = 'SEARCH_USERS';
 export const SEARCH_USERS_SUCCEED = 'SEARCH_USERS_SUCCEED';
 export const SEARCH_USERS_FAILED = 'SEARCH_USERS_FAILED';
@@ -25,6 +31,30 @@ const fetchUserDetailSucceed = (respond, action) => {
 
 const fetchUserDetailFailed = () => ({
   type: FETCH_USER_DETAIL_FAILED,
+});
+
+const fetchFollowingListSucceed = (respond, action) => {
+  return {
+    type: FETCH_FOLLOWING_LIST_SUCCEED,
+    followingList: respond.data.users,
+    userId: action.id,
+  };
+};
+
+const fetchFollowingListFailed = () => ({
+  type: FETCH_FOLLOWING_LIST_FAILED,
+});
+
+const fetchFollowerListSucceed = (respond, action) => {
+  return {
+    type: FETCH_FOLLOWER_LIST_SUCCEED,
+    followerList: respond.data.users,
+    userId: action.id,
+  };
+};
+
+const fetchFollowerListFailed = () => ({
+  type: FETCH_FOLLOWER_LIST_FAILED,
 });
 
 const searchUsersSucceed = (respond) => {
@@ -53,6 +83,7 @@ const toggleUserFollowFailed = () => ({
 });
 
 export const UserReducer = createReducer({
+  userList: List(),
   userDetails: Map(),
   isFetchingFeed: false,
 }, {
@@ -80,6 +111,58 @@ export const UserReducer = createReducer({
       fetchUserDetailError: 'Fetching failed.',
     };
   },
+  [FETCH_FOLLOWING_LIST](state, action) {
+    return loop(
+      { ...state, isFetchingFollowingList: true, fetchFollowingListError: undefined },
+      Cmd.run(apis.user.followingList, {
+        successActionCreator: (respond) => fetchFollowingListSucceed(respond, action),
+        failActionCreator: fetchFollowingListFailed,
+        args: [action.id, action.token]
+      })
+    );
+  },
+  [FETCH_FOLLOWING_LIST_SUCCEED](state, { userId, followingList }) {
+    return {
+      ...state,
+      isFetchingFollowingList: false,
+      userDetails: state.userDetails.setIn(
+        [userId, 'following'], fromJS(followingList)
+      ),
+    };
+  },
+  [FETCH_FOLLOWING_LIST_FAILED](state, action) {
+    return {
+      ...state,
+      isFetchingFollowingList: false,
+      fetchUserDetailError: 'Fetching failed.',
+    };
+  },
+  [FETCH_FOLLOWER_LIST](state, action) {
+    return loop(
+      { ...state, isFetchingFollowerList: true, fetchFollowerListError: undefined },
+      Cmd.run(apis.user.followerList, {
+        successActionCreator: (respond) => fetchFollowerListSucceed(respond, action),
+        failActionCreator: fetchFollowerListFailed,
+        args: [action.id, action.token]
+      })
+    );
+  },
+  [FETCH_FOLLOWER_LIST_SUCCEED](state, { userId, followerList }) {
+    return {
+      ...state,
+      isFetchingFollowerList: false,
+      userDetails: state.userDetails.setIn(
+        [userId, 'followers'], fromJS(followerList)
+      ),
+    };
+  },
+  [FETCH_FOLLOWER_LIST_FAILED](state, action) {
+    return {
+      ...state,
+      isFetchingFollowerList: false,
+      fetchFollowerListError: 'Fetching failed.',
+    };
+  },
   [SEARCH_USERS](state, action) {
     return loop(
       { ...state, isSearchingUsers: true, searchUsersError: undefined },
@@ -94,7 +177,7 @@ export const UserReducer = createReducer({
     return {
       ...state,
       isSearchingUsers: false,
-      userList: action.userList,
+      userList: fromJS(action.userList),
     };
   },
   [SEARCH_USERS_FAILED](state, action) {
@@ -107,7 +190,7 @@ export const UserReducer = createReducer({
   [CLEAR_SEARCH_USERS](state, action) {
     return {
       ...state,
-      userList: [],
+      userList: List(),
     };
   },
   [TOGGLE_USER_FOLLOW](state, action) {
@@ -125,9 +208,16 @@ export const UserReducer = createReducer({
       .setIn([userId, 'followed'], followed)
       .setIn([userId, 'followers'], followers)
     ;
+    const updatedUserList = state.userList
+      .setIn(
+        [state.userList.findIndex(item => item.get('id') === userId), 'followed'],
+        followed,
+      );
+
     return {
       ...state,
       userDetails: updatedUserDetails,
+      userList: updatedUserList,
       isTogglingUserFollow: false,
     };
   },

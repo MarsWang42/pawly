@@ -2,23 +2,31 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   Animated,
-  Dimensions,
-  Image,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import * as sessionActions from '../../reducers/session';
-import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import UserList from '../Shared/UserList';
+import SearchBar from '../../components/Helpers/SearchBar';
+import * as userActions from '../../reducers/user';
 
-class Settings extends Component {
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
+
+const HEADER_MAX_HEIGHT = 200;
+const HEADER_MIN_HEIGHT = 0;
+const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+
+class FollowingList extends Component {
   render() {
-    const { dispatch, navigation } = this.props;
+    const { userDetails, currentUser, navigation, dispatch, userId, view } = this.props;
+    const followingList = userDetails[userId].following;
+
     return (
-      <View>
+      <View style={styles.container}>
         <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
           <Icon name={'arrow-back'} size={24} color={'black'} />
         </TouchableOpacity>
@@ -28,18 +36,20 @@ class Settings extends Component {
           colors={['#ECE9E6', '#ffffff']}
         >
           <Text style={styles.title}>
-            Settings
+            Followers
           </Text>
         </LinearGradient>
-        <View style={styles.optionsContainer}>
-          <TouchableOpacity
-            style={styles.option}
-            onPress={() => dispatch({ type: sessionActions.LOGOUT_USER })}
-          >
-            <IconM name={'logout'} color={'#ff2f2f'} size={25} style={styles.optionIcon} />
-            <Text style={[styles.optionText, { color: '#ff2f2f' }]}>Logout</Text>
-          </TouchableOpacity>
-        </View>
+        <UserList
+          userList={followingList}
+          onPressUser={(user) => {
+            dispatch({
+              type: userActions.FETCH_USER_DETAIL,
+              id: user.id,
+              token: currentUser.accessToken,
+            });
+            navigation.navigate(`${view}User`, { userId: user.id, view });
+          }}
+        />
       </View>
     );
   }
@@ -71,31 +81,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     backgroundColor: 'transparent',
   },
-  optionsContainer: {
-    marginTop: 20,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: 'grey',
-  },
-  option: {
-    flexDirection: 'row',
-    width: '100%',
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-  },
-  optionIcon: {
-    width: 40,
-  },
-  optionText: {
-    flex: 1,
-    fontFamily: 'Lato',
-    fontSize: 18,
-    borderBottomWidth: 1,
-    borderColor: 'grey',
-  }
 });
 
 const mapStateToProps = (state) => {
@@ -105,4 +90,5 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(Settings);
+
+export default connect(mapStateToProps)(FollowingList);

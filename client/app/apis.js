@@ -1,13 +1,15 @@
 import axios from 'axios';
 
-// export const BASE_URL = 'http://localhost:3000/api/v1';
-export const BASE_URL = 'https://pawly.herokuapp.com/api/v1';
+export const BASE_URL = 'http://localhost:3000/api/v1';
+// export const BASE_URL = 'https://pawly.herokuapp.com/api/v1';
 export const AUTH_URL = `${BASE_URL}/user_token`;
 export const USER_URL = `${BASE_URL}/users`;
 export const USERNAME_URL = `${BASE_URL}/username`;
 export const USER_SEARCH_URL = (keyword) => `${USER_URL}/search/${keyword}`;
 export const USER_FOLLOW_URL = `${USER_URL}/follow`;
 export const USER_UNFOLLOW_URL = `${USER_URL}/unfollow`;
+export const FOLLOWING_LIST_URL = (userId) => `${USER_URL}/${userId}/following`;
+export const FOLLOWER_LIST_URL = (userId) => `${USER_URL}/${userId}/followers`;
 export const USER_DETAIL_URL = (userId) => `${USER_URL}/detail/${userId}`;
 export const AVATAR_URL = `${USER_URL}/avatar`;
 
@@ -72,6 +74,18 @@ export default {
       axios({
         method: 'get',
         url: USER_SEARCH_URL(keyword),
+        headers: { Authorization: token },
+      }),
+    followingList: (id, token) =>
+      axios({
+        method: 'get',
+        url: FOLLOWING_LIST_URL(id),
+        headers: { Authorization: token },
+      }),
+    followerList: (id, token) =>
+      axios({
+        method: 'get',
+        url: FOLLOWER_LIST_URL(id),
         headers: { Authorization: token },
       }),
     avatar: (image, token) =>

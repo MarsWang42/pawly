@@ -100,7 +100,7 @@ class Profile extends Component {
 
     const settingsTranslate = this.state.scrollY.interpolate({
       inputRange: [0, HEADER_SCROLL_DISTANCE],
-      outputRange: [0, -15],
+      outputRange: [0, width <= 325 ? -15 : -10],
       extrapolate: 'clamp',
     });
 
@@ -182,18 +182,42 @@ class Profile extends Component {
               </View>
             </View>
             <View style={styles.infoContainer}>
-              <View style={{ alignItems: 'center', width: 100 }}>
+              <TouchableOpacity
+                disabled={!userDetailFetched
+                  || (userDetailFetched && currentUserDetail.followingLength === 0)}
+                onPress={() => {
+                  dispatch({
+                    type: userActions.FETCH_FOLLOWER_LIST,
+                    id: currentUser.id,
+                    token: currentUser.accessToken,
+                  });
+                  navigation.navigate('ProfileFollowerList', { userId: currentUser.id, view: 'Profile' });
+                }}
+                style={{ alignItems: 'center', width: 100 }}
+              >
                 <Text style={styles.infoNumber}>
-                  { userDetailFetched ? currentUserDetail.followers.length : '-' }
+                  { userDetailFetched ? currentUserDetail.followerLength : '-' }
                 </Text>
                 <Text style={styles.infoTitle}>Follower</Text>
-              </View>
-              <View style={{ alignItems: 'center', width: 100 }}>
+              </TouchableOpacity>
+              <TouchableOpacity
+                disabled={!userDetailFetched
+                  || (userDetailFetched && currentUserDetail.followingLength === 0)}
+                onPress={() => {
+                  dispatch({
+                    type: userActions.FETCH_FOLLOWING_LIST,
+                    id: currentUser.id,
+                    token: currentUser.accessToken,
+                  });
+                  navigation.navigate('ProfileFollowingList', { userId: currentUser.id, view: 'Profile' });
+                }}
+                style={{ alignItems: 'center', width: 100 }}
+              >
                 <Text style={styles.infoNumber}>
-                  { userDetailFetched ? currentUserDetail.following.length : '-' }
+                  { userDetailFetched ? currentUserDetail.followingLength : '-' }
                 </Text>
                 <Text style={styles.infoTitle}>Following</Text>
-              </View>
+              </TouchableOpacity>
               <View style={{ alignItems: 'center', width: 100 }}>
                 <Text style={styles.infoNumber}>
                   { userDetailFetched ? currentUserDetail.pictures.length : '-' }

@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   Animated,
-  FlatList,
-  Image,
   Platform,
   StyleSheet,
   Text,
@@ -12,10 +10,11 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import _ from 'lodash';
 import PictureCard from '../Main/PictureCard';
+import UserList from '../Shared/UserList';
 import SearchBar from '../../components/Helpers/SearchBar';
 import * as userActions from '../../reducers/user';
-import _ from 'lodash';
 
 const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
 
@@ -55,60 +54,6 @@ class Home extends Component {
         type: userActions.CLEAR_SEARCH_USERS,
       });
     }
-  }
-
-  renderPets(pets) {
-    const content = pets.slice(0, 2).map(pet => {
-      const petImageSource = pet.avatar.url ? { uri: pet.avatar.url }
-        : require('../../assets/img/pet.png');
-      return (
-        <View style={styles.petContainer} key={pet.id}>
-          <Image source={petImageSource} style={styles.petAvatar} />
-          <Text style={styles.petName}>{ pet.name }</Text>
-        </View>
-      );
-    });
-    if (pets.length >= 3) {
-      content.push(
-        <Text key={'...'} style={{ fontFamily: 'Lato-italic', fontSize: 10 }}>...</Text>
-      );
-    }
-    return content;
-  }
-
-  renderUser(user) {
-    let avatarUrl = user && user.avatar.url;
-    if (!avatarUrl && user && user.facebookId) {
-      avatarUrl = `https://graph.facebook.com/${user.facebookId}/picture?width=9999`;
-    }
-    const imageSource = avatarUrl ? { uri: avatarUrl }
-      : require('../../assets/img/user-default.png');
-
-    return (
-      <TouchableOpacity
-        style={styles.userContainer}
-        key={user.id}
-        onPress={() => {
-          this.props.dispatch({
-            type: userActions.FETCH_USER_DETAIL,
-            id: user.id,
-            token: this.props.currentUser.accessToken,
-          });
-          this.props.navigation.navigate('DiscoverUser', { userId: user.id });
-        }}
-      >
-        <Image source={imageSource} style={styles.userAvatar} />
-        <View>
-          <Text style={styles.username}>{ user.username }</Text>
-          { user.pets.length ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ fontFamily: 'Lato', fontSize: 12 }}>Pets: </Text>
-              { this.renderPets(user.pets) }
-            </View>
-          ) : null}
-        </View>
-      </TouchableOpacity>
-    );
   }
 
   render() {
@@ -152,28 +97,20 @@ class Home extends Component {
               activeOpacity={1}
               onPress={this.searchBar.onCancel}
             >
-              { (userList && userList.length) !== 0 ? (
-                <FlatList
-                  data={userList}
-                  removeClippedSubviews={false}
-                  keyExtractor={(item) => (item.id)}
-                  renderItem={({ item }) => (
-                    this.renderUser(item)
-                  )}
-                />
-                ) : (
-                <View style={{ height: 200, justifyContent: 'center', alignItems: 'center' }}>
-                  <Icon
-                    size={ 40 }
-                    style={{ marginBottom: 5, backgroundColor: 'transparent', textAlign: 'center' }}
-                    name={'account-search'}
-                    color={'grey'}
-                  />
-                  <Text style={{ fontFamily: 'Lato', fontSize: 20, color: 'grey' }}>
-                    No User Found.
-                  </Text>
-                </View>
-              ) }
+              <UserList
+                userList={userList.toJS()}
+                onPressUser={(user) => {
+                  this.props.dispatch({
+                    type: userActions.FETCH_USER_DETAIL,
+                    id: user.id,
+                    token: this.props.currentUser.accessToken,
+                  });
+                  this.props.navigation.navigate('DiscoverUser', {
+                    userId: user.id,
+                    view: 'Discover',
+                  });
+                }}
+              />
             </TouchableOpacity>
           ) }
           <AnimatedLinearGradient
