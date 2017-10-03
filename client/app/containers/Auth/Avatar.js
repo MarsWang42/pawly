@@ -117,7 +117,7 @@ class Avatar extends Component {
     const { currentUser, updateError } = this.props;
     const { isLoadingImage, username, usernameError } = this.state;
 
-    let avatarUrl = currentUser && currentUser.avatar.url;
+    let avatarUrl = currentUser && currentUser.avatar;
     if (!avatarUrl && currentUser && currentUser.facebookId) {
       avatarUrl = `https://graph.facebook.com/${currentUser.facebookId}/picture?width=9999`;
     }

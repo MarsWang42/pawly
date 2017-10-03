@@ -63,7 +63,7 @@ class User extends Component {
     const { userDetails, userId } = this.props;
     const userDetail = userDetails[userId];
     const content = userDetail.pets.slice(0, 2).map(pet => {
-      const petImageSource = pet.avatar.url ? { uri: pet.avatar.url }
+      const petImageSource = pet.avatar ? { uri: pet.avatar }
         : require('../../assets/img/pet.png');
       return (
         <View style={styles.petContainer} key={pet.id}>
@@ -85,7 +85,7 @@ class User extends Component {
     const { userDetails, dispatch, userId, currentUser, navigation } = this.props;
     const userDetail = userDetails[userId];
     const isCurrentUser = userDetail.id === currentUser.id;
-    let avatarUrl = userDetail && userDetail.avatar.url;
+    let avatarUrl = userDetail && userDetail.avatar;
     if (!avatarUrl && userDetail && userDetail.facebookId) {
       avatarUrl = `https://graph.facebook.com/${userDetail.facebookId}/picture?width=9999`;
     }
