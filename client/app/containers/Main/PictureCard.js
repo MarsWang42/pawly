@@ -28,22 +28,10 @@ class PictureCard extends Component {
   constructor() {
     super();
     this.state = {
-      imageWidth: width,
-      imageHeight: width,
       isPetListOpen: false,
     };
     this.togglePetModal = this.togglePetModal.bind(this);
     this.selectPet = this.selectPet.bind(this);
-  }
-
-  componentDidMount() {
-    Image.getSize(
-      this.props.data.image,
-      (imageWidth, imageHeight) => {
-        this.setState({ imageWidth, imageHeight })
-      },
-      error => console.log(error),
-    )
   }
 
   likePic(id) {
@@ -67,6 +55,16 @@ class PictureCard extends Component {
     });
   }
 
+  openPictureDetail(id) {
+    const { currentUser, data, dispatch, navigation, view } = this.props;
+    dispatch({
+      type: pictureActions.FETCH_PICTURE_DETAIL,
+      id,
+      token: currentUser.accessToken
+    });
+    navigation.navigate(`${view}PictureDetail`, { pictureId: id, view, data });
+  }
+
   togglePetModal() {
     if (this.props.data.pets.length >= 2) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -77,8 +75,9 @@ class PictureCard extends Component {
   }
 
   selectPet(id) {
-    this.props.navigateToPet(id);
-    this.props.dispatch({
+    const { navigation, dispatch, view } = this.props;
+    navigation.navigate(`${view}Pet`, { petId: id , view });
+    dispatch({
       type: petActions.FETCH_PET_DETAIL,
       id: id,
       token: this.props.currentUser.accessToken,
@@ -88,7 +87,10 @@ class PictureCard extends Component {
   renderPet(pet) {
     const petImageSource = pet.avatar ? { uri: pet.avatar } : require('../../assets/img/pet.png');
     return (
-      <View style={{ justifyContent: 'center', alignItems: 'center', margin: 3 }}>
+      <TouchableOpacity
+        onPress={() => this.selectPet(pet.id)}
+        style={{ justifyContent: 'center', alignItems: 'center', margin: 3 }}
+      >
         <Image
           style={{
             height: 30,
@@ -98,13 +100,13 @@ class PictureCard extends Component {
           source={petImageSource}
         />
         <Text style={{ fontFamily: 'Lato', fontSize: 14 }}>{ pet.name }</Text>
-      </View>
+      </TouchableOpacity>
     );
   }
 
   render() {
-    const { data } = this.props;
-    const { imageWidth, imageHeight, isPetModalOpen } = this.state;
+    const { data, dispatch } = this.props;
+    const { isPetModalOpen } = this.state;
 
     const pl = data.pets.length;
     // const cl = data.comments.length;
@@ -140,7 +142,10 @@ class PictureCard extends Component {
                 <Image style={styles.thirdPetAvatar} source={petImageSource(data.pets[2].avatar)} />
               }
             </TouchableOpacity>
-            <View style={styles.petInfoContainer}>
+            <TouchableOpacity
+              style={styles.petInfoContainer}
+              onPress={() => this.openPictureDetail(data.pictureId)}
+            >
               <Text style={styles.petName}>{ petNames }</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
                 <Text style={{ fontSize: 11, fontFamily: 'Lato' }}>Taken by </Text>
@@ -158,11 +163,11 @@ class PictureCard extends Component {
                   </Text>
                 </View>
               ) }
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
         <View
-          style={{ height: imageHeight / imageWidth * width, width: width }}
+          style={{ height: width, width }}
         >
           <TouchableOpacity
             style={{ flex: 1 }}
@@ -212,12 +217,12 @@ class PictureCard extends Component {
                       style={{ marginTop: 3 }}
                     />
                     <Text style={{ fontFamily: 'Lato', fontSize: 16, marginHorizontal: 5 }}>
-                      { data.likers.length }
+                      { data.likerLength }
                     </Text>
                   </AnimatableTouchableOpacity>
                   <Icon name={'message-outline'} size={22} style={{ marginTop: 2, marginLeft: 5 }} />
                   <Text style={{ fontFamily: 'Lato', fontSize: 16, marginHorizontal: 5 }}>
-                    158
+                    { data.commentLength }
                   </Text>
                 </View>
               </View>

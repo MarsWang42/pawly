@@ -18,12 +18,18 @@ Rails.application.routes.draw do
       post 'user_token' => 'user_token#create', defaults: {format: :json}
 
       get 'pets/:id' => 'pets#show'
+      post 'pets' => 'pets#create'
+      delete 'pets/:id' => 'pets#delete'
 
       post 'places/nearby' => 'places#nearby'
 
+      get 'pictures/:pic_id' => 'pictures#show'
       post 'pictures' => 'pictures#create'
       post 'pictures/like' => 'pictures#like'
       post 'pictures/unlike' => 'pictures#unlike'
+
+      post 'comments' => 'comments#create'
+      post 'comments/:picture_id' => 'comments#index'
     end
   end
 end

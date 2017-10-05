@@ -7,6 +7,9 @@ import { loop, Cmd } from 'redux-loop';
 export const CREATE_PICTURE = 'CREATE_PICTURE';
 export const CREATE_PICTURE_SUCCEED = 'CREATE_PICTURE_SUCCEED';
 export const CREATE_PICTURE_FAILED = 'CREATE_PICTURE_FAILED';
+export const FETCH_PICTURE_DETAIL = 'FETCH_PICTURE_DETAIL';
+export const FETCH_PICTURE_DETAIL_SUCCEED = 'FETCH_PICTURE_DETAIL_SUCCEED';
+export const FETCH_PICTURE_DETAIL_FAILED = 'FETCH_PICTURE_DETAIL_FAILED';
 export const FETCH_FEED = 'FETCH_FEED';
 export const FETCH_FEED_SUCCEED = 'FETCH_FEED_SUCCEED';
 export const FETCH_FEED_FAILED = 'FETCH_FEED_FAILED';
@@ -27,6 +30,17 @@ const createPictureSucceed = (respond, action) => {
 
 const createPictureFailed = () => ({
   type: CREATE_PICTURE_FAILED,
+});
+
+const fetchPictureDetailSucceed = (respond, action) => {
+  return {
+    type: FETCH_PICTURE_DETAIL_SUCCEED,
+    pictureDetail: respond.data,
+  };
+};
+
+const fetchPictureDetailFailed = () => ({
+  type: FETCH_PICTURE_DETAIL_FAILED,
 });
 
 const fetchFeedSucceed = (respond) => {
@@ -67,6 +81,7 @@ export const PictureReducer = createReducer({
   followingList: List(),
   nearbyList: List(),
   placeList: List(),
+  pictureDetails: Map(),
   isFetchingFeed: false,
 }, {
   [CREATE_PICTURE](state, action) {
@@ -90,6 +105,30 @@ export const PictureReducer = createReducer({
       ...state,
       isCreatingPicture: false,
       createPictureError: 'Creating failed.',
+    };
+  },
+  [FETCH_PICTURE_DETAIL](state, action) {
+    return loop(
+      { ...state, isFetchingPictureDetail: true, fetchPictureDetailError: undefined },
+      Cmd.run(apis.picture.detail, {
+        successActionCreator: (respond) => fetchPictureDetailSucceed(respond, action),
+        failActionCreator: fetchPictureDetailFailed,
+        args: [action.id, action.token]
+      })
+    );
+  },
+  [FETCH_PICTURE_DETAIL_SUCCEED](state, { pictureDetail }) {
+    return {
+      ...state,
+      isFetchingPictureDetail: false,
+      pictureDetails: state.pictureDetails.set(pictureDetail.pictureId, fromJS(pictureDetail)),
+    };
+  },
+  [FETCH_PICTURE_DETAIL_FAILED](state, action) {
+    return {
+      ...state,
+      isFetchingPictureDetail: false,
+      fetchPictureDetailError: 'Fetching failed.',
     };
   },
   [FETCH_FEED](state, action) {
@@ -154,22 +193,25 @@ export const PictureReducer = createReducer({
     );
   },
   [TOGGLE_PICTURE_LIKE_SUCCEED](state, action) {
-    const updatedFollowingList = state.followingList.update(
-      state.followingList.findIndex(item =>
-        item.get('pictureId') === action.data.pictureId),
-      item => fromJS(action.data)
-    );
-    const updatedNearbyList = state.nearbyList.update(
-      state.nearbyList.findIndex(item =>
-        item.get('pictureId') === action.data.pictureId),
-      item => fromJS(action.data)
-    );
+    const followingId = state.followingList.findIndex(item =>
+        item.get('pictureId') === action.data.pictureId);
+    const nearbyId = state.nearbyList.findIndex(item =>
+        item.get('pictureId') === action.data.pictureId);
+
+    const updatedFollowingList = followingId !== -1 ? state.followingList.update(
+      followingId, item => fromJS(action.data)
+    ) : state.followingList;
+
+    const updatedNearbyList = nearbyId !== -1 ? state.nearbyList.update(
+      nearbyId, item => fromJS(action.data)
+    ) : state.nearbyList;
 
     return {
       ...state,
       followingList: updatedFollowingList,
       nearbyList: updatedNearbyList,
       isTogglingLike: false,
+      pictureDetails: state.pictureDetails.set(action.data.pictureId, fromJS(action.data)),
     };
   },
   [TOGGLE_PICTURE_LIKE_FAILED](state, action) {

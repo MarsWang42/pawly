@@ -17,6 +17,7 @@ const AnimatableTouchableOpacity = Animatable.createAnimatableComponent(Touchabl
 class UserList extends Component {
   constructor() {
     super();
+    this.follow = {};
   }
 
   followUser(id) {
@@ -25,7 +26,7 @@ class UserList extends Component {
       toggleType: 'follow',
       userId: id,
       callback: () => {
-        this.follow.pulse();
+        this.follow[id].pulse();
       },
       token: this.props.currentUser.accessToken,
     });
@@ -42,7 +43,7 @@ class UserList extends Component {
 
   renderPets(pets) {
     const content = pets.slice(0, 2).map(pet => {
-      const petImageSource = pet.avatar.url ? { uri: pet.avatar.url }
+      const petImageSource = pet.avatar ? { uri: pet.avatar }
         : require('../../assets/img/pet.png');
       return (
         <View style={styles.petContainer} key={pet.id}>
@@ -60,7 +61,7 @@ class UserList extends Component {
   }
 
   renderUser(user) {
-    let avatarUrl = user && user.avatar.url;
+    let avatarUrl = user && user.avatar;
     if (!avatarUrl && user && user.facebookId) {
       avatarUrl = `https://graph.facebook.com/${user.facebookId}/picture?width=9999`;
     }
@@ -88,7 +89,7 @@ class UserList extends Component {
         { !isCurrentUser && (
           <AnimatableTouchableOpacity
             style={[styles.followButton, { borderColor: '#167ac6' }]}
-            ref={follow => this.follow = follow}
+            ref={follow => this.follow[user.id] = follow}
             onPress={() => {
               if (!user.followed) {
                 this.followUser(user.id);

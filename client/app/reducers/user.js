@@ -2,6 +2,7 @@ import createReducer from '../helpers/createReducer';
 import db from '../db';
 import apis from '../apis';
 import * as pictureActions from './picture';
+import * as petActions from './pet';
 import { fromJS, List, Map } from 'immutable';
 import { loop, Cmd } from 'redux-loop';
 
@@ -21,6 +22,7 @@ export const CLEAR_SEARCH_USERS = 'CLEAR_SEARCH_USERS';
 export const TOGGLE_USER_FOLLOW = 'TOGGLE_USER_FOLLOW';
 export const TOGGLE_USER_FOLLOW_SUCCEED = 'TOGGLE_USER_FOLLOW_SUCCEED';
 export const TOGGLE_USER_FOLLOW_FAILED = 'TOGGLE_USER_FOLLOW_FAILED';
+export const CREATE_PET_SUCCEED = 'CREATE_PET_SUCCEED';
 
 const fetchUserDetailSucceed = (respond, action) => {
   return {
@@ -73,7 +75,9 @@ const toggleUserFollowSucceed = (respond, { userId, callback }) => {
   return {
     type: TOGGLE_USER_FOLLOW_SUCCEED,
     followed: respond.data.followed,
-    followers: respond.data.followers,
+    followerLength: respond.data.followerLength,
+    followingLength: respond.data.followingLength,
+    currentUserId: respond.data.currentUserId,
     userId,
   };
 };
@@ -203,10 +207,11 @@ export const UserReducer = createReducer({
       })
     );
   },
-  [TOGGLE_USER_FOLLOW_SUCCEED](state, { userId, followed, followers }) {
+  [TOGGLE_USER_FOLLOW_SUCCEED](state, { currentUserId, userId, followed, followerLength, followingLength }) {
     const updatedUserDetails = state.userDetails
       .setIn([userId, 'followed'], followed)
-      .setIn([userId, 'followers'], followers)
+      .setIn([currentUserId, 'followingLength'], followingLength)
+      .setIn([userId, 'followerLength'], followerLength)
     ;
     const updatedUserList = state.userList
       .setIn(
@@ -226,6 +231,19 @@ export const UserReducer = createReducer({
       ...state,
       isTogglingUserFollow: false,
       toggleUserFollowError: 'Fetching failed.',
+    };
+  },
+  [CREATE_PET_SUCCEED](state, { pet }) {
+    const updatedUserDetails = state.userDetails.updateIn(
+      [
+        pet.ownerId,
+        'pets',
+      ],
+      arr => arr.push(fromJS(pet))
+    );
+    return {
+      ...state,
+      userDetails: updatedUserDetails,
     };
   },
   [pictureActions.TOGGLE_PICTURE_LIKE_SUCCEED](state, { data }) {

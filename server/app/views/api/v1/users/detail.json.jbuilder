@@ -27,14 +27,14 @@ json.pictures(@pictures) do |picture|
     end
   end
   json.pets(picture.pets) do |pet|
+    json.id pet.id
     json.name pet.name
     json.avatar pet.avatar.url
   end
   json.pictureId picture.id
   json.liked @user.liked?(picture)
-  json.likers(picture.likers) do |liker|
-    json.username liker.username
-  end
+  json.likerLength picture.likers.length
+  json.commentLength picture.comments.length
 end
 
 json.followerLength @user.followers.size

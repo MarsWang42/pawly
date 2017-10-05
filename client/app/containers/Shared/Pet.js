@@ -15,6 +15,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { BlurView } from 'react-native-blur';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as actions from '../../reducers/pet';
+import * as userActions from '../../reducers/user';
 
 const { width, height } = Dimensions.get('window');
 const HEADER_MAX_HEIGHT = 160;
@@ -31,8 +32,18 @@ class Pet extends Component {
     };
   }
 
+  selectUser(id) {
+    const { navigation, dispatch, currentUser, view } = this.props;
+    dispatch({
+      type: userActions.FETCH_USER_DETAIL,
+      id: id,
+      token: currentUser.accessToken,
+    });
+    navigation.navigate(`${view}User`, { userId: id, view });
+  }
+
   render() {
-    const { petDetails, dispatch, petId, currentUser, navigation } = this.props;
+    const { petDetails, dispatch, petId, view, currentUser, navigation } = this.props;
     const  petDetail = petDetails[petId];
     if (!petDetail) return null;
 
@@ -121,7 +132,10 @@ class Pet extends Component {
               blurAmount={10}
             />
             <Image source={petImageSource} style={styles.petAvatar} />
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity
+              style={{ justifyContent: 'center', alignItems: 'center' }}
+              onPress={() => this.selectUser(petDetail.owner.userId)}
+            >
               <Text style={{ backgroundColor: 'transparent', fontFamily: 'Lato', color: 'white' }}>
                 Owner:&nbsp;
               </Text>
@@ -129,7 +143,7 @@ class Pet extends Component {
               <Text style={{ backgroundColor: 'transparent', fontFamily: 'Lato', color: 'white' }}>
                 { petDetail.owner.username }
               </Text>
-            </View>
+            </TouchableOpacity>
           </Animated.View>
         </AnimatedLinearGradient>
         <Animated.ScrollView
@@ -238,6 +252,7 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30,
     borderRadius: 15,
+    margin: 8,
     overflow: 'hidden',
     backgroundColor: 'white'
   },

@@ -107,12 +107,12 @@ class PictureCard extends Component {
                       style={{ marginTop: 3 }}
                     />
                     <Text style={{ fontFamily: 'Lato', fontSize: 16, marginHorizontal: 5 }}>
-                      { data.likers.length }
+                      { data.likerLength }
                     </Text>
                   </AnimatableTouchableOpacity>
                   <Icon name={'message-outline'} size={22} style={{ marginTop: 2, marginLeft: 5 }} />
                   <Text style={{ fontFamily: 'Lato', fontSize: 16, marginHorizontal: 5 }}>
-                    158
+                    { data.commentLength }
                   </Text>
                 </View>
               </View>
@@ -142,7 +142,7 @@ class PictureCard extends Component {
             </View>
             <View style={styles.petInfoContainer}>
               <Text style={styles.petName}>{ petNames }</Text>
-              { data.place.name && (
+              { data.place && (
                 <View style={styles.locationContainer}>
                   <Text
                     numberOfLines={1}

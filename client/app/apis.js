@@ -108,6 +108,23 @@ export default {
 
   /* Pet APIs */
   pet: {
+    create: (payload, token) =>
+      axios({
+        method: 'post',
+        url: PETS_URL,
+        headers: {
+          Authorization: token,
+        },
+        data: payload,
+      }),
+    remove: (id, token) =>
+      axios({
+        method: 'delete',
+        url: `${PETS_URL}/${id}`,
+        headers: {
+          Authorization: token,
+        },
+      }),
     detail: (id, token) =>
       axios({
         method: 'get',
@@ -126,6 +143,12 @@ export default {
         url: PICTURE_URL,
         headers: { Authorization: token },
         data: body,
+      }),
+    detail: (id, token) =>
+      axios({
+        method: 'get',
+        url: `${PICTURE_URL}/${id}`,
+        headers: { Authorization: token },
       }),
     toggleLike: (picId, type, token) =>
       axios({

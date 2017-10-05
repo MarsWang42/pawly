@@ -17,7 +17,7 @@ json.pictures(@pictures) do |picture|
     json.avatar picture.creator.avatar.url
   end
   if picture.place.present?
-    json.place do |place|
+    json.place do
       json.placeId picture.place.id
       json.name picture.place.name
       json.latitude picture.place.latitude

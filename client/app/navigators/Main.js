@@ -4,11 +4,13 @@ import mapNavigationStateParamsToProps from '../helpers/mapNavigationStateParams
 import Home from '../containers/Main/Home';
 import User from '../containers/Shared/User';
 import Pet from '../containers/Shared/Pet';
+import PictureDetail from '../containers/Shared/PictureDetail';
 
 const routeConfiguration = {
   Home: { screen: Home },
-  User: { screen: mapNavigationStateParamsToProps(User) },
-  Pet: { screen: mapNavigationStateParamsToProps(Pet) },
+  MainUser: { screen: mapNavigationStateParamsToProps(User) },
+  MainPet: { screen: mapNavigationStateParamsToProps(Pet) },
+  MainPictureDetail: { screen: mapNavigationStateParamsToProps(PictureDetail) },
 };
 
 const stackNavigatorConfiguration = {

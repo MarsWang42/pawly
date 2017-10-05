@@ -15,12 +15,12 @@ import uuidv4 from 'uuid/v4';
 import Spinner from 'react-native-spinkit';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import IconM from 'react-native-vector-icons/MaterialIcons';
 import ImageCropper from 'react-native-image-crop-picker';
 import ImagePicker from 'react-native-image-picker';
 import Modal from 'react-native-modal';
 const Clarifai = require('clarifai');
-import * as actions from '../../reducers/session';
+import * as actions from '../../reducers/pet';
 
 function ucfirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -151,23 +151,25 @@ class Avatar extends Component {
   submitForm() {
     if (this.validate()) {
       const { petAvatar, petName, petType } = this.state;
-      const { username, currentUser } = this.props;
+      const { currentUser, navigation } = this.props;
       let formData = new FormData();
-      formData.append('username', username)
-      formData.append('pet_name', petName);
-      formData.append('pet_type', petType);
-      formData.append('pet_avatar',
-        { uri: petAvatar, name: `${uuidv4()}.jpg`, type: 'multipart/formdata' });
+      formData.append('name', petName);
+      formData.append('type', petType || 'others');
+      if (petAvatar) {
+        formData.append('avatar',
+          { uri: petAvatar, name: `${uuidv4()}.jpg`, type: 'multipart/formdata' });
+      }
       this.props.dispatch({
-        type: actions.UPDATE_USER,
-        update: formData,
+        type: actions.CREATE_PET,
+        payload: formData,
         token: currentUser.accessToken,
+        callback: () => navigation.goBack(),
       });
     }
   }
 
   render() {
-    const { currentUser, isLoading } = this.props;
+    const { currentUser, isLoading, navigation } = this.props;
     const { isLoadingImage, petAvatar, petType, isRecognizingImage, petNameError } = this.state;
 
     const petImageSource = petAvatar ? { uri: petAvatar }
@@ -175,7 +177,10 @@ class Avatar extends Component {
 
     return (
       <KeyboardAwareScrollView scrollEnabled={false} style={{ flex: 1 }} >
-        <View style={styles.container}>
+        <LinearGradient
+          colors={['#e63460', '#e6535a']}
+          style={styles.container}
+        >
           <Modal
             isVisible={this.state.isModalVisible}
             backdropColor={'black'}
@@ -193,7 +198,7 @@ class Avatar extends Component {
               style={styles.modalContent}
             >
               <Text style={styles.petOptionsTitle}>
-                <MaterialIcon
+                <IconM
                   name={'pets'}
                   size={24}
                   color={'#141823'}
@@ -222,6 +227,9 @@ class Avatar extends Component {
               </View>
             </LinearGradient>
           </Modal>
+          <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+            <IconM name={'arrow-back'} size={36} color={'white'} />
+          </TouchableOpacity>
           { isLoadingImage && <View style={styles.overlay} /> }
           <TouchableOpacity onPress={this.showPetImagePicker}>
             <Image source={petImageSource} style={styles.uploadAvatar} />
@@ -233,7 +241,7 @@ class Avatar extends Component {
               <Text style={{ color: 'white', backgroundColor: 'transparent' }}>+</Text>
             </LinearGradient>
           </TouchableOpacity>
-          <Text style={styles.title}>
+          <Text style={[styles.title, { marginTop: width <= 325 ? 15 : 30 }]}>
             Name of your pet?
           </Text>
           <View style={styles.textInputContainer}>
@@ -259,7 +267,7 @@ class Avatar extends Component {
               : null
             }
           </View>
-          <Text style={[styles.title, { marginTop: 15 }]}>
+          <Text style={[styles.title, { marginTop: width <= 325 ? 5 : 15 }]}>
             Type
           </Text>
           <Text style={{ fontFamily: 'Lato', color: 'white', textAlign: 'center' }}>
@@ -291,7 +299,7 @@ class Avatar extends Component {
               </View>
             ) : (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <MaterialIcon
+                <IconM
                   name={'pets'}
                   size={22}
                   color={'white'}
@@ -301,7 +309,7 @@ class Avatar extends Component {
               </View>
             )}
           </TouchableOpacity>
-        </View>
+        </LinearGradient>
       </KeyboardAwareScrollView>
     );
   }
@@ -325,11 +333,18 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 3,
   },
+  back: {
+    position: 'absolute',
+    top: 36,
+    left: 20,
+    zIndex: 10,
+    width: 80,
+    backgroundColor: 'transparent',
+  },
   title: {
     fontFamily: 'Lato',
     color: 'white',
     fontSize: 26,
-    marginTop: 30,
     marginBottom: 15,
   },
   rowContainer: {
@@ -403,7 +418,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 50,
+    marginTop: width <= 325 ? 30 : 50,
 
     height: height <= 480 ? 30 : 40,
     width: 175,

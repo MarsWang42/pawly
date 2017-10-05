@@ -12,7 +12,6 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import PictureCard from '../Main/PictureCard';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import * as sessionActions from '../../reducers/session';
 import * as userActions from '../../reducers/user';
 
 const { width } = Dimensions.get('window');
@@ -45,8 +44,9 @@ class Profile extends Component {
   }
 
   renderPets() {
-    const { currentUser } = this.props;
-    const content = currentUser.pets.slice(0, 2).map(pet => {
+    const { userDetails, currentUser } = this.props;
+    let currentUserDetail = userDetails[currentUser.id];
+    const content = currentUserDetail.pets.slice(0, 2).map(pet => {
       const petImageSource = pet.avatar ? { uri: pet.avatar }
         : require('../../assets/img/pet.png');
       return (
@@ -57,7 +57,7 @@ class Profile extends Component {
         </View>
       );
     });
-    if (currentUser.pets.length >= 3) {
+    if (currentUserDetail.pets.length >= 3) {
       content.push(
         <Text key={'...'} style={[styles.petType, { fontSize: 10 }]}>...</Text>
       );
@@ -166,9 +166,12 @@ class Profile extends Component {
                 <Text style={styles.petTitle}>
                   Pets
                 </Text>
-                { this.renderPets() }
+                { userDetailFetched && this.renderPets() }
                 <View style={styles.petButtons}>
-                  <TouchableOpacity style={[styles.petButton, { borderColor: '#ffe1af' }]}>
+                  <TouchableOpacity
+                    style={[styles.petButton, { borderColor: '#ffe1af' }]}
+                    onPress={() => navigation.navigate('PetList')}
+                  >
                     <Text style={[styles.petButtonText, { color: '#ffe1af' }]}>
                       See all...
                     </Text>
@@ -238,7 +241,12 @@ class Profile extends Component {
           >
             <View style={styles.scrollViewContent}>
               { currentUserDetail.pictures.map((item) => (
-                <PictureCard data={item} key={item.pictureId} />
+                <PictureCard
+                  data={item}
+                  key={item.pictureId}
+                  navigation={navigation}
+                  view={'Profile'}
+                />
               )) }
             </View>
           </Animated.ScrollView>

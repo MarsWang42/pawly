@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
   has_many :pets, foreign_key: :owner_id, dependent: :destroy
+  has_many :comments, foreign_key: :author_id, dependent: :destroy
   has_many :pictures, foreign_key: :creator_id, dependent: :destroy
   has_many :active_relationships, class_name:  "Relationship",
                                   foreign_key: "follower_id",

@@ -44,12 +44,22 @@ class Api::V1::UsersController < ApiController
 
   def follow
     current_user.follow(set_user)
-    render :json => { "followed": true, "followers": set_user.followers }
+    render :json => {
+      "currentUserId": current_user.id,
+      "followed": true,
+      "followerLength": set_user.followers.length,
+      "followingLength": current_user.following.length
+    }
   end
 
   def unfollow
     current_user.unfollow(set_user)
-    render :json => { "followed": false, "followers": set_user.followers }
+    render :json => {
+      "currentUserId": current_user.id,
+      "followed": false,
+      "followerLength": set_user.followers.length,
+      "followingLength": current_user.following.length
+    }
   end
 
   def check_username

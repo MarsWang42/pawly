@@ -28,6 +28,12 @@ class Api::V1::PicturesController < ApiController
     end
   end
 
+  def show
+    @pic = set_pic
+    @user = current_user
+    render :show
+  end
+
   def like
     @pic = set_pic
     @user = current_user

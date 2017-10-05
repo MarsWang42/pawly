@@ -20,7 +20,6 @@ json.feeds(@feeds) do |feed|
   end
   json.pictureId feed.id
   json.liked @user.liked?(feed)
-  json.likers(feed.likers) do |liker|
-    json.username liker.username
-  end
+  json.likerLength feed.likers.length
+  json.commentLength feed.comments.length
 end

@@ -10,10 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171001163849) do
+ActiveRecord::Schema.define(version: 20171004180118) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "comments", force: :cascade do |t|
+    t.bigint "author_id"
+    t.integer "target_id"
+    t.bigint "picture_id"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_comments_on_author_id"
+    t.index ["picture_id"], name: "index_comments_on_picture_id"
+  end
 
   create_table "like_pictures", force: :cascade do |t|
     t.integer "liker_id"
@@ -74,6 +85,14 @@ ActiveRecord::Schema.define(version: 20171001163849) do
     t.index ["follower_id"], name: "index_relationships_on_follower_id"
   end
 
+  create_table "respond_to", force: :cascade do |t|
+    t.integer "author_id"
+    t.integer "target_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id", "target_id"], name: "index_respond_to_on_author_id_and_target_id", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
@@ -89,6 +108,8 @@ ActiveRecord::Schema.define(version: 20171001163849) do
     t.index ["username"], name: "index_users_on_username"
   end
 
+  add_foreign_key "comments", "pictures"
+  add_foreign_key "comments", "users", column: "author_id"
   add_foreign_key "pets", "users", column: "owner_id"
   add_foreign_key "pictures", "places"
   add_foreign_key "pictures", "users", column: "creator_id"

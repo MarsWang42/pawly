@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import {
   Animated,
   Dimensions,
+  FlatList,
   Image,
   StyleSheet,
   Text,
@@ -11,11 +12,13 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Animatable from 'react-native-animatable';
-import PictureCard from '../Main/PictureCard';
+import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconM from 'react-native-vector-icons/MaterialIcons';
+import PictureCard from '../Main/PictureCard';
 import * as sessionActions from '../../reducers/session';
 import * as userActions from '../../reducers/user';
+import * as petActions from '../../reducers/pet';
 
 const { width } = Dimensions.get('window');
 const HEADER_MAX_HEIGHT = width <= 325 ? 250 : 270;
@@ -35,7 +38,10 @@ class User extends Component {
     super();
     this.state = {
       scrollY: new Animated.Value(0),
+      isPetModalVisible: false,
     };
+    this.openPetListModal = this.openPetListModal.bind(this);
+    this.closePetListModal = this.closePetListModal.bind(this);
   }
 
   followUser(id) {
@@ -57,6 +63,14 @@ class User extends Component {
       userId: id,
       token: this.props.currentUser.accessToken,
     });
+  }
+
+  openPetListModal() {
+    this.setState({ isPetModalVisible: true });
+  }
+
+  closePetListModal() {
+    this.setState({ isPetModalVisible: false });
   }
 
   renderPets() {
@@ -81,8 +95,35 @@ class User extends Component {
     return content;
   }
 
+  renderPet(pet) {
+    const { dispatch, view, navigation, currentUser } = this.props;
+    const petImageSource = pet.avatar ? { uri: pet.avatar }
+      : require('../../assets/img/pet.png');
+    return (
+      <TouchableOpacity
+        style={styles.petDetailContainer}
+        onPress={() => {
+          dispatch({
+            type: petActions.FETCH_PET_DETAIL,
+            id: pet.id,
+            token: currentUser.accessToken,
+          });
+          this.closePetListModal();
+          navigation.navigate(`${view}Pet`, { petId: pet.id, view });
+        }}
+      >
+        <Image source={petImageSource} style={styles.petDetailAvatar} />
+        <View>
+          <Text style={styles.petDetailName}>{ pet.name }</Text>
+          <Text style={styles.petDetailType}>Type: { pet.type }</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
   render() {
     const { view, userDetails, dispatch, userId, currentUser, navigation } = this.props;
+    const { isPetModalVisible } = this.state;
     const userDetail = userDetails[userId];
     const isCurrentUser = userDetail ? userDetail.id === currentUser.id : false;
     let avatarUrl = userDetail && userDetail.avatar;
@@ -129,6 +170,42 @@ class User extends Component {
     if (userDetail) {
       return (
         <View style={styles.container}>
+          <Modal
+            isVisible={isPetModalVisible}
+            style={styles.modal}
+            backdropColor={'black'}
+            backdropOpacity={0.3}
+            animationIn={'zoomIn'}
+            animationOut={'zoomOut'}
+            animationInTiming={300}
+            animationOutTiming={300}
+            backdropTransitionInTiming={300}
+            backdropTransitionOutTiming={300}
+            onBackdropPress={this.closePetListModal}
+          >
+            <LinearGradient
+              colors={['#ECE9E6', '#ffffff']}
+              style={styles.modalContent}
+            >
+              <Text style={styles.petsTitle}>
+                <IconM
+                  name={'pets'}
+                  size={24}
+                  color={'#141823'}
+                  style={{ marginHorizontal: 5 }}
+                />
+                &nbsp;Pets
+              </Text>
+              <FlatList
+                data={userDetail.pets}
+                removeClippedSubviews={false}
+                keyExtractor={(item) => (item.id || item)}
+                renderItem={({ item }) => (
+                  this.renderPet(item)
+                )}
+              />
+            </LinearGradient>
+          </Modal>
           <AnimatedTouchableOpacity
             style={[
               styles.back,
@@ -182,6 +259,7 @@ class User extends Component {
                       style={[styles.petButton,
                         { width: isCurrentUser ? 160 : 80, borderColor: '#ffe1af' }
                       ]}
+                      onPress={this.openPetListModal}
                     >
                       <Text style={[styles.petButtonText, { color: '#ffe1af' }]}>
                         See all...
@@ -269,7 +347,12 @@ class User extends Component {
           >
             <View style={styles.scrollViewContent}>
               { userDetail.pictures.map((item) => (
-                <PictureCard data={item} key={item.pictureId} />
+                <PictureCard
+                  data={item}
+                  key={item.pictureId}
+                  navigation={navigation}
+                  view={view}
+                />
               )) }
             </View>
           </Animated.ScrollView>
@@ -286,6 +369,46 @@ class User extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  modalContent: {
+    padding: 22,
+    height: 200,
+    borderWidth: 2,
+    borderColor: 'gray',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  petsTitle: {
+    fontFamily: 'Lato',
+    color: '#141823',
+    fontSize: 26,
+    marginBottom: 15,
+  },
+  petDetailContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    width: width - 50,
+    marginVertical: 5,
+  },
+  petDetailAvatar: {
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    overflow: 'hidden',
+  },
+  petDetailName: {
+    fontFamily: 'Lato',
+    fontSize: 16,
+    backgroundColor: 'transparent',
+    marginLeft: 5
+  },
+  petDetailType: {
+    fontFamily: 'Lato-Italic',
+    fontSize: 14,
+    backgroundColor: 'transparent',
+    marginLeft: 5
   },
   header: {
     position: 'absolute',

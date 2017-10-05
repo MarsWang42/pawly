@@ -24,8 +24,7 @@ json.places(@places) do |place|
     end
     json.pictureId picture.id
     json.liked @user.liked?(picture)
-    json.likers(picture.likers) do |liker|
-      json.username liker.username
-    end
+    json.likerLength picture.likers.length
+    json.commentLength picture.comments.length
   end
 end

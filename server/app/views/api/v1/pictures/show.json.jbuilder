@@ -7,6 +7,7 @@ json.creator do
 end
 json.liked @user.liked?(@pic)
 json.pets(@pic.pets) do |pet|
+  json.id pet.id
   json.name pet.name
   json.avatar pet.avatar.url
 end
@@ -22,3 +23,14 @@ json.pictureId @pic.id
 json.likers(@pic.likers) do |liker|
   json.username liker.username
 end
+json.comments(@pic.comments) do |comment|
+  json.id comment.id
+  json.user do
+    json.id comment.creator.id
+    json.username comment.creator.username
+    json.avatar comment.creator.avatar.url
+  end
+  json.body comment.body
+end
+json.likerLength @pic.likers.length
+json.commentLength @pic.comments.length
