@@ -10,6 +10,9 @@ export const CREATE_PICTURE_FAILED = 'CREATE_PICTURE_FAILED';
 export const FETCH_PICTURE_DETAIL = 'FETCH_PICTURE_DETAIL';
 export const FETCH_PICTURE_DETAIL_SUCCEED = 'FETCH_PICTURE_DETAIL_SUCCEED';
 export const FETCH_PICTURE_DETAIL_FAILED = 'FETCH_PICTURE_DETAIL_FAILED';
+export const COMMENT_PICTURE = 'COMMENT_PICTURE';
+export const COMMENT_PICTURE_SUCCEED = 'COMMENT_PICTURE_SUCCEED';
+export const COMMENT_PICTURE_FAILED = 'COMMENT_PICTURE_FAILED';
 export const FETCH_FEED = 'FETCH_FEED';
 export const FETCH_FEED_SUCCEED = 'FETCH_FEED_SUCCEED';
 export const FETCH_FEED_FAILED = 'FETCH_FEED_FAILED';
@@ -20,11 +23,11 @@ export const TOGGLE_PICTURE_LIKE = 'TOGGLE_PICTURE_LIKE';
 export const TOGGLE_PICTURE_LIKE_SUCCEED = 'TOGGLE_PICTURE_LIKE_SUCCEED';
 export const TOGGLE_PICTURE_LIKE_FAILED = 'TOGGLE_PICTURE_LIKE_FAILED';
 
-const createPictureSucceed = (respond, action) => {
+const createPictureSucceed = (response, action) => {
   action.callback && action.callback();
   return {
     type: CREATE_PICTURE_SUCCEED,
-    followingList: respond.data.feeds,
+    followingList: response.data.feeds,
   };
 };
 
@@ -32,10 +35,10 @@ const createPictureFailed = () => ({
   type: CREATE_PICTURE_FAILED,
 });
 
-const fetchPictureDetailSucceed = (respond, action) => {
+const fetchPictureDetailSucceed = (response, action) => {
   return {
     type: FETCH_PICTURE_DETAIL_SUCCEED,
-    pictureDetail: respond.data,
+    pictureDetail: response.data,
   };
 };
 
@@ -43,10 +46,24 @@ const fetchPictureDetailFailed = () => ({
   type: FETCH_PICTURE_DETAIL_FAILED,
 });
 
-const fetchFeedSucceed = (respond) => {
+const commentPictureSucceed = (response, action) => {
+  action.callback && action.callback();
+  return {
+    type: COMMENT_PICTURE_SUCCEED,
+    comment: response.data,
+    pictureId: action.pictureId,
+  };
+};
+
+const commentPictureFailed = () => ({
+  type: COMMENT_PICTURE_FAILED,
+});
+
+const fetchFeedSucceed = (response, initialize) => {
   return {
     type: FETCH_FEED_SUCCEED,
-    followingList: respond.data.feeds,
+    followingList: response.data.feeds,
+    initialize,
   };
 };
 
@@ -54,10 +71,10 @@ const fetchFeedFailed = () => ({
   type: FETCH_FEED_FAILED,
 });
 
-const fetchNearbySucceed = (respond) => {
+const fetchNearbySucceed = (response) => {
   return {
     type: FETCH_NEARBY_SUCCEED,
-    placeList: respond.data.places,
+    placeList: response.data.places,
   };
 };
 
@@ -65,11 +82,11 @@ const fetchNearbyFailed = () => ({
   type: FETCH_NEARBY_FAILED,
 });
 
-const toggleLikeSucceed = (respond, { callback }) => {
+const toggleLikeSucceed = (response, { callback }) => {
   callback && callback();
   return {
     type: TOGGLE_PICTURE_LIKE_SUCCEED,
-    data: respond.data,
+    data: response.data,
   };
 };
 
@@ -79,6 +96,7 @@ const toggleLikeFailed = () => ({
 
 export const PictureReducer = createReducer({
   followingList: List(),
+  followingListPage: 1,
   nearbyList: List(),
   placeList: List(),
   pictureDetails: Map(),
@@ -111,7 +129,7 @@ export const PictureReducer = createReducer({
     return loop(
       { ...state, isFetchingPictureDetail: true, fetchPictureDetailError: undefined },
       Cmd.run(apis.picture.detail, {
-        successActionCreator: (respond) => fetchPictureDetailSucceed(respond, action),
+        successActionCreator: (response) => fetchPictureDetailSucceed(response, action),
         failActionCreator: fetchPictureDetailFailed,
         args: [action.id, action.token]
       })
@@ -131,21 +149,72 @@ export const PictureReducer = createReducer({
       fetchPictureDetailError: 'Fetching failed.',
     };
   },
+  [COMMENT_PICTURE](state, action) {
+    return loop(
+      { ...state, isCommentingPicture: true, commentPictureError: undefined },
+      Cmd.run(apis.picture.comment, {
+        successActionCreator: (response) => commentPictureSucceed(response, action),
+        failActionCreator: commentPictureFailed,
+        args: [action.pictureId, action.body, action.token]
+      })
+    );
+  },
+  [COMMENT_PICTURE_SUCCEED](state, action) {
+    const updatedPictureDetails = state.pictureDetails.updateIn(
+      [
+        action.pictureId,
+        'comments',
+      ],
+      arr => arr.unshift(fromJS(action.comment))
+    );
+    return {
+      ...state,
+      isCommentingPicture: false,
+      pictureDetails: updatedPictureDetails,
+    };
+  },
+  [COMMENT_PICTURE_FAILED](state, action) {
+    return {
+      ...state,
+      isCommentingPicture: false,
+      commentPictureError: 'Comment failed.',
+    };
+  },
   [FETCH_FEED](state, action) {
+    // If initializing, then reset page.
+    if (action.initial) {
+      return loop(
+        { ...state, followingListPage: 1, isFetchingFeed: true, fetchFeedError: undefined },
+        Cmd.run(apis.picture.feed, {
+          successActionCreator: (response) => fetchFeedSucceed(response, true),
+          failActionCreator: fetchFeedFailed,
+          args: [1, action.token]
+        })
+      );
+    }
     return loop(
       { ...state, isFetchingFeed: true, fetchFeedError: undefined },
       Cmd.run(apis.picture.feed, {
-        successActionCreator: fetchFeedSucceed,
+          successActionCreator: (response) => fetchFeedSucceed(response, false),
         failActionCreator: fetchFeedFailed,
-        args: [action.token]
+        args: [state.followingListPage, action.token]
       })
     );
   },
   [FETCH_FEED_SUCCEED](state, action) {
+    let updatedFollowingList, updatedFollowingListPage;
+    if (action.initialize) {
+      updatedFollowingList = fromJS(action.followingList);
+      updatedFollowingListPage = 1;
+    } else {
+      updatedFollowingList = state.followingList.concat(fromJS(action.followingList));
+      updatedFollowingListPage = state.followingListPage + 1;
+    }
     return {
       ...state,
       isFetchingFeed: false,
-      followingList: fromJS(action.followingList),
+      followingList: fromJS(updatedFollowingList),
+      followingListPage: updatedFollowingListPage,
     };
   },
   [FETCH_FEED_FAILED](state, action) {

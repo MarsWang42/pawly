@@ -89,7 +89,8 @@ class PictureCard extends Component {
     return (
       <TouchableOpacity
         onPress={() => this.selectPet(pet.id)}
-        style={{ justifyContent: 'center', alignItems: 'center', margin: 3 }}
+        style={{ justifyContent: 'center', alignItems: 'center', marginHorizontal: 5 }}
+        activeOpacity={1}
       >
         <Image
           style={{
@@ -129,7 +130,7 @@ class PictureCard extends Component {
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity
               onPress={this.togglePetModal}
-              activeOpacity={0.6}
+              activeOpacity={1}
               style={[styles.petAvatarContainer,
                 { width: pl === 1 ? 60 : pl === 2 ? 70 : 80 }
               ]}
@@ -145,6 +146,7 @@ class PictureCard extends Component {
             <TouchableOpacity
               style={styles.petInfoContainer}
               onPress={() => this.openPictureDetail(data.pictureId)}
+              activeOpacity={1}
             >
               <Text style={styles.petName}>{ petNames }</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>

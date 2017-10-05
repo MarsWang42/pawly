@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-  Animated,
-  Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,

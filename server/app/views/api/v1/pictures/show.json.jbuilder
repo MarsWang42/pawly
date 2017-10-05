@@ -25,12 +25,20 @@ json.likers(@pic.likers) do |liker|
 end
 json.comments(@pic.comments) do |comment|
   json.id comment.id
-  json.user do
-    json.id comment.creator.id
-    json.username comment.creator.username
-    json.avatar comment.creator.avatar.url
+  json.author do
+    json.id comment.author.id
+    json.username comment.author.username
+    json.avatar comment.author.avatar.url
   end
   json.body comment.body
+  json.createdAt comment.created_at
+  if comment.target.present?
+    json.target do
+      json.id = comment.target.id
+      json.username = comment.target.username
+      json.avatar comment.target.avatar.url
+    end
+  end
 end
 json.likerLength @pic.likers.length
 json.commentLength @pic.comments.length

@@ -14,11 +14,12 @@ export const USER_DETAIL_URL = (userId) => `${USER_URL}/detail/${userId}`;
 export const AVATAR_URL = `${USER_URL}/avatar`;
 
 export const PETS_URL = `${BASE_URL}/pets`;
-export const PETS_SEARCH_URL = (keyword) => `${PETS_URL}/${keyword}`;
+export const PETS_SEARCH_URL = (keyword) => `${USER_URL}/pets/${keyword}`;
 export const PET_DETAIL_URL = (petId) => `${PETS_URL}/${petId}`;
 
-export const FEED_URL = `${USER_URL}/feed`;
+export const FEED_URL = page => `${USER_URL}/feed/${page}`;
 export const PICTURE_URL = `${BASE_URL}/pictures`;
+export const COMMENT_URL = `${BASE_URL}/comments`;
 export const NEARBY_URL = `${BASE_URL}/places/nearby`;
 export const PICTURE_LIKE_URL = `${PICTURE_URL}/like`;
 export const PICTURE_UNLIKE_URL = `${PICTURE_URL}/unlike`;
@@ -159,6 +160,15 @@ export default {
         },
         data: { picId },
       }),
+    comment: (pictureId, body, token) =>
+      axios({
+        method: 'post',
+        url: COMMENT_URL,
+        headers: {
+          Authorization: token,
+        },
+        data: { pictureId, body },
+      }),
     nearby: (latitude, longitude, radius, token) =>
       axios({
         method: 'post',
@@ -168,10 +178,10 @@ export default {
         },
         data: { latitude, longitude, radius },
       }),
-    feed: (token) =>
+    feed: (page, token) =>
       axios({
         method: 'get',
-        url: FEED_URL,
+        url: FEED_URL(page),
         headers: {
           Authorization: token,
         },

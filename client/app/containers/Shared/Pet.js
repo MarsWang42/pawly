@@ -18,7 +18,7 @@ import * as actions from '../../reducers/pet';
 import * as userActions from '../../reducers/user';
 
 const { width, height } = Dimensions.get('window');
-const HEADER_MAX_HEIGHT = 160;
+const HEADER_MAX_HEIGHT = 180;
 const HEADER_MIN_HEIGHT = width <= 325 ? 50 : 60;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
@@ -133,14 +133,21 @@ class Pet extends Component {
             />
             <Image source={petImageSource} style={styles.petAvatar} />
             <TouchableOpacity
-              style={{ justifyContent: 'center', alignItems: 'center' }}
+              style={styles.ownerInfo}
               onPress={() => this.selectUser(petDetail.owner.userId)}
             >
-              <Text style={{ backgroundColor: 'transparent', fontFamily: 'Lato', color: 'white' }}>
+              <Image source={userImageSource} style={styles.userAvatar} />
+              <Text
+                style={{
+                  backgroundColor: 'transparent',
+                  fontFamily: 'Lato-italic',
+                  color: 'white',
+                  fontSize: 12
+                }}
+              >
                 Owner:&nbsp;
               </Text>
-              <Image source={userImageSource} style={styles.userAvatar} />
-              <Text style={{ backgroundColor: 'transparent', fontFamily: 'Lato', color: 'white' }}>
+              <Text style={{ backgroundColor: 'transparent', fontFamily: 'Lato', color: 'white', fontSize: 13 }}>
                 { petDetail.owner.username }
               </Text>
             </TouchableOpacity>
@@ -222,6 +229,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 30,
   },
+  ownerInfo: {
+    position: 'absolute',
+    right: 40,
+    top: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   scrollViewContent: {
     marginTop: HEADER_MAX_HEIGHT,
     marginBottom: 28,
@@ -242,9 +256,10 @@ const styles = StyleSheet.create({
     justifyContent:'center'
   },
   petAvatar: {
-    height: 60,
-    width: 60,
-    borderRadius: 30,
+    height: 80,
+    width: 80,
+    borderRadius: 40,
+    marginTop: 10,
     overflow: 'hidden',
     backgroundColor: 'white',
   },
@@ -252,7 +267,7 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30,
     borderRadius: 15,
-    margin: 8,
+    margin: 5,
     overflow: 'hidden',
     backgroundColor: 'white'
   },

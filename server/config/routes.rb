@@ -10,7 +10,7 @@ Rails.application.routes.draw do
       post 'users/unfollow' => 'users#unfollow'
       get 'users/:id/followers' => 'users#followers'
       get 'users/:id/following' => 'users#following'
-      get 'users/feed' => 'users#get_feed'
+      get 'users/feed/:page' => 'users#get_feed'
       get 'users/pets/(:keyword)' => 'users#get_available_pets'
 
       post 'username' => 'users#check_username'

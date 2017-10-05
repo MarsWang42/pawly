@@ -15,13 +15,24 @@ class FollowingList extends Component {
       token: this.props.currentUser.accessToken,
     });
     this.onRefresh = this.onRefresh.bind(this);
+    this.onEndReached = this.onEndReached.bind(this);
   }
 
   onRefresh() {
     this.props.dispatch({
       type: actions.FETCH_FEED,
+      initial: true,
       token: this.props.currentUser.accessToken,
     });
+  }
+
+  onEndReached(data) {
+    if (!this.props.isLoading) {
+      this.props.dispatch({
+        type: actions.FETCH_FEED,
+        token: this.props.currentUser.accessToken,
+      });
+    }
   }
 
   render() {
@@ -33,7 +44,9 @@ class FollowingList extends Component {
         refreshing={isLoading}
         onRefresh={this.onRefresh}
         style={styles.container}
+        onEndReachedThreshold={0}
         keyExtractor={(item) => (item.pictureId)}
+        onEndReached={this.onEndReached}
         renderItem={({ item }) => (
           <PictureCard
             data={item}

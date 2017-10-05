@@ -103,12 +103,12 @@ class User extends Component {
       <TouchableOpacity
         style={styles.petDetailContainer}
         onPress={() => {
+          this.closePetListModal();
           dispatch({
             type: petActions.FETCH_PET_DETAIL,
             id: pet.id,
             token: currentUser.accessToken,
           });
-          this.closePetListModal();
           navigation.navigate(`${view}Pet`, { petId: pet.id, view });
         }}
       >

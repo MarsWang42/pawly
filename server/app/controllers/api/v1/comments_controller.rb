@@ -1,4 +1,4 @@
-class Api::V1::ControllersController < ApiController
+class Api::V1::CommentsController < ApiController
   before_action :authenticate_user
 
   def create

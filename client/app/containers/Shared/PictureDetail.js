@@ -5,6 +5,7 @@ import {
   FlatList,
   Image,
   LayoutAnimation,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -19,6 +20,7 @@ import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconM from 'react-native-vector-icons/MaterialIcons';
 import ProgressPie from 'react-native-progress/Pie';
+import Comment from '../Shared/Comment';
 import ImageWithProgress from '../../components/Helpers/ImageWithProgress';
 import * as pictureActions from '../../reducers/picture';
 import * as petActions from '../../reducers/pet';
@@ -27,14 +29,17 @@ UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationE
 const { height, width } = Dimensions.get('window');
 const AnimatableTouchableOpacity = Animatable.createAnimatableComponent(TouchableOpacity);
 
-class PictureCard extends Component {
+class PictureDetail extends Component {
   constructor() {
     super();
     this.state = {
       isPetListOpen: false,
+      isCommentModalVisible: false,
     };
     this.togglePetModal = this.togglePetModal.bind(this);
     this.selectPet = this.selectPet.bind(this);
+    this.openCommentModal = this.openCommentModal.bind(this);
+    this.closeCommentModal = this.closeCommentModal.bind(this);
   }
 
   likePic(id) {
@@ -70,6 +75,14 @@ class PictureCard extends Component {
     }
   }
 
+  openCommentModal() {
+    this.setState({ isCommentModalVisible: true });
+  }
+
+  closeCommentModal() {
+    this.setState({ isCommentModalVisible: false });
+  }
+
   selectPet(id) {
     const { navigation, dispatch, view } = this.props;
     navigation.navigate(`${view}Pet`, { petId: id , view });
@@ -101,19 +114,30 @@ class PictureCard extends Component {
   }
 
   renderComment(comment) {
-    const { user } = comment;
-    let avatarUrl = user && user.avatar;
-    if (!avatarUrl && user && user.facebookId) {
-      avatarUrl = `https://graph.facebook.com/${user.facebookId}/picture?width=9999`;
+    const { author } = comment;
+    let avatarUrl = author && author.avatar;
+    if (!avatarUrl && author && author.facebookId) {
+      avatarUrl = `https://graph.facebook.com/${author.facebookId}/picture?width=9999`;
     }
     const imageSource = avatarUrl ? { uri: avatarUrl }
       : require('../../assets/img/user-default.png');
     return (
-      <View style={styles.userContainer}>
+      <View style={styles.commentContainer}>
         <Image source={imageSource} style={styles.userAvatar} />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.username}>{ user.username }</Text>
-          <Text style={{ fontFamily: 'Lato', fontSize: 12 }}>{ comment.body }</Text>
+        <View
+          style={{
+            flex: 1,
+            padding: 5,
+            marginRight: 15,
+            borderBottomWidth: 1,
+            borderColor: 'lightgrey',
+          }}
+        >
+          <Text style={styles.commentUsername}>{ author.username }</Text>
+          <Text style={{ fontFamily: 'Lato', fontSize: 14 }}>{ comment.body }</Text>
+          <Text style={{ fontFamily: 'Lato', fontSize: 12, color: 'grey', marginTop: 5 }}>
+            { moment(comment.createdAt).format('MM-DD hh:mm') }
+          </Text>
         </View>
       </View>
     );
@@ -121,7 +145,7 @@ class PictureCard extends Component {
 
   render() {
     const { navigation, pictureDetails, pictureId, data } = this.props;
-    const { isPetModalOpen } = this.state;
+    const { isPetModalOpen, isCommentModalVisible } = this.state;
     let pictureDetailFetched = true;
     let pictureDetail = pictureDetails[pictureId];
 
@@ -158,6 +182,16 @@ class PictureCard extends Component {
 
     return (
       <View style={styles.container}>
+        <Modal
+          animationType='slide'
+          transparent={false}
+          visible={isCommentModalVisible}
+        >
+          <Comment
+            closeModal={this.closeCommentModal}
+            pictureId={pictureId}
+          />
+        </Modal>
         <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
           <IconM name={'arrow-back'} size={24} color={'black'} />
         </TouchableOpacity>
@@ -259,7 +293,6 @@ class PictureCard extends Component {
               { pictureDetailFetched && likerNames }
             </Text>
           </View>
-          <Icon name={'message-outline'} size={22} style={{ marginTop: 3, marginLeft: 8 }} />
           { pictureDetailFetched && (
             <FlatList
               style={{ marginBottom: 100 }}
@@ -267,22 +300,28 @@ class PictureCard extends Component {
               renderItem={({ item }) => this.renderComment(item)}
               keyExtractor={(item) => item.id}
               ListEmptyComponent={(
+              <View style={{ height: 100, justifyContent: 'center', alignItems: 'center' }}>
+                <Icon name={'message-outline'} size={22} color={'grey'} />
                 <Text
                   style={{
                     fontFamily: 'Lato-italic',
                     fontSize: 15,
                     textAlign: 'center',
-                    flex: 1,
-                    margin: 5,
+                    marginTop: 5,
+                    color: 'grey'
                   }}
                 >
                   No comment yet.
                 </Text>
+              </View>
               )}
             />
           ) }
         </ScrollView>
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={this.openCommentModal}
+        >
           <Text
             style={{
               fontFamily: 'Lato-bold',
@@ -416,7 +455,23 @@ const styles = StyleSheet.create({
   },
   commentContainer: {
     marginLeft: 10,
-    marginTop: 5,
+    marginTop: 2,
+    flexDirection: 'row',
+  },
+  userAvatar: {
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    marginTop: 8,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'lightgrey'
+  },
+  commentUsername: {
+    color: '#3a3a3a',
+    fontFamily: 'Lato',
+    fontSize: 15,
+    marginBottom: 3,
   },
   time: {
     fontFamily: 'Lato',
@@ -462,4 +517,4 @@ const mapStateToProps = (state) => {
 };
 
 
-export default connect(mapStateToProps)(PictureCard);
+export default connect(mapStateToProps)(PictureDetail);

@@ -3,7 +3,9 @@ class Comment < ApplicationRecord
   belongs_to :picture
 
   def target
-    User.find(self.target_id)
+    if self.target_id.present?
+      User.find(self.target_id)
+    end
   end
 
 end
