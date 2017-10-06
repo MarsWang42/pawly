@@ -74,9 +74,9 @@ class PictureCard extends Component {
     }
   }
 
-  selectPet(id) {
+  selectPet(id, pet) {
     const { navigation, dispatch, view } = this.props;
-    navigation.navigate(`${view}Pet`, { petId: id , view });
+    navigation.navigate(`${view}Pet`, { petId: id, pet, view });
     dispatch({
       type: petActions.FETCH_PET_DETAIL,
       id: id,
@@ -88,7 +88,7 @@ class PictureCard extends Component {
     const petImageSource = pet.avatar ? { uri: pet.avatar } : require('../../assets/img/pet.png');
     return (
       <TouchableOpacity
-        onPress={() => this.selectPet(pet.id)}
+        onPress={() => this.selectPet(pet.id, pet)}
         style={{ justifyContent: 'center', alignItems: 'center', marginHorizontal: 5 }}
         activeOpacity={1}
       >

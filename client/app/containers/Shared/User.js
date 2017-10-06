@@ -166,6 +166,7 @@ class User extends Component {
       outputRange: [0, 0, width <= 325 ? -10 : -8],
       extrapolate: 'clamp',
     });
+    console.log(userDetail)
 
     if (userDetail) {
       return (
@@ -295,7 +296,7 @@ class User extends Component {
               </View>
               <View style={styles.infoContainer}>
                 <TouchableOpacity
-                  disabled={!userDetail || (userDetail && userDetail.followingLength === 0)}
+                  disabled={!userDetail || (userDetail && userDetail.followerLength === 0)}
                   onPress={() => {
                     dispatch({
                       type: userActions.FETCH_FOLLOWER_LIST,

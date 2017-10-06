@@ -57,7 +57,7 @@ class Home extends Component {
   }
 
   render() {
-    const { isLoading, followingList, userList, dispatch } = this.props;
+    const { isLoading, navigation, followingList, userList, dispatch } = this.props;
     const { isUserListShow } = this.state;
 
     const headerTranslate = this.state.scrollY.interpolate({
@@ -152,7 +152,12 @@ class Home extends Component {
           >
             <View style={styles.scrollViewContent}>
               { followingList.toJS().map((item) => (
-                <PictureCard data={item} key={item.pictureId} />
+                <PictureCard
+                  key={item.pictureId}
+                  data={item}
+                  navigation={navigation}
+                  view={'Discover'}
+                />
               )) }
             </View>
           </Animated.ScrollView>

@@ -14,8 +14,8 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import { BlurView } from 'react-native-blur';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import * as actions from '../../reducers/pet';
 import * as userActions from '../../reducers/user';
+import * as pictureActions from '../../reducers/picture';
 
 const { width, height } = Dimensions.get('window');
 const HEADER_MAX_HEIGHT = 180;
@@ -42,10 +42,57 @@ class Pet extends Component {
     navigation.navigate(`${view}User`, { userId: id, view });
   }
 
+  openPictureDetail(id, data) {
+    const { currentUser, dispatch, navigation, view } = this.props;
+    dispatch({
+      type: pictureActions.FETCH_PICTURE_DETAIL,
+      id,
+      token: currentUser.accessToken
+    });
+    navigation.navigate(`${view}PictureDetail`, { pictureId: id, view, data });
+  }
+
+  renderOwner() {
+    const { petDetails, petId } = this.props;
+    const petDetail = petDetails[petId];
+    let avatarUrl = petDetail.owner.avatar;
+    if (!avatarUrl && petDetail.owner.facebookId) {
+      avatarUrl = `https://graph.facebook.com/${petDetail.owner.facebookId}/picture?width=9999`;
+    }
+    const userImageSource = avatarUrl ? { uri: avatarUrl }
+      : require('../../assets/img/user-default.png');
+    return (
+      <TouchableOpacity
+        style={styles.ownerInfo}
+        onPress={() => this.selectUser(petDetail.owner.userId)}
+      >
+        <Image source={userImageSource} style={styles.userAvatar} />
+        <Text
+          style={{
+            backgroundColor: 'transparent',
+            fontFamily: 'Lato-italic',
+            color: 'white',
+            fontSize: 12
+          }}
+        >
+          Owner:&nbsp;
+        </Text>
+        <Text style={{ backgroundColor: 'transparent', fontFamily: 'Lato', color: 'white', fontSize: 13 }}>
+          { petDetail.owner.username }
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+
   render() {
-    const { petDetails, dispatch, petId, view, currentUser, navigation } = this.props;
-    const  petDetail = petDetails[petId];
-    if (!petDetail) return null;
+    const { petDetails, dispatch, petId, pet, view, currentUser, navigation } = this.props;
+    let petDetailFetched = true;
+    let petDetail = petDetails[petId];
+
+    if (!petDetail) {
+      petDetail = pet;
+      petDetailFetched = false;
+    }
 
     const headerTranslate = this.state.scrollY.interpolate({
       inputRange: [0, HEADER_SCROLL_DISTANCE],
@@ -74,13 +121,6 @@ class Pet extends Component {
       outputRange: [0, 0, width <= 325 ? -10 : -8],
       extrapolate: 'clamp',
     });
-
-    let avatarUrl = petDetail.owner.avatar;
-    if (!avatarUrl && petDetail.owner.facebookId) {
-      avatarUrl = `https://graph.facebook.com/${petDetail.owner.facebookId}/picture?width=9999`;
-    }
-    const userImageSource = avatarUrl ? { uri: avatarUrl }
-      : require('../../assets/img/user-default.png');
 
     const petImageSource = petDetail.avatar ? { uri: petDetail.avatar }
       : require('../../assets/img/pet.png');
@@ -132,45 +172,34 @@ class Pet extends Component {
               blurAmount={10}
             />
             <Image source={petImageSource} style={styles.petAvatar} />
-            <TouchableOpacity
-              style={styles.ownerInfo}
-              onPress={() => this.selectUser(petDetail.owner.userId)}
-            >
-              <Image source={userImageSource} style={styles.userAvatar} />
-              <Text
-                style={{
-                  backgroundColor: 'transparent',
-                  fontFamily: 'Lato-italic',
-                  color: 'white',
-                  fontSize: 12
-                }}
-              >
-                Owner:&nbsp;
-              </Text>
-              <Text style={{ backgroundColor: 'transparent', fontFamily: 'Lato', color: 'white', fontSize: 13 }}>
-                { petDetail.owner.username }
-              </Text>
-            </TouchableOpacity>
+            { petDetailFetched && this.renderOwner() }
           </Animated.View>
         </AnimatedLinearGradient>
-        <Animated.ScrollView
-          style={{ flex: 1 }}
-          scrollEventThrottle={1}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: {y: this.state.scrollY } } }],
-            { useNativeDriver: true },
-          )}
-        >
-          <View style={styles.scrollViewContent}>
-            { petDetail.pictures.map((item) => (
-              <Image
-                key={item.pictureId}
-                source={{ uri: item.image }}
-                style={{ width: width / 3, height: width / 3 }}
-              />
-            )) }
-          </View>
-        </Animated.ScrollView>
+        { petDetailFetched && (
+          <Animated.ScrollView
+            style={{ flex: 1 }}
+            scrollEventThrottle={1}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: {y: this.state.scrollY } } }],
+              { useNativeDriver: true },
+            )}
+          >
+            <View style={styles.scrollViewContent}>
+              { petDetail.pictures.map((item) => (
+                <TouchableOpacity
+                  key={item.pictureId}
+                  activeOpacity={0.8}
+                  onPress={() => this.openPictureDetail(item.pictureId, item)}
+                >
+                  <Image
+                    source={{ uri: item.image }}
+                    style={{ width: width / 3, height: width / 3 }}
+                  />
+                </TouchableOpacity>
+              )) }
+            </View>
+          </Animated.ScrollView>
+        ) }
       </View>
     );
   }

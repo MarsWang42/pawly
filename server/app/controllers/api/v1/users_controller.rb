@@ -72,7 +72,7 @@ class Api::V1::UsersController < ApiController
 
   def get_feed
     @user = current_user
-    @feeds = @user.feed.page(params[:page]).per(5)
+    @feeds = @user.feed.page(params[:page]).per(10)
     render :feed
   end
 

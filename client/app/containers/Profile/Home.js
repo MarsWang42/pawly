@@ -187,7 +187,7 @@ class Profile extends Component {
             <View style={styles.infoContainer}>
               <TouchableOpacity
                 disabled={!userDetailFetched
-                  || (userDetailFetched && currentUserDetail.followingLength === 0)}
+                  || (userDetailFetched && currentUserDetail.followerLength === 0)}
                 onPress={() => {
                   dispatch({
                     type: userActions.FETCH_FOLLOWER_LIST,

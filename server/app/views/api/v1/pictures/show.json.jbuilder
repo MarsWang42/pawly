@@ -23,19 +23,20 @@ json.pictureId @pic.id
 json.likers(@pic.likers) do |liker|
   json.username liker.username
 end
-json.comments(@pic.comments) do |comment|
+json.comments(@pic.comments.order('created_at ASC')) do |comment|
   json.id comment.id
   json.author do
     json.id comment.author.id
     json.username comment.author.username
+    json.facebookId comment.author.facebook_id
     json.avatar comment.author.avatar.url
   end
   json.body comment.body
   json.createdAt comment.created_at
   if comment.target.present?
     json.target do
-      json.id = comment.target.id
-      json.username = comment.target.username
+      json.id comment.target.id
+      json.username comment.target.username
       json.avatar comment.target.avatar.url
     end
   end

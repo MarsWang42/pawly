@@ -1,16 +1,35 @@
 import React from 'react';
-import App from './containers/App';
+import Immutable from 'immutable';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware, compose} from 'redux';
 import { install } from 'redux-loop';
 import { createLogger } from 'redux-logger';
+
+import App from './containers/App';
 import reducer from './reducers';
 
 // Polyfill to get clarifai work
 process.nextTick = setImmediate;
 
+const stateTransformer = (state) => {
+  let newState = {};
+
+  if (typeof state === "object" && state !== null && Object.keys(state).length) {
+    for (var i of Object.keys(state)) {
+      if (Immutable.Iterable.isIterable(state[i])) {
+        newState[i] = state[i].toJS();
+      } else {
+        newState[i] = stateTransformer(state[i]);
+      }
+    }
+  } else {
+    newState = state;
+  }
+  return newState;
+};
+
 // middleware that logs actions
-const loggerMiddleware = createLogger({ predicate: (getState, action) => __DEV__  });
+const loggerMiddleware = createLogger({ stateTransformer });
 
 let middlewares = []
 

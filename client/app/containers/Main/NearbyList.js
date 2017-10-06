@@ -39,7 +39,8 @@ class NearbyList extends Component {
         renderItem={({ item }) => (
           <PictureCard
             data={item}
-            navigateToPet={(id) => navigation.navigate('Pet', { petId: id })}
+            navigation={navigation}
+            view={'Main'}
           />
         )}
       />

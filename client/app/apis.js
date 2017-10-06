@@ -160,14 +160,14 @@ export default {
         },
         data: { picId },
       }),
-    comment: (pictureId, body, token) =>
+    comment: (pictureId, body, targetId, token) =>
       axios({
         method: 'post',
         url: COMMENT_URL,
         headers: {
           Authorization: token,
         },
-        data: { pictureId, body },
+        data: { pictureId, body, targetId },
       }),
     nearby: (latitude, longitude, radius, token) =>
       axios({

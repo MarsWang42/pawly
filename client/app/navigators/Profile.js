@@ -4,6 +4,7 @@ import mapNavigationStateParamsToProps from '../helpers/mapNavigationStateParams
 import Home from '../containers/Profile/Home';
 import Settings from '../containers/Profile/Settings';
 import User from '../containers/Shared/User';
+import PictureDetail from '../containers/Shared/PictureDetail';
 import Pet from '../containers/Shared/Pet';
 import PetList from '../containers/Profile/PetList.js';
 import AddPet from '../containers/Profile/AddPet.js';
@@ -16,6 +17,7 @@ const routeConfiguration = {
   PetList: { screen: PetList },
   AddPet: { screen: AddPet },
   ProfilePet: { screen: mapNavigationStateParamsToProps(Pet) },
+  ProfilePictureDetail: { screen: mapNavigationStateParamsToProps(PictureDetail) },
   ProfileUser: { screen: mapNavigationStateParamsToProps(User) },
   ProfileFollowingList: { screen: mapNavigationStateParamsToProps(FollowingList) },
   ProfileFollowerList: { screen: mapNavigationStateParamsToProps(FollowerList) },

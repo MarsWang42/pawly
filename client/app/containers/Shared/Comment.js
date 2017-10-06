@@ -26,19 +26,20 @@ class Settings extends Component {
   }
 
   submitComment() {
-    const { dispatch, currentUser, pictureId, closeModal } = this.props;
+    const { dispatch, target, currentUser, pictureId, closeModal } = this.props;
     const { text } = this.state;
     dispatch({
       type: pictureActions.COMMENT_PICTURE,
       pictureId,
       body: text,
       token: currentUser.accessToken,
+      targetId: target && target.id,
       callback: closeModal,
     });
   }
 
   render() {
-    const { dispatch, closeModal } = this.props;
+    const { dispatch, closeModal, target } = this.props;
     const { text } = this.state;
     return (
       <View style={styles.container}>
@@ -62,7 +63,7 @@ class Settings extends Component {
             multiline
             style={styles.textInput}
             placeholderTextColor={'grey'}
-            placeholder={'Add a comment...'}
+            placeholder={target ? `Reply ${target.username}` : 'Add a comment...'}
             maxLength={200}
             value={text}
             onChangeText={(text) => this.setState({text})}

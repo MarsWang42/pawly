@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
+  ActivityIndicator,
   FlatList,
   Platform,
   StyleSheet,
+  View,
 } from 'react-native';
 import PictureCard from './PictureCard';
 import * as actions from '../../reducers/picture';
@@ -11,6 +13,7 @@ import * as actions from '../../reducers/picture';
 class FollowingList extends Component {
   componentDidMount() {
     this.props.dispatch({
+      initial: true,
       type: actions.FETCH_FEED,
       token: this.props.currentUser.accessToken,
     });
@@ -27,7 +30,8 @@ class FollowingList extends Component {
   }
 
   onEndReached(data) {
-    if (!this.props.isLoading) {
+    console.log(this.props.isLoading, this.props.isLoadingMore)
+    if (!this.props.isLoading && !this.props.isLoadingMore) {
       this.props.dispatch({
         type: actions.FETCH_FEED,
         token: this.props.currentUser.accessToken,
@@ -36,10 +40,14 @@ class FollowingList extends Component {
   }
 
   render() {
-    const { isLoading, followingList, navigation } = this.props;
+    const { isLoadingMore, isLoading, navigation } = this.props;
+    const followingList = this.props.followingList.toJS();
+    if (isLoadingMore === true) {
+      followingList.push({ pictureId: 'isLoading' });
+    }
     return (
       <FlatList
-        data={followingList.toJS()}
+        data={followingList}
         removeClippedSubviews={false}
         refreshing={isLoading}
         onRefresh={this.onRefresh}
@@ -47,13 +55,22 @@ class FollowingList extends Component {
         onEndReachedThreshold={0}
         keyExtractor={(item) => (item.pictureId)}
         onEndReached={this.onEndReached}
-        renderItem={({ item }) => (
-          <PictureCard
-            data={item}
-            navigation={navigation}
-            view={'Main'}
-          />
-        )}
+        renderItem={({ item }) => {
+          if (item.pictureId === 'isLoading') {
+          return (
+            <View style={{ height: 80, justifyContent: 'center', alignItems: 'center' }}>
+              <ActivityIndicator />
+            </View>
+          );
+          }
+          return (
+            <PictureCard
+              data={item}
+              navigation={navigation}
+              view={'Main'}
+            />
+          );
+        }}
       />
     );
   }
@@ -75,6 +92,7 @@ const mapStateToProps = (state) => {
     currentUser: state.session.currentUser,
     followingList: state.picture.followingList,
     isLoading: state.picture.isFetchingFeed,
+    isLoadingMore: state.picture.isFetchingMoreFeed,
   };
 };
 

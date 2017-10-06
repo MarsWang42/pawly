@@ -24,6 +24,7 @@ import Comment from '../Shared/Comment';
 import ImageWithProgress from '../../components/Helpers/ImageWithProgress';
 import * as pictureActions from '../../reducers/picture';
 import * as petActions from '../../reducers/pet';
+import * as userActions from '../../reducers/user';
 
 UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
 const { height, width } = Dimensions.get('window');
@@ -75,12 +76,22 @@ class PictureDetail extends Component {
     }
   }
 
-  openCommentModal() {
-    this.setState({ isCommentModalVisible: true });
+  openCommentModal(target) {
+    this.setState({ isCommentModalVisible: true, target });
   }
 
   closeCommentModal() {
     this.setState({ isCommentModalVisible: false });
+  }
+
+  selectUser(id) {
+    const { navigation, dispatch, currentUser, view } = this.props;
+    dispatch({
+      type: userActions.FETCH_USER_DETAIL,
+      id: id,
+      token: currentUser.accessToken,
+    });
+    navigation.navigate(`${view}User`, { userId: id, view });
   }
 
   selectPet(id) {
@@ -114,7 +125,7 @@ class PictureDetail extends Component {
   }
 
   renderComment(comment) {
-    const { author } = comment;
+    const { author, body, target } = comment;
     let avatarUrl = author && author.avatar;
     if (!avatarUrl && author && author.facebookId) {
       avatarUrl = `https://graph.facebook.com/${author.facebookId}/picture?width=9999`;
@@ -123,8 +134,11 @@ class PictureDetail extends Component {
       : require('../../assets/img/user-default.png');
     return (
       <View style={styles.commentContainer}>
-        <Image source={imageSource} style={styles.userAvatar} />
-        <View
+        <TouchableOpacity activeOpacity={1} onPress={() => this.selectUser(author.id)}>
+          <Image source={imageSource} style={styles.userAvatar} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          opacity={1}
           style={{
             flex: 1,
             padding: 5,
@@ -132,24 +146,39 @@ class PictureDetail extends Component {
             borderBottomWidth: 1,
             borderColor: 'lightgrey',
           }}
+          onPress={() => this.openCommentModal(author)}
         >
           <Text style={styles.commentUsername}>{ author.username }</Text>
-          <Text style={{ fontFamily: 'Lato', fontSize: 14 }}>{ comment.body }</Text>
-          <Text style={{ fontFamily: 'Lato', fontSize: 12, color: 'grey', marginTop: 5 }}>
-            { moment(comment.createdAt).format('MM-DD hh:mm') }
+          <Text style={{ fontFamily: 'Lato', fontSize: 14 }}>
+            { target && (
+              <Text>
+                <Text>Reply </Text>
+                <Text
+                  style={{ color: 'orange', textDecorationLine: 'underline' }}
+                  onPress={() => this.selectUser(target.id)}
+                >
+                  { target.username }
+                </Text>
+                <Text>:  </Text>
+              </Text>
+            ) }
+            <Text>{ body }</Text>
           </Text>
-        </View>
+          <Text style={{ fontFamily: 'Lato', fontSize: 12, color: 'grey', marginTop: 5 }}>
+            { moment(comment.createdAt).format('MM-DD hh:mm AA') }
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   render() {
     const { navigation, pictureDetails, pictureId, data } = this.props;
-    const { isPetModalOpen, isCommentModalVisible } = this.state;
+    const { isPetModalOpen, isCommentModalVisible, target } = this.state;
     let pictureDetailFetched = true;
     let pictureDetail = pictureDetails[pictureId];
 
-    if (!pictureDetails[pictureId]) {
+    if (!pictureDetail) {
       pictureDetail = data;
       pictureDetailFetched = false;
     }
@@ -190,6 +219,7 @@ class PictureDetail extends Component {
           <Comment
             closeModal={this.closeCommentModal}
             pictureId={pictureId}
+            target={target}
           />
         </Modal>
         <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
@@ -264,7 +294,7 @@ class PictureDetail extends Component {
                 <FlatList
                   horizontal
                   style={{ padding: 5 }}
-                  pictureDetail={pictureDetail.pets}
+                  data={pictureDetail.pets}
                   renderItem={({ item }) => this.renderPet(item)}
                   keyExtractor={(item) => item.id}
                 />
@@ -320,12 +350,12 @@ class PictureDetail extends Component {
         </ScrollView>
         <TouchableOpacity
           style={styles.addButton}
-          onPress={this.openCommentModal}
+          onPress={() => this.openCommentModal()}
         >
           <Text
             style={{
               fontFamily: 'Lato-bold',
-              fontSize: 20,
+              fontSize: 23,
               color: 'grey',
               backgroundColor: 'transparent'
             }}

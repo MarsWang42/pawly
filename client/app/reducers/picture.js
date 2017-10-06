@@ -155,7 +155,7 @@ export const PictureReducer = createReducer({
       Cmd.run(apis.picture.comment, {
         successActionCreator: (response) => commentPictureSucceed(response, action),
         failActionCreator: commentPictureFailed,
-        args: [action.pictureId, action.body, action.token]
+        args: [action.pictureId, action.body, action.targetId, action.token]
       })
     );
   },
@@ -165,7 +165,7 @@ export const PictureReducer = createReducer({
         action.pictureId,
         'comments',
       ],
-      arr => arr.unshift(fromJS(action.comment))
+      arr => arr.push(fromJS(action.comment))
     );
     return {
       ...state,
@@ -193,7 +193,7 @@ export const PictureReducer = createReducer({
       );
     }
     return loop(
-      { ...state, isFetchingFeed: true, fetchFeedError: undefined },
+      { ...state, isFetchingMoreFeed: true, fetchFeedError: undefined },
       Cmd.run(apis.picture.feed, {
           successActionCreator: (response) => fetchFeedSucceed(response, false),
         failActionCreator: fetchFeedFailed,
@@ -202,25 +202,35 @@ export const PictureReducer = createReducer({
     );
   },
   [FETCH_FEED_SUCCEED](state, action) {
-    let updatedFollowingList, updatedFollowingListPage;
+    let updatedFollowingList;
     if (action.initialize) {
       updatedFollowingList = fromJS(action.followingList);
-      updatedFollowingListPage = 1;
     } else {
-      updatedFollowingList = state.followingList.concat(fromJS(action.followingList));
-      updatedFollowingListPage = state.followingListPage + 1;
+      updatedFollowingList = state.followingList;
+      // Get rid of the duplicated feeds
+      if (action.followingList.length > 0) {
+        let duplicatedFollowingId = updatedFollowingList.findIndex(o =>
+          (new Date(o.get('timestamp'))).getTime() <= (new Date(action.followingList[0].timestamp)).getTime()
+        );
+        if (duplicatedFollowingId !== -1) {
+          updatedFollowingList = updatedFollowingList.slice(0, duplicatedFollowingId);
+        }
+      }
+      updatedFollowingList = updatedFollowingList.concat(fromJS(action.followingList));
     }
     return {
       ...state,
       isFetchingFeed: false,
+      isFetchingMoreFeed: false,
       followingList: fromJS(updatedFollowingList),
-      followingListPage: updatedFollowingListPage,
+      followingListPage: state.followingListPage + 1,
     };
   },
   [FETCH_FEED_FAILED](state, action) {
     return {
       ...state,
       isFetchingFeed: false,
+      isFetchingMoreFeed: false,
       fetchFeedError: 'Fetching failed.',
     };
   },
