@@ -14,7 +14,7 @@ import pluralize from 'pluralize';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ProgressPie from 'react-native-progress/Pie';
-import * as actions from '../../reducers/picture';
+import * as pictureActions from '../../reducers/picture';
 
 const PLACE_HOLDER = 'https://images.pexels.com/photos/7720/night-animal-dog-pet.jpg?w=1260&h=750&auto=compress&cs=tinysrgb';
 const { height, width } = Dimensions.get('window');
@@ -42,7 +42,7 @@ class PictureCard extends Component {
 
   likePic(id) {
     this.props.dispatch({
-      type: actions.TOGGLE_PICTURE_LIKE,
+      type: pictureActions.TOGGLE_PICTURE_LIKE,
       toggleType: 'like',
       picId: id,
       callback: () => {
@@ -54,11 +54,21 @@ class PictureCard extends Component {
 
   unlikePic(id) {
     this.props.dispatch({
-      type: actions.TOGGLE_PICTURE_LIKE,
+      type: pictureActions.TOGGLE_PICTURE_LIKE,
       toggleType: 'unlike',
       picId: id,
       token: this.props.currentUser.accessToken,
     });
+  }
+
+  openPictureDetail(id) {
+    const { currentUser, data, dispatch, navigation, view } = this.props;
+    dispatch({
+      type: pictureActions.FETCH_PICTURE_DETAIL,
+      id,
+      token: currentUser.accessToken
+    });
+    navigation.navigate(`${view}PictureDetail`, { pictureId: id, view, data });
   }
 
   render() {
@@ -77,7 +87,11 @@ class PictureCard extends Component {
     }
 
     return (
-      <View style={styles.container}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.container}
+        onPress={() => this.openPictureDetail(data.pictureId)}
+      >
         <View
           style={{ height: cardWidth * 2 / 3, width: cardWidth }}
         >
@@ -156,7 +170,7 @@ class PictureCard extends Component {
             </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }
 }

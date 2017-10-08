@@ -66,11 +66,12 @@ class PictureCard extends Component {
   }
 
   togglePetModal() {
-    if (this.props.data.pets.length >= 2) {
+    const { pets } = this.props.data;
+    if (pets.length >= 2) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       this.setState({ isPetModalOpen: !this.state.isPetModalOpen });
     } else {
-      this.selectPet(this.props.data.pets[0].id);
+      this.selectPet(pets[0].id, pets[0]);
     }
   }
 
@@ -222,10 +223,16 @@ class PictureCard extends Component {
                       { data.likerLength }
                     </Text>
                   </AnimatableTouchableOpacity>
-                  <Icon name={'message-outline'} size={22} style={{ marginTop: 2, marginLeft: 5 }} />
-                  <Text style={{ fontFamily: 'Lato', fontSize: 16, marginHorizontal: 5 }}>
-                    { data.commentLength }
-                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    style={{ flexDirection: 'row', alignItems: 'center' }}
+                    onPress={() => this.openPictureDetail(data.pictureId)}
+                  >
+                    <Icon name={'message-outline'} size={22} style={{ marginTop: 2, marginLeft: 5 }} />
+                    <Text style={{ fontFamily: 'Lato', fontSize: 16, marginHorizontal: 5 }}>
+                      { data.commentLength }
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>

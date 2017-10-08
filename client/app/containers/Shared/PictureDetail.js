@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
+  ActivityIndicator,
   Dimensions,
   FlatList,
   Image,
@@ -124,6 +125,39 @@ class PictureDetail extends Component {
     );
   }
 
+  renderCaption() {
+    const { navigation, isLoading, pictureDetails, pictureId, data } = this.props;
+    const pictureDetail = pictureDetails[pictureId] || data;
+    const { creator, caption } = pictureDetail;
+
+    let avatarUrl = creator && creator.avatar;
+    if (!avatarUrl && creator && creator.facebookId) {
+      avatarUrl = `https://graph.facebook.com/${creator.facebookId}/picture?width=9999`;
+    }
+    const imageSource = avatarUrl ? { uri: avatarUrl }
+      : require('../../assets/img/user-default.png');
+
+    return (
+      <View style={styles.commentContainer}>
+        <TouchableOpacity activeOpacity={1} onPress={() => this.selectUser(creator.id)}>
+          <Image source={imageSource} style={styles.creatorAvatar} />
+        </TouchableOpacity>
+        <Text
+          style={{
+            flex: 1,
+            padding: 5,
+            marginRight: 15,
+            fontSize: 14,
+            fontFamily: 'Lato',
+          }}
+        >
+          <Text style={{ fontFamily: 'Lato-bold' }}>{ creator.username }  </Text>
+          <Text>{ caption }</Text>
+        </Text>
+      </View>
+    );
+  }
+
   renderComment(comment) {
     const { author, body, target } = comment;
     let avatarUrl = author && author.avatar;
@@ -173,7 +207,7 @@ class PictureDetail extends Component {
   }
 
   render() {
-    const { navigation, pictureDetails, pictureId, data } = this.props;
+    const { navigation, isLoading, pictureDetails, pictureId, data } = this.props;
     const { isPetModalOpen, isCommentModalVisible, target } = this.state;
     let pictureDetailFetched = true;
     let pictureDetail = pictureDetails[pictureId];
@@ -301,7 +335,8 @@ class PictureDetail extends Component {
               </View>
             ) }
           </View>
-          <View style={{ flexDirection: 'row', marginTop: 5, marginLeft: 8, alignItems: 'center' }}>
+          { pictureDetail.caption && this.renderCaption() }
+          <View style={{ flexDirection: 'row', marginTop: 5, marginLeft: 10, alignItems: 'center' }}>
             <AnimatableTouchableOpacity
               ref={like => this.like = like}
               onPress={() => {
@@ -323,6 +358,11 @@ class PictureDetail extends Component {
               { pictureDetailFetched && likerNames }
             </Text>
           </View>
+          { isLoading && (
+            <View style={{ height: 50, justifyContent: 'center', alignItems: 'center' }}>
+              <ActivityIndicator />
+            </View>
+          ) }
           { pictureDetailFetched && (
             <FlatList
               style={{ marginBottom: 100 }}
@@ -483,6 +523,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Lato-Bold',
     fontSize: 13,
   },
+  creatorAvatar: {
+    height: 25,
+    width: 25,
+    borderRadius: 12,
+    marginTop: 3,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'lightgrey'
+  },
   commentContainer: {
     marginLeft: 10,
     marginTop: 2,
@@ -543,6 +592,7 @@ const mapStateToProps = (state) => {
   return {
     currentUser: state.session.currentUser,
     pictureDetails: state.picture.pictureDetails.toJS(),
+    isLoading: state.picture.isFetchingPictureDetail,
   };
 };
 

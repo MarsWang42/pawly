@@ -5,6 +5,7 @@ class Api::V1::PicturesController < ApiController
     @user = current_user
     @picture = Picture.new image: params[:image]
     @picture.creator = @user
+    @picture.caption = params[:caption]
     JSON.parse(params[:pets]).each do |pet|
       @picture.pets << Pet.find(pet)
     end

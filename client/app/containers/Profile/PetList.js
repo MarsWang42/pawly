@@ -27,6 +27,16 @@ class PetList extends Component {
     });
   }
 
+  selectPet(id, pet) {
+    const { navigation, dispatch } = this.props;
+    navigation.navigate('ProfilePet', { petId: id, pet, view: 'Profile' });
+    dispatch({
+      type: petActions.FETCH_PET_DETAIL,
+      id: id,
+      token: this.props.currentUser.accessToken,
+    });
+  }
+
   renderPet(pet) {
     const petImageSource = pet.avatar ? { uri: pet.avatar }
       : require('../../assets/img/pet.png');
@@ -42,15 +52,24 @@ class PetList extends Component {
           }}
           onPress={() => this.props.navigation.navigate('AddPet')}
         >
-          <Icon name={'plus'} size={25} color={'grey'} style={{ marginRight: 20 }} />
-          <Text style={{ fontFamily: 'Lato', fontSize: 18, color: 'black' }}>
+          <Icon
+            name={'plus'}
+            size={25}
+            color={'black'}
+            style={{ backgroundColor: 'transparent', marginRight: 15, marginTop: 2 }}
+          />
+          <Text style={{ fontFamily: 'Lato', fontSize: 18, color: 'black', backgroundColor: 'transparent' }}>
             Add a new pet
           </Text>
         </TouchableOpacity>
       );
     }
     return (
-      <View style={styles.petContainer}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        style={styles.petContainer}
+        onPress={() => this.selectPet(pet.id, pet)}
+      >
         <Image source={petImageSource} style={styles.petAvatar} />
         <View style={{ flex: 1 }}>
           <Text style={styles.petName}>{ pet.name }</Text>
@@ -76,7 +95,7 @@ class PetList extends Component {
             color={'black'}
           />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   }
 
@@ -101,28 +120,34 @@ class PetList extends Component {
             Pets
           </Text>
         </LinearGradient>
-        { (petList && petList.length) !== 0 ? (
-          <FlatList
-            data={petList}
-            removeClippedSubviews={false}
-            keyExtractor={(item) => (item.id || item)}
-            renderItem={({ item }) => (
-              this.renderPet(item)
-            )}
-          />
-        ) : (
-          <View style={{ height: 200, justifyContent: 'center', alignItems: 'center' }}>
-            <Icon
-              size={ 40 }
-              style={{ marginBottom: 5, backgroundColor: 'transparent', textAlign: 'center' }}
-              name={'account-search'}
-              color={'grey'}
+        <LinearGradient
+          style={{ flex: 1, paddingTop: 10 }}
+          start={{x: 0.0, y: 0.25}} end={{x: 0.5, y: 1.0}}
+          colors={['#ff9966', '#ff5e62']}
+        >
+          { (petList && petList.length) !== 0 ? (
+            <FlatList
+              data={petList}
+              removeClippedSubviews={false}
+              keyExtractor={(item) => (item.id || item)}
+              renderItem={({ item }) => (
+                this.renderPet(item)
+              )}
             />
-            <Text style={{ fontFamily: 'Lato', fontSize: 20, color: 'grey' }}>
-              Add first pet now!
-            </Text>
-          </View>
-        ) }
+          ) : (
+            <View style={{ height: 200, justifyContent: 'center', alignItems: 'center' }}>
+              <Icon
+                size={ 40 }
+                style={{ marginBottom: 5, backgroundColor: 'transparent', textAlign: 'center' }}
+                name={'account-search'}
+                color={'grey'}
+              />
+              <Text style={{ backgroundColor: 'transparent', fontFamily: 'Lato', fontSize: 20, color: 'grey' }}>
+                Add first pet now!
+              </Text>
+            </View>
+          ) }
+        </LinearGradient>
       </View>
       );
   }
@@ -137,7 +162,6 @@ const styles = StyleSheet.create({
     paddingTop: 19,
     alignItems:'center',
     justifyContent:'center',
-    marginBottom: 10,
   },
   back: {
     position: 'absolute',

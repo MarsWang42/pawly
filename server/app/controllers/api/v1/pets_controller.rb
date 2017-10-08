@@ -3,13 +3,9 @@ class Api::V1::PetsController < ApiController
 
   def create
     @user = current_user
-    @pet = @user.pets.new(name: pet_params[:name])
-    if pet_params[:type]
-      @pet.type = pet_params[:type]
-    end
+    @pet = @user.pets.new(pet_params)
 
     if pet_params[:avatar]
-      @pet.avatar = pet_params[:avatar]
       pic = @pet.pictures.new(image: pet_params[:avatar])
       pic.creator = @user
       if !pic.save
@@ -47,7 +43,7 @@ class Api::V1::PetsController < ApiController
 
   private
     def pet_params
-      params.permit(:id, :name, :type, :avatar)
+      params.permit(:id, :name, :type, :avatar, :bio)
     end
 
     def set_pet

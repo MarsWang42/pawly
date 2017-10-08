@@ -2,6 +2,7 @@ json.id @pet.id
 json.name @pet.name
 json.type @pet.type
 json.avatar @pet.avatar.url
+json.bio @pet.bio
 json.owner do
   json.username @pet.owner.username
   json.userId @pet.owner.id

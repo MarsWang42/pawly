@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
+  ActivityIndicator,
   Animated,
   Platform,
   StyleSheet,
@@ -22,7 +23,15 @@ const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
 class FollowingList extends Component {
   render() {
-    const { userDetails, currentUser, navigation, dispatch, userId, view } = this.props;
+    const {
+      userDetails,
+      isLoading,
+      currentUser,
+      navigation,
+      dispatch,
+      userId,
+      view,
+    } = this.props;
     const followingList = userDetails[userId].following;
 
     return (
@@ -39,6 +48,11 @@ class FollowingList extends Component {
             Followers
           </Text>
         </LinearGradient>
+        { isLoading && (
+          <View style={{ height: 50, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator />
+          </View>
+        ) }
         <UserList
           userList={followingList}
           onPressUser={(user) => {
@@ -87,6 +101,7 @@ const mapStateToProps = (state) => {
   return {
     currentUser: state.session.currentUser,
     userDetails: state.user.userDetails.toJS(),
+    isLoading: state.user.isFetchingFollowingList,
   };
 };
 

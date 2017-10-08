@@ -34,6 +34,9 @@ class Home extends Component {
       selectedPicture: undefined,
       selectedPictureId: -1,
     };
+    this.renderPicture = this.renderPicture.bind(this);
+    this.onRegionChange = this.onRegionChange.bind(this);
+    this.redoMapSearch = this.redoMapSearch.bind(this);
   }
 
   componentDidMount() {
@@ -103,7 +106,8 @@ class Home extends Component {
           type: pictureActions.FETCH_NEARBY,
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-          radius: 10,
+          latitudeDelta: this.state.region.latitudeDelta / 2,
+          longitudeDelta: this.state.region.longitudeDelta / 2,
           token: this.props.currentUser.accessToken,
         });
       },
@@ -168,6 +172,31 @@ class Home extends Component {
     }
   }
 
+  onRegionChange(region) {
+    if (region.longitudeDelta < 0.2973655516254894) {
+      this.setState({
+        region,
+        showRedoSearchButton: true,
+      });
+    } else {
+      this.setState({
+        region,
+        showRedoSearchButton: false,
+      });
+    }
+  }
+
+  redoMapSearch() {
+    this.props.dispatch({
+      type: pictureActions.FETCH_NEARBY,
+      latitude: this.state.region.latitude,
+      longitude: this.state.region.longitude,
+      latitudeDelta: this.state.region.latitudeDelta / 2,
+      longitudeDelta: this.state.region.longitudeDelta / 2,
+      token: this.props.currentUser.accessToken,
+    });
+  }
+
   renderMarkers() {
     const {
       placeList,
@@ -212,16 +241,19 @@ class Home extends Component {
   }
 
   renderPicture({ item, index }) {
+    const { navigation } = this.props;
     return (
-      <TouchableOpacity>
-        <PictureCard data={item} />
-      </TouchableOpacity>
-    )
+      <PictureCard
+        data={item}
+        navigation={navigation}
+        view={'Map'}
+      />
+    );
   }
 
   render() {
     const { nearbyList } = this.props;
-    const { region, selectedPlace, opacityAnim } = this.state;
+    const { region, selectedPlace, opacityAnim, showRedoSearchButton } = this.state;
     const cardWidth = width - 30;
     return (
       <View style={styles.container}>
@@ -251,12 +283,35 @@ class Home extends Component {
           </Animated.View>
         )}
         <View style={styles.container}>
+          { showRedoSearchButton && (
+            <TouchableOpacity
+              style={styles.redoButton}
+              onPress={this.redoMapSearch}
+            >
+              <LinearGradient
+                style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+                start={{x: 0.0, y: 0.25}} end={{x: 0.5, y: 1.0}}
+                colors={['#4568DC', '#B06AB3']}
+              >
+                <Text
+                  style={{
+                    color: 'white',
+                    fontFamily: 'Lato',
+                    fontSize: 14,
+                    backgroundColor: 'transparent'
+                  }}
+                >
+                  Redo search in this area
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          ) }
           <MapView
             style={styles.map}
             region={region}
             pitchEnabled={false}
             ref={map => this.map = map}
-            onRegionChange={region => this.setState({ region })}
+            onRegionChange={this.onRegionChange}
             onPress={() => this.deselectPlace()}
           >
             { nearbyList && this.renderMarkers() }
@@ -304,6 +359,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     backgroundColor: 'transparent',
+  },
+  redoButton: {
+    zIndex: 10,
+    borderRadius: 8,
+    position: 'absolute',
+    height: 30,
+    top: 20,
+    left: width <= 325 ? 30 : 50,
+    right: width <= 325 ? 30 : 50,
+    overflow: 'hidden',
   },
   bgImg: {
     flex: 1,

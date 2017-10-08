@@ -45,6 +45,7 @@
     "react-native-progress": "^3.4.0",
     "react-native-scrollable-tab-view": "^0.7.4",
     "react-native-spinkit": "latest",
+    "react-native-textinput-effects": "^0.4.1",
     "react-native-vector-icons": "^4.4.0",
     "react-navigation": "^1.0.0-beta.11",
     "react-redux": "^5.0.6",

@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 20171004180118) do
     t.string "name", null: false
     t.string "type", null: false
     t.string "avatar"
+    t.text "bio"
     t.bigint "owner_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -83,14 +84,6 @@ ActiveRecord::Schema.define(version: 20171004180118) do
     t.index ["followed_id"], name: "index_relationships_on_followed_id"
     t.index ["follower_id", "followed_id"], name: "index_relationships_on_follower_id_and_followed_id", unique: true
     t.index ["follower_id"], name: "index_relationships_on_follower_id"
-  end
-
-  create_table "respond_to", force: :cascade do |t|
-    t.integer "author_id"
-    t.integer "target_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["author_id", "target_id"], name: "index_respond_to_on_author_id_and_target_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|

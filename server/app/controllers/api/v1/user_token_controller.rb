@@ -4,12 +4,6 @@ class Api::V1::UserTokenController < Knock::AuthTokenController
     @token = Knock::AuthToken.new payload: { sub: @user.id }
   end
 
-  def authenticate
-    unless entity.present?
-      raise Knock.not_found_exception_class
-    end
-  end
-
   def entity
     if auth_params[:strategy] == 'local'
       @entity ||=

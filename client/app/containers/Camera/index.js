@@ -54,6 +54,7 @@ class AppCamera extends Component {
       petList: [],
       selectedPets: [],
       view: 'camera',
+      caption: '',
     };
     this.takePicture = this.takePicture.bind(this);
     this.pickPicture = this.pickPicture.bind(this);
@@ -159,7 +160,7 @@ class AppCamera extends Component {
   }
 
   uploadPicture() {
-    const { pickedPicture, selectedPlace, selectedPets } = this.state;
+    const { pickedPicture, selectedPlace, selectedPets, caption } = this.state;
     const { currentUser, dispatch, navigation } = this.props;
     let formData = new FormData();
     if (selectedPlace) {
@@ -169,6 +170,7 @@ class AppCamera extends Component {
       formData.append('latitude', selectedPlace.latitude);
     }
     formData.append('pets', JSON.stringify(selectedPets.map(pet => pet.id)));
+    formData.append('caption', caption);
     formData.append('image',
       { uri: pickedPicture, name: `${uuidv4()}.jpg`, type: 'multipart/formdata' });
     dispatch({
@@ -373,6 +375,7 @@ class AppCamera extends Component {
       isPetListOpen,
       selectedPets,
       selectedPlace,
+      caption,
     } = this.state;
     // Filter out the selected pets.
     const petList = this.state.petList.filter(pet =>
@@ -535,6 +538,8 @@ class AppCamera extends Component {
             placeholderTextColor={'grey'}
             placeholder={'Say something! Maximum 200 charactres.'}
             maxLength={200}
+            value={caption}
+            onChangeText={(caption) => this.setState({caption})}
           />
         </KeyboardAwareScrollView>
         <View style={styles.uploadButtonContainer}>
@@ -630,7 +635,7 @@ class AppCamera extends Component {
 
   render() {
     const { view, pickedPicture, isImageModalOpen, modalPicture } = this.state;
-    const { isLoading } = this.props;
+    const { isLoading, navigation } = this.props;
     return (
       <View style={styles.container}>
         { isLoading && (
@@ -648,6 +653,9 @@ class AppCamera extends Component {
             </View>
           </View>
         ) }
+        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+          <Text style={{ fontFamily: 'Lato', fontSize: 16 }}>Back</Text>
+        </TouchableOpacity>
         <LinearGradient
           style={styles.header}
           start={{x: 0.0, y: 0.25}} end={{x: 0.5, y: 1.0}}
@@ -683,6 +691,14 @@ class AppCamera extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  back: {
+    position: 'absolute',
+    top: 30,
+    left: 30,
+    zIndex: 10,
+    width: 80,
+    backgroundColor: 'transparent',
   },
   modal: {
     margin: 0,
@@ -814,7 +830,6 @@ const styles = StyleSheet.create({
     right: 25,
     borderWidth: 3,
     borderColor: '#107896',
-    width: 250,
     height: 35,
     borderRadius: 20,
     alignItems: 'center',

@@ -169,14 +169,14 @@ export default {
         },
         data: { pictureId, body, targetId },
       }),
-    nearby: (latitude, longitude, radius, token) =>
+    nearby: (latitude, longitude, latitudeDelta, longitudeDelta, token) =>
       axios({
         method: 'post',
         url: NEARBY_URL,
         headers: {
           Authorization: token,
         },
-        data: { latitude, longitude, radius },
+        data: { latitude, longitude, latitudeDelta, longitudeDelta },
       }),
     feed: (page, token) =>
       axios({

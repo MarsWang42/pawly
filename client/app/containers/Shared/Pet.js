@@ -18,7 +18,7 @@ import * as userActions from '../../reducers/user';
 import * as pictureActions from '../../reducers/picture';
 
 const { width, height } = Dimensions.get('window');
-const HEADER_MAX_HEIGHT = 180;
+const HEADER_MAX_HEIGHT = 220;
 const HEADER_MIN_HEIGHT = width <= 325 ? 50 : 60;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
@@ -173,6 +173,13 @@ class Pet extends Component {
             />
             <Image source={petImageSource} style={styles.petAvatar} />
             { petDetailFetched && this.renderOwner() }
+            { petDetail.bio && (
+              <View style={{ marginTop: 15 }}>
+                <Text style={{ color: 'white', fontFamily: 'Lato', backgroundColor: 'transparent' }}>
+                  { petDetail.bio }
+                </Text>
+              </View>
+            ) }
           </Animated.View>
         </AnimatedLinearGradient>
         { petDetailFetched && (
@@ -246,7 +253,6 @@ const styles = StyleSheet.create({
     height: HEADER_MAX_HEIGHT,
   },
   backgroundImage: {
-    flexDirection: 'row',
     position: 'absolute',
     top: 0,
     left: 0,
@@ -254,7 +260,6 @@ const styles = StyleSheet.create({
     width: null,
     height: HEADER_MAX_HEIGHT,
     backgroundColor: 'lightgray',
-    justifyContent: 'space-around',
     alignItems: 'center',
     paddingTop: 30,
   },
@@ -288,7 +293,7 @@ const styles = StyleSheet.create({
     height: 80,
     width: 80,
     borderRadius: 40,
-    marginTop: 10,
+    marginTop: 40,
     overflow: 'hidden',
     backgroundColor: 'white',
   },

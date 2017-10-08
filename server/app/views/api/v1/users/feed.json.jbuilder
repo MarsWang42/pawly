@@ -1,9 +1,12 @@
 json.feeds(@feeds) do |feed|
+  json.pictureId feed.id
   json.image feed.image.url
   json.timestamp feed.created_at
   json.creator do
+    json.id feed.creator.id
     json.username feed.creator.username
     json.avatar feed.creator.avatar.url
+    json.facebookId feed.creator.facebook_id
   end
   json.pets(feed.pets) do |pet|
     json.id pet.id
@@ -18,7 +21,7 @@ json.feeds(@feeds) do |feed|
       json.longitude feed.place.longitude
     end
   end
-  json.pictureId feed.id
+  json.caption feed.caption
   json.liked @user.liked?(feed)
   json.likerLength feed.likers.length
   json.commentLength feed.comments.length
