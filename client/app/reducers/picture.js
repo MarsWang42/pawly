@@ -203,6 +203,7 @@ export const PictureReducer = createReducer({
   },
   [FETCH_FEED_SUCCEED](state, action) {
     let updatedFollowingList;
+    const feedReachEnd = action.followingList.length ? true : false;
     if (action.initialize) {
       updatedFollowingList = fromJS(action.followingList);
     } else {
@@ -222,6 +223,7 @@ export const PictureReducer = createReducer({
       ...state,
       isFetchingFeed: false,
       isFetchingMoreFeed: false,
+      feedReachEnd,
       followingList: fromJS(updatedFollowingList),
       followingListPage: state.followingListPage + 1,
     };

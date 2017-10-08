@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { NavigationActions } from 'react-navigation'
 import {
   StyleSheet,
   Text,
@@ -12,8 +13,24 @@ import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 class Settings extends Component {
-  render() {
+  constructor() {
+    super();
+    this.logoutUser = this.logoutUser.bind(this);
+  }
+
+  logoutUser() {
     const { dispatch, navigation } = this.props;
+    dispatch({ type: sessionActions.LOGOUT_USER });
+    navigation.dispatch(NavigationActions.reset({
+      index: 0,
+      actions: [
+        NavigationActions.navigate({ routeName: 'Home'})
+      ]
+    }));
+  }
+
+  render() {
+    const { navigation } = this.props;
     return (
       <View>
         <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
@@ -31,7 +48,7 @@ class Settings extends Component {
         <View style={styles.optionsContainer}>
           <TouchableOpacity
             style={styles.option}
-            onPress={() => dispatch({ type: sessionActions.LOGOUT_USER })}
+            onPress={this.logoutUser}
           >
             <IconM name={'logout'} color={'#ff2f2f'} size={25} style={styles.optionIcon} />
             <Text style={[styles.optionText, { color: '#ff2f2f' }]}>Logout</Text>

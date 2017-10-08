@@ -30,8 +30,7 @@ class FollowingList extends Component {
   }
 
   onEndReached(data) {
-    console.log(this.props.isLoading, this.props.isLoadingMore)
-    if (!this.props.isLoading && !this.props.isLoadingMore) {
+    if (!this.props.isLoading && !this.props.isLoadingMore && !this.props.feedReachEnd) {
       this.props.dispatch({
         type: actions.FETCH_FEED,
         token: this.props.currentUser.accessToken,
@@ -93,6 +92,7 @@ const mapStateToProps = (state) => {
     followingList: state.picture.followingList,
     isLoading: state.picture.isFetchingFeed,
     isLoadingMore: state.picture.isFetchingMoreFeed,
+    feedReachEnd: state.picture.feedReachEnd,
   };
 };
 
