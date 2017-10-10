@@ -30,6 +30,7 @@ class Login extends Component {
   render(){
     const {
       isLoggingIn,
+      isRegistering,
       loginUserByFacebook,
       loginUserByEmail,
       loginError,
@@ -94,6 +95,7 @@ class Login extends Component {
           style={styles.loginButton}
           text={'Log In'}
           isLoading={isLoggingIn === 'local'}
+          disabled={(isLoggingIn || isRegistering) ? true : false}
           onPress={() => this.props.dispatch({
             type: actions.LOGIN_USER,
             strategy: 'local',
@@ -182,6 +184,7 @@ const mapStateToProps = (state) => {
   return {
     loginError: state.session.loginError,
     isLoggingIn: state.session.isLoggingIn,
+    isRegistering: state.session.isRegistering,
   };
 };
 

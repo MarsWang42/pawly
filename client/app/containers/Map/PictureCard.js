@@ -76,14 +76,33 @@ class PictureCard extends Component {
     const { imageWidth, imageHeight } = this.state;
 
     const pl = data.pets.length;
-    // const cl = data.comments.length;
-    let petNames, likerNames, comments;
+
+    let isRescue = false;
+    for (let i = 0; i < pl; i++) {
+      if (data.pets[i].isRescue) {
+        isRescue = true;
+        break;
+      }
+    }
+
+    // Prioritize rescue pets.
+    const petList = isRescue ? data.pets.sort((a, b) => {
+      if (a.isRescue) {
+        return -1;
+      } else if (b.isRescue) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }) : data.pets;
+
+    let petNames;
     if (pl >= 3) {
-      petNames = `${data.pets[0].name}, ${data.pets[1].name} and ${pl - 2} others`;
+      petNames = `${petList[0].name}, ${petList[1].name} and ${pl - 2} others`;
     } else if (pl === 2) {
-      petNames = `${data.pets[0].name} and ${data.pets[1].name}`;
+      petNames = `${petList[0].name} and ${petList[1].name}`;
     } else {
-      petNames = data.pets[0].name;
+      petNames = petList[0].name;
     }
 
     return (
@@ -133,7 +152,7 @@ class PictureCard extends Component {
             </View>
           </View>
         </View>
-        <View style={styles.headerContainer}>
+        <View style={[styles.headerContainer, { backgroundColor: isRescue ? '#9eff89' : 'white' }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View
               style={[styles.petAvatarContainer,
@@ -142,16 +161,16 @@ class PictureCard extends Component {
             >
               <Image
                 style={styles.firstPetAvatar}
-                source={{ uri: data.pets[0].avatar || PLACE_HOLDER }}
+                source={{ uri: petList[0].avatar || PLACE_HOLDER }}
               />
-              { data.pets[1] &&
+              { petList[1] &&
                 <Image
                   style={styles.secondPetAvatar}
-                  source={{ uri: data.pets[1].avatar || PLACE_HOLDER }}
+                  source={{ uri: petList[1].avatar || PLACE_HOLDER }}
                 />
               }
-              { data.pets[2] &&
-                <Image style={styles.thirdPetAvatar} source={{ uri: data.pets[2].avatar || PLACE_HOLDER }}/>
+              { petList[2] &&
+                <Image style={styles.thirdPetAvatar} source={{ uri: petList[2].avatar || PLACE_HOLDER }}/>
               }
             </View>
             <View style={styles.petInfoContainer}>

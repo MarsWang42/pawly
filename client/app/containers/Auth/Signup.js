@@ -1,12 +1,12 @@
 import React, { Component, PropTypes } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   Dimensions,
+  Linking,
+  StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  ImageBackground,
+  View,
 } from 'react-native';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -62,6 +62,7 @@ class Signup extends Component {
 
   render(){
     const {
+      isLoggingIn,
       isRegistering,
       loginUserByFacebook,
       loginUserByEmail,
@@ -144,6 +145,7 @@ class Signup extends Component {
           style={styles.loginButton}
           text={'Sign Up'}
           isLoading={isRegistering}
+          disabled={(isLoggingIn || isRegistering) ? true : false}
           onPress={() => this.submitForm()}
         />
       </View>
@@ -212,6 +214,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     registerError: state.session.registerError,
+    isLoggingIn: state.session.isLoggingIn,
     isRegistering: state.session.isRegistering,
   };
 };

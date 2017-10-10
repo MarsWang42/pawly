@@ -10,10 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171004180118) do
+ActiveRecord::Schema.define(version: 20171010194139) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "adoption_requests", force: :cascade do |t|
+    t.bigint "adoption_applicant_id"
+    t.bigint "adoption_pet_owner_id"
+    t.bigint "pet_id"
+    t.string "email"
+    t.string "phone"
+    t.string "full_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["adoption_applicant_id"], name: "index_adoption_requests_on_adoption_applicant_id"
+    t.index ["adoption_pet_owner_id"], name: "index_adoption_requests_on_adoption_pet_owner_id"
+    t.index ["pet_id"], name: "index_adoption_requests_on_pet_id"
+  end
 
   create_table "comments", force: :cascade do |t|
     t.bigint "author_id"
@@ -39,6 +53,8 @@ ActiveRecord::Schema.define(version: 20171004180118) do
     t.string "type", null: false
     t.string "avatar"
     t.text "bio"
+    t.boolean "is_rescue"
+    t.boolean "is_missing"
     t.bigint "owner_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -101,6 +117,9 @@ ActiveRecord::Schema.define(version: 20171004180118) do
     t.index ["username"], name: "index_users_on_username"
   end
 
+  add_foreign_key "adoption_requests", "pets"
+  add_foreign_key "adoption_requests", "users", column: "adoption_applicant_id"
+  add_foreign_key "adoption_requests", "users", column: "adoption_pet_owner_id"
   add_foreign_key "comments", "pictures"
   add_foreign_key "comments", "users", column: "author_id"
   add_foreign_key "pets", "users", column: "owner_id"

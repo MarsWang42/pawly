@@ -21,6 +21,7 @@ class Settings extends Component {
   logoutUser() {
     const { dispatch, navigation } = this.props;
     dispatch({ type: sessionActions.LOGOUT_USER });
+    // Reset react navigation routes
     navigation.dispatch(NavigationActions.reset({
       index: 0,
       actions: [

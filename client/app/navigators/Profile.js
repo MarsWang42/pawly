@@ -7,7 +7,7 @@ import User from '../containers/Shared/User';
 import PictureDetail from '../containers/Shared/PictureDetail';
 import Pet from '../containers/Shared/Pet';
 import PetList from '../containers/Profile/PetList.js';
-import AddPet from '../containers/Profile/AddPet.js';
+import PetForm from '../containers/Profile/PetForm.js';
 import FollowingList from '../containers/Shared/FollowingList';
 import FollowerList from '../containers/Shared/FollowerList';
 
@@ -15,7 +15,7 @@ const routeConfiguration = {
   Home: { screen: Home },
   Settings: { screen: Settings },
   PetList: { screen: PetList },
-  AddPet: { screen: AddPet },
+  PetForm: { screen: mapNavigationStateParamsToProps(PetForm) },
   ProfilePet: { screen: mapNavigationStateParamsToProps(Pet) },
   ProfilePictureDetail: { screen: mapNavigationStateParamsToProps(PictureDetail) },
   ProfileUser: { screen: mapNavigationStateParamsToProps(User) },

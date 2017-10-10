@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   FlatList,
+  Image,
   Platform,
   StyleSheet,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 import PictureCard from './PictureCard';
 import * as pictureActions from '../../reducers/picture';
-import * as actions from '../../reducers/picture';
 
 class NearbyList extends Component {
   constructor() {
@@ -27,7 +29,24 @@ class NearbyList extends Component {
   }
 
   render() {
-    const { isLoading, nearbyList, navigation } = this.props;
+    const { isLoading, fetchError, nearbyList, navigation } = this.props;
+
+    if (fetchError) {
+      return (
+        <TouchableOpacity
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 40 }}
+          activeOpacity={1}
+          onPress={this.onRefresh}
+        >
+          <Image
+            source={require('../../assets/img/network-error.png')}
+            style={{ height: 200, width: 200, marginBottom: 10 }}
+          />
+          <Text style={{ fontFamily: 'Lato', fontSize: 18, color: 'grey' }}>Network error</Text>
+        </TouchableOpacity>
+      );
+    }
+
     return (
       <FlatList
         data={nearbyList.toJS()}
@@ -81,8 +100,9 @@ const mapStateToProps = (state) => {
   return {
     currentUser: state.session.currentUser,
     nearbyList: state.picture.nearbyList,
+    fetchError: state.picture.fetchNearbyError,
     currentLocation: state.session.currentLocation,
-    isLoading: state.picture.isFetchingFeed,
+    isLoading: state.picture.isFetchingNearby,
   };
 };
 

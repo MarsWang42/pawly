@@ -19,7 +19,6 @@ import IconM from 'react-native-vector-icons/MaterialIcons';
 import ImageCropper from 'react-native-image-crop-picker';
 import ImagePicker from 'react-native-image-picker';
 import Modal from 'react-native-modal';
-import { Makiko } from 'react-native-textinput-effects';
 const Clarifai = require('clarifai');
 import * as actions from '../../reducers/pet';
 
@@ -78,19 +77,24 @@ const app = new Clarifai.App({
   apiKey: 'c5dc272a19e141d8893da0ed6ba1658b'
 });
 
-class Avatar extends Component {
-  constructor() {
-    super();
+class PetForm extends Component {
+  constructor(props) {
+    super(props);
     this.state = {
       isModalVisible: false,
-      petAvatar: '',
-      petName: '',
-      petType: '',
-      bio: '',
+      petAvatar: props.pet.avatar || '',
+      petName: props.pet.name || '',
+      petType: props.pet.type || '',
+      bio: props.pet.bio || '',
+      isPetAvatarUpdated: false,
+      isRescue: props.pet.isRescue || false,
+      isMissing: props.pet.isMissing || false,
     };
     this.showPetImagePicker = this.showPetImagePicker.bind(this);
     this.submitForm = this.submitForm.bind(this);
     this.showModal = this.showModal.bind(this);
+    this.toggleRescue = this.toggleRescue.bind(this);
+    this.toggleMissing = this.toggleMissing.bind(this);
     this.hideModal = this.hideModal.bind(this);
     this.validate = this.validate.bind(this);
   }
@@ -101,6 +105,14 @@ class Avatar extends Component {
 
   hideModal() {
     this.setState({ isModalVisible: false });
+  }
+
+  toggleRescue() {
+    this.setState({ isRescue: !this.state.isRescue });
+  }
+
+  toggleMissing() {
+    this.setState({ isMissing: !this.state.isMissing });
   }
 
   validate() {
@@ -131,10 +143,11 @@ class Avatar extends Component {
           compressImageQuality: 0.5,
           includeBase64: true,
         }).then(response => {
-          this.setState({ isRecognizingImage: true });
           this.setState({
+            isRecognizingImage: true,
             petAvatar: response.path,
             isLoadingImage: false,
+            isPetAvatarUpdated: true,
           });
           app.models.predict(Clarifai.GENERAL_MODEL, { base64: response.data })
             .then((response) => {
@@ -152,28 +165,49 @@ class Avatar extends Component {
 
   submitForm() {
     if (this.validate()) {
-      const { petAvatar, petName, petType, bio } = this.state;
-      const { currentUser, navigation } = this.props;
+      const { isPetAvatarUpdated, petAvatar, petName, petType, bio, isMissing, isRescue } = this.state;
+      const { currentUser, navigation, pet, dispatch } = this.props;
       let formData = new FormData();
       formData.append('name', petName);
       formData.append('type', petType || 'others');
       formData.append('bio', bio);
-      if (petAvatar) {
+      formData.append('is_rescue', isRescue);
+      formData.append('is_missing', isMissing);
+      if (isPetAvatarUpdated) {
         formData.append('avatar',
           { uri: petAvatar, name: `${uuidv4()}.jpg`, type: 'multipart/formdata' });
       }
-      this.props.dispatch({
-        type: actions.CREATE_PET,
-        payload: formData,
-        token: currentUser.accessToken,
-        callback: () => navigation.goBack(),
-      });
+      if (!pet) {
+        dispatch({
+          type: actions.CREATE_PET,
+          payload: formData,
+          token: currentUser.accessToken,
+          callback: () => navigation.goBack(),
+        });
+      } else {
+        dispatch({
+          type: actions.EDIT_PET,
+          petId: pet.id,
+          payload: formData,
+          token: currentUser.accessToken,
+          callback: () => navigation.goBack(),
+        });
+      }
     }
   }
 
   render() {
-    const { currentUser, isLoading, navigation } = this.props;
-    const { isLoadingImage, bio, petAvatar, petType, isRecognizingImage, petNameError } = this.state;
+    const { pet, currentUser, isLoading, navigation } = this.props;
+    const {
+      isLoadingImage,
+      bio,
+      petAvatar,
+      petType,
+      isRecognizingImage,
+      petNameError,
+      isRescue,
+      isMissing,
+    } = this.state;
 
     const petImageSource = petAvatar ? { uri: petAvatar }
       : require('../../assets/img/pet.png');
@@ -236,23 +270,49 @@ class Avatar extends Component {
           </TouchableOpacity>
           { isLoadingImage && <View style={styles.overlay} /> }
           <View style={{ width, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' }}>
-            <TouchableOpacity onPress={this.showPetImagePicker} style={{ height: 80, width: 80 }}>
-              <Image source={petImageSource} style={styles.uploadAvatar} />
-              <LinearGradient
-                start={{x: 0.0, y: 0.25}} end={{x: 0.5, y: 1.0}}
-                colors={['#1c92d2', '#f2fcfe']}
-                style={styles.plus}
-              >
-                <Text style={{ color: 'white', backgroundColor: 'transparent' }}>+</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-            <View>
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+              <TouchableOpacity onPress={this.showPetImagePicker} style={{ height: 80, width: 80 }}>
+                <Image source={petImageSource} style={styles.uploadAvatar} />
+                <LinearGradient
+                  start={{x: 0.0, y: 0.25}} end={{x: 0.5, y: 1.0}}
+                  colors={['#1c92d2', '#f2fcfe']}
+                  style={styles.plus}
+                >
+                  <Text style={{ color: 'white', backgroundColor: 'transparent' }}>+</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+              <View style={styles.petButtons}>
+                <TouchableOpacity
+                  style={[styles.petButton, {
+                    borderColor: '#ffe1af',
+                    backgroundColor: isRescue ? '#ffe1af' : 'transparent',
+                  }]}
+                  onPress={this.toggleRescue}
+                >
+                  <Text style={[styles.petButtonText, { color: isRescue ? 'black' : '#ffe1af' }]}>
+                    Rescue
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.petButton, {
+                    borderColor: '#aeffe1',
+                    backgroundColor: isMissing ? '#aeffe1' : 'transparent',
+                  }]}
+                  onPress={this.toggleMissing}
+                >
+                  <Text style={[styles.petButtonText, { color: isMissing ? 'black' : '#aeffe1' }]}>
+                    Missing
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={{ width: width - 175, justifyContent: 'center', alignItems: 'center' }}>
               <View style={styles.textInputContainer}>
                 <Icon
                   name={'account'}
-                  size={22}
+                  size={18}
                   color={'white'}
-                  style={{ paddingHorizontal: 10 }}
+                  style={{ paddingLeft: 8, paddingRight: 4 }}
                 />
                 <TextInput
                   blurOnSubmit={ false }
@@ -276,17 +336,17 @@ class Avatar extends Component {
               >
                 <Icon
                   name={'paw'}
-                  size={22}
+                  size={18}
                   color={'white'}
-                  style={{ paddingHorizontal: 10 }}
+                  style={{ paddingLeft: 8, paddingRight: 4 }}
                 />
                 { isRecognizingImage ? (
                   <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <Spinner type={'Wave'} size={20} color={'#fff'} />
+                    <Spinner type={'Wave'} size={14} color={'#fff'} />
                   </View>
                 ) : (
                 <Text
-                  style={{ flex: 1, fontFamily: 'Lato', fontSize: 17, color: petType ? 'white' : 'rgba(255, 255, 255, 0.5)' }}
+                  style={{ flex: 1, fontFamily: 'Lato', fontSize: 14, color: petType ? 'white' : 'rgba(255, 255, 255, 0.5)' }}
                 >
                   { ucfirst(petType) || 'Type' }
                 </Text>
@@ -309,6 +369,7 @@ class Avatar extends Component {
           <TouchableOpacity
             style={styles.buttonContainer}
             onPress={this.submitForm}
+            disabled={isLoading}
           >
             { isLoading ? (
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -322,7 +383,7 @@ class Avatar extends Component {
                   color={'white'}
                   style={{ paddingHorizontal: 5 }}
                 />
-                <Text style={styles.text}>Add Pet!</Text>
+                <Text style={styles.text}>{ pet ? 'Save' : 'Add Pet!' }</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -389,9 +450,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  petButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 15,
+  },
+  petButton: {
+    width: 70,
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    paddingVertical: 4,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderRadius: 4,
+    marginHorizontal: 6,
+  },
+  petButtonText: {
+    fontFamily: 'Lato',
+    fontSize: 12,
+    backgroundColor: 'transparent'
+  },
   textInputContainer: {
     flexDirection: 'row',
-    height: 40,
+    height: 30,
     width: width - 200,
     marginVertical: 10,
     backgroundColor: 'rgba(200, 200, 200, 0.3)',
@@ -399,12 +480,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textInput: {
-    width: width - 200,
+    width: width - 230,
     color: 'white',
+    fontSize: 14,
   },
   bioInput: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: 'Lato',
     height: height - 400,
     backgroundColor: 'rgba(200, 200, 200, 0.3)',
@@ -460,8 +542,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     currentUser: state.session.currentUser,
-    isLoading: state.session.isUpdating,
+    isLoading: state.pet.isCreatingPet || state.pet.isEditingPet,
   };
 };
 
-export default connect(mapStateToProps)(Avatar);
+export default connect(mapStateToProps)(PetForm);

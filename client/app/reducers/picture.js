@@ -101,6 +101,7 @@ export const PictureReducer = createReducer({
   placeList: List(),
   pictureDetails: Map(),
   isFetchingFeed: false,
+  isFetchingNearby: false,
 }, {
   [CREATE_PICTURE](state, action) {
     return loop(
@@ -242,7 +243,14 @@ export const PictureReducer = createReducer({
       Cmd.run(apis.picture.nearby, {
         successActionCreator: fetchNearbySucceed,
         failActionCreator: fetchNearbyFailed,
-        args: [action.latitude, action.longitude, action.latitudeDelta, action.longitudeDelta, action.token]
+        args: [
+          action.latitude,
+          action.longitude,
+          action.radius,
+          action.latitudeDelta,
+          action.longitudeDelta,
+          action.token,
+        ]
       })
     );
   },

@@ -27,6 +27,10 @@ class PetList extends Component {
     });
   }
 
+  editPet(pet) {
+    this.props.navigation.navigate('PetForm', { pet });
+  }
+
   selectPet(id, pet) {
     const { navigation, dispatch } = this.props;
     navigation.navigate('ProfilePet', { petId: id, pet, view: 'Profile' });
@@ -50,7 +54,7 @@ class PetList extends Component {
             alignItems: 'center',
             padding: 5,
           }}
-          onPress={() => this.props.navigation.navigate('AddPet')}
+          onPress={() => this.props.navigation.navigate('PetForm', { pet: undefined })}
         >
           <Icon
             name={'plus'}
@@ -75,6 +79,14 @@ class PetList extends Component {
           <Text style={styles.petName}>{ pet.name }</Text>
           <Text style={styles.petType}>Type: { pet.type }</Text>
         </View>
+        <TouchableOpacity onPress={() => this.editPet(pet) }>
+          <Icon
+            size={ 30 }
+            style={{ marginRight: 10, backgroundColor: 'transparent' }}
+            name={'pencil'}
+            color={'black'}
+          />
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             Alert.alert(

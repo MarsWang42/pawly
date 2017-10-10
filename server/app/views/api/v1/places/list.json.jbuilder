@@ -22,6 +22,7 @@ json.places(@places) do |place|
     end
     json.pets(picture.pets) do |pet|
       json.id pet.id
+      json.isRescue pet.is_rescue
       json.name pet.name
       json.avatar pet.avatar.url
     end

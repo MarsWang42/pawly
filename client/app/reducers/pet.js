@@ -11,6 +11,9 @@ export const FETCH_PET_DETAIL_FAILED = 'FETCH_PET_DETAIL_FAILED';
 export const CREATE_PET = 'CREATE_PET';
 export const CREATE_PET_SUCCEED = 'CREATE_PET_SUCCEED';
 export const CREATE_PET_FAILED = 'CREATE_PET_FAILED';
+export const EDIT_PET = 'EDIT_PET';
+export const EDIT_PET_SUCCEED = 'EDIT_PET_SUCCEED';
+export const EDIT_PET_FAILED = 'EDIT_PET_FAILED';
 export const DELETE_PET = 'DELETE_PET';
 export const DELETE_PET_SUCCEED = 'DELETE_PET_SUCCEED';
 export const DELETE_PET_FAILED = 'DELETE_PET_FAILED';
@@ -36,6 +39,18 @@ const createPetSucceed = (response, action) => {
 
 const createPetFailed = () => ({
   type: CREATE_PET_FAILED,
+});
+
+const editPetSucceed = (response, action) => {
+  action.callback && action.callback();
+  return {
+    type: EDIT_PET_SUCCEED,
+    pet: response.data,
+  };
+};
+
+const editPetFailed = () => ({
+  type: EDIT_PET_FAILED,
 });
 
 const deletePetSucceed = (response, action) => {
@@ -99,6 +114,29 @@ export const PetReducer = createReducer({
       ...state,
       isCreatingPet: false,
       createPetError: 'Create failed.',
+    };
+  },
+  [EDIT_PET](state, action) {
+    return loop(
+      { ...state, isEditingPet: true, editPetError: undefined },
+      Cmd.run(apis.pet.update, {
+        successActionCreator: (response) => editPetSucceed(response, action),
+        failActionCreator: editPetFailed,
+        args: [action.payload, action.petId, action.token]
+      })
+    );
+  },
+  [EDIT_PET_SUCCEED](state) {
+    return {
+      ...state,
+      isEditingPet: false,
+    };
+  },
+  [EDIT_PET_FAILED](state, action) {
+    return {
+      ...state,
+      isEditingPet: false,
+      editPetError: 'Edit failed.',
     };
   },
   [DELETE_PET](state, action) {

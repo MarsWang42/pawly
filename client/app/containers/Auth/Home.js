@@ -67,7 +67,7 @@ class Home extends Component {
 
   render() {
     const { isUploadingAvatar, isSettingPet, tab } = this.state;
-    const { currentUser, isLoggingIn } = this.props;
+    const { currentUser, isLoggingIn, isRegistering } = this.props;
 
     const text = tab === 0
       ? 'Sign up with your email!'
@@ -128,6 +128,7 @@ class Home extends Component {
           <FBLoginButton
             style={styles.facebookButton}
             isLoading={isLoggingIn === 'facebook'}
+            disabled={(isLoggingIn || isRegistering) ? true : false}
             onLogin={
               (data) => this.props.dispatch({
                 type: actions.LOGIN_USER,
@@ -245,6 +246,7 @@ const mapStateToProps = (state) => {
   return {
     isCheckingUser: state.session.isCheckingUser,
     isLoggingIn: state.session.isLoggingIn,
+    isRegistering: state.session.isRegistering,
     currentUser: state.session.currentUser,
   };
 };

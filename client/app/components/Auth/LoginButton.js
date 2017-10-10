@@ -13,7 +13,7 @@ export default class LoginButton extends Component {
     return (
       <View style={this.props.style}>
         <TouchableHighlight
-          disabled={this.props.isLoading}
+          disabled={this.props.disabled}
           activeOpacity={0.8}
           style={styles.container}
           onPress={this.props.onPress}

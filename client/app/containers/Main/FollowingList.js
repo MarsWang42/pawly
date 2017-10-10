@@ -3,8 +3,11 @@ import { connect } from 'react-redux';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Platform,
   StyleSheet,
+  Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import PictureCard from './PictureCard';
@@ -39,7 +42,24 @@ class FollowingList extends Component {
   }
 
   render() {
-    const { isLoadingMore, isLoading, navigation } = this.props;
+    const { isLoadingMore, isLoading, navigation, fetchError } = this.props;
+
+    if (fetchError) {
+      return (
+        <TouchableOpacity
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 40 }}
+          activeOpacity={1}
+          onPress={this.onRefresh}
+        >
+          <Image
+            source={require('../../assets/img/network-error.png')}
+            style={{ height: 200, width: 200, marginBottom: 10 }}
+          />
+          <Text style={{ fontFamily: 'Lato', fontSize: 18, color: 'grey' }}>Network error</Text>
+        </TouchableOpacity>
+      );
+    }
+
     const followingList = this.props.followingList.toJS();
     if (isLoadingMore === true) {
       followingList.push({ pictureId: 'isLoading' });
@@ -90,6 +110,7 @@ const mapStateToProps = (state) => {
   return {
     currentUser: state.session.currentUser,
     followingList: state.picture.followingList,
+    fetchError: state.picture.fetchFeedError,
     isLoading: state.picture.isFetchingFeed,
     isLoadingMore: state.picture.isFetchingMoreFeed,
     feedReachEnd: state.picture.feedReachEnd,

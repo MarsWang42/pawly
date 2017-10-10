@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   ownerInfo: {
     position: 'absolute',
     right: 40,
-    top: 80,
+    top: 90,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -298,9 +298,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   userAvatar: {
-    height: 30,
-    width: 30,
-    borderRadius: 15,
+    height: 40,
+    width: 40,
+    borderRadius: 20,
     margin: 5,
     overflow: 'hidden',
     backgroundColor: 'white'

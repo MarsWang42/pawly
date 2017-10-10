@@ -178,7 +178,7 @@ class Profile extends Component {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.petButton, { borderColor: '#aeffe1' }]}
-                    onPress={() => navigation.navigate('AddPet')}
+                    onPress={() => navigation.navigate('PetForm')}
                   >
                     <Text style={[styles.petButtonText, { color: '#aeffe1' }]}>
                       +

@@ -5,7 +5,6 @@ import {
   FlatList,
   Image,
   LayoutAnimation,
-  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -111,14 +110,33 @@ class PictureCard extends Component {
     const { isPetModalOpen } = this.state;
 
     const pl = data.pets.length;
-    // const cl = data.comments.length;
-    let petNames, likerNames, comments;
+
+    let isRescue = false;
+    for (let i = 0; i < pl; i++) {
+      if (data.pets[i].isRescue) {
+        isRescue = true;
+        break;
+      }
+    }
+
+    // Prioritize rescue pets.
+    const petList = isRescue ? data.pets.sort((a, b) => {
+      if (a.isRescue) {
+        return -1;
+      } else if (b.isRescue) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }) : data.pets;
+
+    let petNames;
     if (pl >= 3) {
-      petNames = `${data.pets[0].name}, ${data.pets[1].name} and ${pl - 2} others`;
+      petNames = `${petList[0].name}, ${petList[1].name} and ${pl - 2} others`;
     } else if (pl === 2) {
-      petNames = `${data.pets[0].name} and ${data.pets[1].name}`;
+      petNames = `${petList[0].name} and ${petList[1].name}`;
     } else {
-      petNames = data.pets[0].name;
+      petNames = petList[0].name;
     }
 
     const petImageSource = (url) => (
@@ -128,6 +146,12 @@ class PictureCard extends Component {
     return (
       <View style={styles.container}>
         <View style={[styles.headerContainer, { height: data.place ? 65 : 55 }]}>
+          { isRescue && (
+            <View style={styles.rescueTriangle}/>
+          ) }
+          { isRescue && (
+            <Text style={styles.rescueText}>R</Text>
+          ) }
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity
               onPress={this.togglePetModal}
@@ -136,12 +160,30 @@ class PictureCard extends Component {
                 { width: pl === 1 ? 60 : pl === 2 ? 70 : 80 }
               ]}
             >
-              <Image style={styles.firstPetAvatar} source={petImageSource(data.pets[0].avatar)} />
-              { data.pets[1] &&
-                <Image style={styles.secondPetAvatar} source={petImageSource(data.pets[1].avatar)} />
+              <Image
+                style={[
+                  styles.firstPetAvatar,
+                  { borderColor: petList[0].isRescue ? '#9eff89' : 'white' }
+                ]}
+                source={petImageSource(petList[0].avatar)}
+              />
+              { petList[1] &&
+                <Image
+                  style={[
+                    styles.secondPetAvatar,
+                    { borderColor: petList[1].isRescue ? '#9eff89' : 'white' }
+                  ]}
+                  source={petImageSource(petList[1].avatar)}
+                />
               }
-              { data.pets[2] &&
-                <Image style={styles.thirdPetAvatar} source={petImageSource(data.pets[2].avatar)} />
+              { petList[2] &&
+                <Image
+                  style={[
+                    styles.thirdPetAvatar,
+                    { borderColor: petList[2].isRescue ? '#9eff89' : 'white' }
+                  ]}
+                  source={petImageSource(petList[2].avatar)}
+                />
               }
             </TouchableOpacity>
             <TouchableOpacity
@@ -263,6 +305,27 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  rescueTriangle: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 1,
+    width: 0,
+    height: 0,
+    borderTopWidth: 30,
+    borderLeftWidth: 30,
+    borderTopColor: '#3ce694',
+    borderLeftColor: 'transparent',
+  },
+  rescueText: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    zIndex: 2,
+    fontFamily: 'Berlin bold',
+    color: 'white',
+    backgroundColor: 'transparent',
   },
   petAvatarContainer: {
     flexDirection: 'row',

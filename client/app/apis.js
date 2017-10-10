@@ -118,6 +118,15 @@ export default {
         },
         data: payload,
       }),
+    update: (payload, petId, token) =>
+      axios({
+        method: 'patch',
+        url: `${PETS_URL}/${petId}`,
+        headers: {
+          Authorization: token,
+        },
+        data: payload,
+      }),
     remove: (id, token) =>
       axios({
         method: 'delete',
@@ -169,14 +178,14 @@ export default {
         },
         data: { pictureId, body, targetId },
       }),
-    nearby: (latitude, longitude, latitudeDelta, longitudeDelta, token) =>
+    nearby: (latitude, longitude, radius, latitudeDelta, longitudeDelta, token) =>
       axios({
         method: 'post',
         url: NEARBY_URL,
         headers: {
           Authorization: token,
         },
-        data: { latitude, longitude, latitudeDelta, longitudeDelta },
+        data: { latitude, longitude, radius, latitudeDelta, longitudeDelta },
       }),
     feed: (page, token) =>
       axios({

@@ -284,6 +284,7 @@ class Avatar extends Component {
           <TouchableOpacity
             style={styles.buttonContainer}
             onPress={this.submitForm}
+            disabled={isLoading}
           >
             { isLoading ? (
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

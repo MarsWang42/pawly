@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
       get 'pets/:id' => 'pets#show'
       post 'pets' => 'pets#create'
+      patch 'pets/:id' => 'pets#update'
       delete 'pets/:id' => 'pets#delete'
 
       post 'places/nearby' => 'places#nearby'
@@ -30,6 +31,8 @@ Rails.application.routes.draw do
 
       post 'comments' => 'comments#create'
       post 'comments/:picture_id' => 'comments#index'
+
+      post 'adoption' => 'adoption_requests#create'
     end
   end
 end

@@ -9,6 +9,8 @@ json.pets(@user.pets) do |pet|
   json.name pet.name
   json.type pet.type
   json.avatar pet.avatar.url
+  json.bio pet.bio
+  json.isRescue pet.is_rescue
 end
 
 json.pictures(@pictures) do |picture|

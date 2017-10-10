@@ -1,6 +1,11 @@
 class User < ApplicationRecord
   has_secure_password
   has_many :pets, foreign_key: :owner_id, dependent: :destroy
+  has_many :adoption_requests, foreign_key: :adoption_applicant_id, dependent: :destroy
+  has_many :received_adoption_requests, class_name: :AdoptionRequest,
+                                        foreign_key: :adoption_pet_owner_id,
+                                        dependent: :destroy
+  has_many :pets, foreign_key: :owner_id, dependent: :destroy
   has_many :comments, foreign_key: :author_id, dependent: :destroy
   has_many :pictures, foreign_key: :creator_id, dependent: :destroy
   has_many :active_relationships, class_name:  "Relationship",
@@ -86,6 +91,14 @@ class User < ApplicationRecord
         .where("owner_id IN (#{following_ids})
                 OR owner_id = :user_id", user_id: id)
     end
+  end
+
+  def has_pet?(pet)
+    pets.include?(pet)
+  end
+
+  def requested_adopt_pet(id)
+    adoption_requests.where(pet_id: id).present?
   end
 
 end

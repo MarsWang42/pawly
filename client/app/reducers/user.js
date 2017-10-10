@@ -23,6 +23,7 @@ export const TOGGLE_USER_FOLLOW = 'TOGGLE_USER_FOLLOW';
 export const TOGGLE_USER_FOLLOW_SUCCEED = 'TOGGLE_USER_FOLLOW_SUCCEED';
 export const TOGGLE_USER_FOLLOW_FAILED = 'TOGGLE_USER_FOLLOW_FAILED';
 export const CREATE_PET_SUCCEED = 'CREATE_PET_SUCCEED';
+export const EDIT_PET_SUCCEED = 'EDIT_PET_SUCCEED';
 
 const fetchUserDetailSucceed = (respond, action) => {
   return {
@@ -240,6 +241,22 @@ export const UserReducer = createReducer({
         'pets',
       ],
       arr => arr.push(fromJS(pet))
+    );
+    return {
+      ...state,
+      userDetails: updatedUserDetails,
+    };
+  },
+  [EDIT_PET_SUCCEED](state, { pet }) {
+    const updatedPetIndex = state.userDetails.getIn([pet.ownerId, 'pets'])
+      .findIndex(p => p.id === pet.id);
+    const updatedUserDetails = state.userDetails.setIn(
+      [
+        pet.ownerId,
+        'pets',
+        updatedPetIndex,
+      ],
+      fromJS(pet)
     );
     return {
       ...state,

@@ -20,6 +20,20 @@ class Api::V1::PetsController < ApiController
     render :create
   end
 
+  def update
+    @user = current_user
+    @pet = set_pet
+    if (@pet.owner == @user)
+      @pet.assign_attributes(pet_params)
+      if !@pet.save
+        render :json => @pet.errors, :status => 422
+      end
+      render :create
+    else
+      render :json => { error: "User not permitted" }, :status => 422
+    end
+  end
+
   def delete
     @pet = set_pet
     @pet.pictures.each do |picture|
@@ -43,7 +57,7 @@ class Api::V1::PetsController < ApiController
 
   private
     def pet_params
-      params.permit(:id, :name, :type, :avatar, :bio)
+      params.permit(:id, :name, :type, :avatar, :bio, :is_rescue, :is_missing)
     end
 
     def set_pet

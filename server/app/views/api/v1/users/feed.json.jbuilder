@@ -10,6 +10,7 @@ json.feeds(@feeds) do |feed|
   end
   json.pets(feed.pets) do |pet|
     json.id pet.id
+    json.isRescue pet.is_rescue
     json.name pet.name
     json.avatar pet.avatar.url
   end
