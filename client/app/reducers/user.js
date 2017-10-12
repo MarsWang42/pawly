@@ -1,8 +1,6 @@
 import createReducer from '../helpers/createReducer';
-import db from '../db';
 import apis from '../apis';
 import * as pictureActions from './picture';
-import * as petActions from './pet';
 import { fromJS, List, Map } from 'immutable';
 import { loop, Cmd } from 'redux-loop';
 
@@ -24,6 +22,9 @@ export const TOGGLE_USER_FOLLOW_SUCCEED = 'TOGGLE_USER_FOLLOW_SUCCEED';
 export const TOGGLE_USER_FOLLOW_FAILED = 'TOGGLE_USER_FOLLOW_FAILED';
 export const CREATE_PET_SUCCEED = 'CREATE_PET_SUCCEED';
 export const EDIT_PET_SUCCEED = 'EDIT_PET_SUCCEED';
+export const FETCH_RECEIVED_ADOPTIONS = 'FETCH_RECEIVED_ADOPTIONS';
+export const FETCH_RECEIVED_ADOPTIONS_SUCCEED = 'FETCH_RECEIVED_ADOPTIONS_SUCCEED';
+export const FETCH_RECEIVED_ADOPTIONS_FAILED = 'FETCH_RECEIVED_ADOPTIONS_FAILED';
 
 const fetchUserDetailSucceed = (respond, action) => {
   return {
@@ -85,6 +86,17 @@ const toggleUserFollowSucceed = (respond, { userId, callback }) => {
 
 const toggleUserFollowFailed = () => ({
   type: TOGGLE_USER_FOLLOW_FAILED,
+});
+
+const fetchReceivedAdoptionsSucceed = (respond, action) => {
+  return {
+    type: FETCH_RECEIVED_ADOPTIONS_SUCCEED,
+    adoptionRequests: respond.data.adoptionRequests,
+  };
+};
+
+const fetchReceivedAdoptionsFailed = () => ({
+  type: FETCH_RECEIVED_ADOPTIONS_FAILED,
 });
 
 export const UserReducer = createReducer({
@@ -261,6 +273,30 @@ export const UserReducer = createReducer({
     return {
       ...state,
       userDetails: updatedUserDetails,
+    };
+  },
+  [FETCH_RECEIVED_ADOPTIONS](state, action) {
+    return loop(
+      { ...state, isFetchingReceivedAdoptions: true, fetchReceivedAdoptionsError: undefined },
+      Cmd.run(apis.user.receivedAdoptions, {
+        successActionCreator: (respond) => fetchReceivedAdoptionsSucceed(respond, action),
+        failActionCreator: fetchReceivedAdoptionsFailed,
+        args: [action.token]
+      })
+    );
+  },
+  [FETCH_RECEIVED_ADOPTIONS_SUCCEED](state, action) {
+    return {
+      ...state,
+      isFetchingReceivedAdoptions: false,
+      receivedRequests: action.adoptionRequests
+    };
+  },
+  [FETCH_RECEIVED_ADOPTIONS_FAILED](state, action) {
+    return {
+      ...state,
+      isFetchingReceivedAdoptions: false,
+      fetchReceivedAdoptionsError: 'Fetching failed.',
     };
   },
   [pictureActions.TOGGLE_PICTURE_LIKE_SUCCEED](state, { data }) {

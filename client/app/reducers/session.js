@@ -2,6 +2,7 @@ import createReducer from '../helpers/createReducer';
 import db from '../db';
 import apis from '../apis';
 import { loop, Cmd } from 'redux-loop';
+import { fromJS, List, Map } from 'immutable';
 
 export const GET_CURRENT_USER = 'GET_CURRENT_USER';
 export const GET_CURRENT_USER_SUCCEED = 'GET_CURRENT_USER_SUCCEED';
@@ -21,6 +22,12 @@ export const UPLOAD_AVATAR_SUCCEED = 'UPLOAD_AVATAR_SUCCEED';
 export const UPLOAD_AVATAR_FAILED = 'UPLOAD_AVATAR_FAILED';
 export const SET_CURRENT_LOCATION = 'SET_CURRENT_LOCATION';
 export const SET_LOCATION_AUTH = 'SET_LOCATION_AUTH';
+export const FETCH_NOTIFICATIONS = 'FETCH_NOTIFICATIONS';
+export const FETCH_NOTIFICATIONS_SUCCEED = 'FETCH_NOTIFICATIONS_SUCCEED';
+export const FETCH_NOTIFICATIONS_FAILED = 'FETCH_NOTIFICATIONS_FAILED';
+export const READ_NOTIFICATION = 'READ_NOTIFICATION';
+export const READ_NOTIFICATION_SUCCEED = 'READ_NOTIFICATION_SUCCEED';
+export const READ_NOTIFICATION_FAILED = 'READ_NOTIFICATION_FAILED';
 
 const getCurrentUserSucceed = (value) => {
   value = JSON.parse(value);
@@ -93,10 +100,34 @@ const uploadAvatarFailed = (respond, callback) => {
   };
 };
 
+const fetchNotificationsSucceed = (respond, action) => {
+  return {
+    type: FETCH_NOTIFICATIONS_SUCCEED,
+    notifications: respond.data.notifications,
+    notificationCount: respond.data.notificationCount
+  };
+};
+
+const fetchNotificationsFailed = () => ({
+  type: FETCH_NOTIFICATIONS_FAILED,
+});
+
+const readNotificationSucceed = (respond, action) => {
+  return {
+    type: READ_NOTIFICATION_SUCCEED,
+    read: respond.data.read,
+  };
+};
+
+const readNotificationFailed = () => ({
+  type: READ_NOTIFICATION_FAILED,
+});
+
 export const SessionReducer = createReducer({
   isCheckingUser: true,
   currentLocation: { coords: { longitude: -122.4194, latitude: 37.7749 } },
   isLocationAuthed: false,
+  notifications: List(),
 }, {
   [GET_CURRENT_USER](state, action) {
     return loop(
@@ -208,7 +239,6 @@ export const SessionReducer = createReducer({
     );
   },
   [UPLOAD_AVATAR_SUCCEED](state, action) {
-    const currentUserWithAva = { ...state.currentUser };
     return {
       ...state,
       isUploadingAvatar: false,
@@ -244,6 +274,59 @@ export const SessionReducer = createReducer({
     return {
       ...state,
       currentLocation: action.loc,
+    };
+  },
+  [FETCH_NOTIFICATIONS](state, action) {
+    return loop(
+      { ...state, isFetchingNotifications: true, fetchNotificationsError: undefined },
+      Cmd.run(apis.notification.get, {
+        successActionCreator: (respond) => fetchNotificationsSucceed(respond, action),
+        failActionCreator: fetchNotificationsFailed,
+        args: [action.token]
+      })
+    );
+  },
+  [FETCH_NOTIFICATIONS_SUCCEED](state, action) {
+    return {
+      ...state,
+      isFetchingNotifications: false,
+      notifications: fromJS(action.notifications),
+      notificationCount: action.notificationCount,
+    };
+  },
+  [FETCH_NOTIFICATIONS_FAILED](state, action) {
+    return {
+      ...state,
+      isFetchingNotifications: false,
+      fetchNotificationsError: 'Fetching failed.',
+    };
+  },
+  [READ_NOTIFICATION](state, action) {
+    return loop(
+      { ...state, isReadingNotification: true, readNotificationError: undefined },
+      Cmd.run(apis.notification.read, {
+        successActionCreator: (respond) => readNotificationSucceed(respond, action),
+        failActionCreator: readNotificationFailed,
+        args: [action.id, action.token]
+      })
+    );
+  },
+  [READ_NOTIFICATION_SUCCEED](state, action) {
+    return {
+      ...state,
+      isReadingNotification: false,
+      notifications: state.notifications.setIn([
+        state.notifications.findIndex(n => n.get('id') === parseInt(action.read, 10)),
+        'read'
+      ], true),
+      notificationCount: state.notificationCount - 1,
+    };
+  },
+  [READ_NOTIFICATION_FAILED](state, action) {
+    return {
+      ...state,
+      isReadingNotification: false,
+      readNotificationError: 'Fetching failed.',
     };
   },
   ['START_ONBOARDING'](state, action) {

@@ -1,7 +1,7 @@
 class CreatePictures < ActiveRecord::Migration[5.1]
   def change
     create_table :pictures do |t|
-      t.references :creator, foreign_key: { to_table: :users }
+      t.references :creator, foreign_key: { to_table: :users }, index: true
       t.string :image
       t.text :caption
 

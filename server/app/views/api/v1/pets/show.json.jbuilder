@@ -4,6 +4,8 @@ json.type @pet.type
 json.avatar @pet.avatar.url
 json.bio @pet.bio
 json.isRescue @pet.is_rescue
+json.isAdoptionRequested @user.requested_adopt_pet?(@pet)
+
 json.owner do
   json.username @pet.owner.username
   json.userId @pet.owner.id

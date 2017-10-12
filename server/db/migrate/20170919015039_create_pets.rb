@@ -7,7 +7,7 @@ class CreatePets < ActiveRecord::Migration[5.1]
       t.text :bio
       t.boolean :is_rescue
       t.boolean :is_missing
-      t.references :owner, foreign_key: { to_table: :users }
+      t.references :owner, foreign_key: { to_table: :users }, index: true
 
       t.timestamps
     end

@@ -97,6 +97,8 @@ class PictureCard extends Component {
             height: 30,
             width: 30,
             borderRadius: 15,
+            borderColor: pet.isRescue ? '#9eff89' : 'white',
+            borderWidth: 2,
           }}
           source={petImageSource}
         />
@@ -145,7 +147,7 @@ class PictureCard extends Component {
 
     return (
       <View style={styles.container}>
-        <View style={[styles.headerContainer, { height: data.place ? 65 : 55 }]}>
+        <View style={styles.headerContainer}>
           { isRescue && (
             <View style={styles.rescueTriangle}/>
           ) }
@@ -305,6 +307,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 5,
   },
   rescueTriangle: {
     position: 'absolute',
@@ -371,6 +374,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   petName: {
+    width: width - 100,
     fontFamily: 'Lato-Italic',
     fontSize: 14,
   },

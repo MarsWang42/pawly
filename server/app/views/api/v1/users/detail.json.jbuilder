@@ -32,6 +32,7 @@ json.pictures(@pictures) do |picture|
     json.id pet.id
     json.name pet.name
     json.avatar pet.avatar.url
+    json.isRescue pet.is_rescue
   end
   json.pictureId picture.id
   json.liked @user.liked?(picture)

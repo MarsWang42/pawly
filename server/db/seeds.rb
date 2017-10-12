@@ -7,7 +7,7 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 user1 = User.create(email: 'asdf@asdf.com', username: 'mars02', password: 'asdfasdf')
-user2 = User.create(email: 'asd@asd.com', username: 'sunny32', password: 'asdfasdf')
+user2 = User.create(email: 'asd@asd.com', username: 'I_have_a_long_name', password: 'asdfasdf')
 user3 = User.create(email: 'asd@asdf.com', username: 'sunny13', password: 'asdfasdf')
 user4 = User.create(email: 'asdf@asd.com', username: 'sunny21', password: 'asdfasdf')
 user5 = User.create(email: 'as@asd.com', username: 'mars12', password: 'asdfasdf')
@@ -16,7 +16,7 @@ user7 = User.create(email: 'as@as.com', username: 'sunny92', password: 'asdfasdf
 
 user1.pets.create(name: 'Zoey', type: 'dog')
 user1.pets.create(name: 'Cloud', type: 'cat')
-user2.pets.create(name: 'Pika', type: 'dog')
+user2.pets.create(name: 'Im_a_very_big_cat', type: 'dog')
 user2.pets.create(name: 'Simba', type: 'cat')
 user3.pets.create(name: 'Lucky', type: 'cat')
 user3.pets.create(name: 'Ruby', type: 'cat')

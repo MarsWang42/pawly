@@ -12,6 +12,8 @@ import {
   View,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import ScrollableTabView from 'react-native-scrollable-tab-view';
+import DotTabBar from '../../components/Helpers/DotTabBar';
 import { BlurView } from 'react-native-blur';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as userActions from '../../reducers/user';
@@ -50,6 +52,34 @@ class Pet extends Component {
       token: currentUser.accessToken
     });
     navigation.navigate(`${view}PictureDetail`, { pictureId: id, view, data });
+  }
+
+  renderRescue() {
+    const { petDetails, petId, navigation, view, currentUser } = this.props;
+    const petDetail = petDetails[petId];
+    return (
+      <View
+        style={styles.rescueContainer}
+      >
+        <LinearGradient
+          style={styles.circleContainer}
+          colors={['#67B26F', '#4ca2cd']}
+        >
+          <Text style={{ backgroundColor: 'transparent', fontFamily: 'Lato', color: 'white' }}>R</Text>
+        </LinearGradient>
+        { petDetail.owner.userId !== currentUser.id && (
+          <TouchableOpacity
+            style={[styles.petButton, { borderColor: '#ffe1af' }]}
+            disabled={petDetail.isAdoptionRequested}
+            onPress={() => navigation.navigate(`${view}AdoptionForm`, { pet: petDetail })}
+          >
+            <Text style={[styles.petButtonText, { color: '#ffe1af' }]}>
+              { petDetail.isAdoptionRequested ? 'Requested' : 'Adopt now!' }
+            </Text>
+          </TouchableOpacity>
+        ) }
+      </View>
+    );
   }
 
   renderOwner() {
@@ -169,17 +199,33 @@ class Pet extends Component {
               style={styles.blurView}
               viewRef={this.backgroundImage}
               blurType="light"
-              blurAmount={10}
+              blurAmount={15}
             />
-            <Image source={petImageSource} style={styles.petAvatar} />
-            { petDetailFetched && this.renderOwner() }
-            { petDetail.bio && (
-              <View style={{ marginTop: 15 }}>
-                <Text style={{ color: 'white', fontFamily: 'Lato', backgroundColor: 'transparent' }}>
+            <ScrollableTabView
+              tabBarPosition='bottom'
+              renderTabBar={() => <DotTabBar/>}
+              prerenderingSiblingsNumber={1}
+            >
+              <View
+                label={'main'}
+                style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}
+              >
+                <Image source={petImageSource} style={styles.petAvatar} />
+                { petDetailFetched && petDetail.isRescue && this.renderRescue() }
+                { petDetailFetched && this.renderOwner() }
+              </View>
+              <View
+                label={'bio'}
+                style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}
+              >
+                <Text style={{ color: 'white', fontFamily: 'Lato', backgroundColor: 'transparent', fontSize: 17 }}>
+                  Bio
+                </Text>
+                <Text style={{ color: 'white', fontFamily: 'Lato', backgroundColor: 'transparent', marginTop: 10 }}>
                   { petDetail.bio }
                 </Text>
               </View>
-            ) }
+            </ScrollableTabView>
           </Animated.View>
         </AnimatedLinearGradient>
         { petDetailFetched && (
@@ -263,10 +309,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 30,
   },
+  rescueContainer: {
+    position: 'absolute',
+    left: 20,
+    top: 80,
+    width: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  circleContainer: {
+    height: 30,
+    width: 30,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  petButton: {
+    marginTop: 10,
+    width: 70,
+    alignItems: 'center',
+    paddingHorizontal: 2,
+    paddingVertical: 2,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderRadius: 4,
+    marginHorizontal: 6,
+  },
+  petButtonText: {
+    fontFamily: 'Lato',
+    fontSize: 12,
+    backgroundColor: 'transparent'
+  },
   ownerInfo: {
     position: 'absolute',
-    right: 40,
-    top: 90,
+    right: 30,
+    top: 65,
+    width: 70,
     justifyContent: 'center',
     alignItems: 'center',
   },

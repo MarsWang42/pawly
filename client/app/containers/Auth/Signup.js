@@ -39,15 +39,15 @@ class Signup extends Component {
     } = this.state;
 
     if (!password || password.length < 8 || password.length > 20) {
-      this.setState({ passwordError: true })
+      this.setState({ passwordError: true });
     } else {
-      this.setState({ passwordError: false })
+      this.setState({ passwordError: false });
     }
 
     if (!email || !validateEmail(email) ) {
-      this.setState({ emailError: true })
+      this.setState({ emailError: true });
     } else {
-      this.setState({ emailError: false })
+      this.setState({ emailError: false });
     }
 
     if (password && password.length >= 8 && password.length <= 20
@@ -86,6 +86,7 @@ class Signup extends Component {
             placeholderTextColor={'rgba(255, 255, 255, 0.3)'}
             value={this.state.email}
             style={styles.textInput}
+            keyboardType={'email-address'}
             onChangeText={(text) => this.setState({ email: text })}
             ref={input => { this.inputs[0] = input; }}
             onSubmitEditing={() => this.inputs[1].focus()}
@@ -214,7 +215,6 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state) => {
   return {
     registerError: state.session.registerError,
-    isLoggingIn: state.session.isLoggingIn,
     isRegistering: state.session.isRegistering,
   };
 };

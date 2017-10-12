@@ -77,10 +77,10 @@ class UserList extends Component {
         onPress={() => this.props.onPressUser(user)}
       >
         <Image source={imageSource} style={styles.userAvatar} />
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, overflow: 'hidden' }}>
           <Text style={styles.username}>{ user.username }</Text>
           { user.pets.length ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
               <Text style={{ fontFamily: 'Lato', fontSize: 12 }}>Pets: </Text>
               { this.renderPets(user.pets) }
             </View>
@@ -121,7 +121,7 @@ class UserList extends Component {
 
     return (
       <View style={styles.container}>
-        { (userList && userList.length) !== 0 ? (
+        { (userList && userList.length !== 0) ? (
           <FlatList
             data={userList}
             removeClippedSubviews={false}
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   userContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 50,
+    padding: 5,
     marginHorizontal: 5,
     borderBottomWidth: 1,
     borderColor: 'grey',

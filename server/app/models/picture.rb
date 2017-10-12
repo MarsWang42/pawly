@@ -7,6 +7,7 @@ class Picture < ApplicationRecord
                                   foreign_key: "liked_id",
                                   dependent:   :destroy
   has_many :likers, through: :like_relationships, source: :liker
+  has_many :notifications, dependent: :destroy
 
   mount_uploader :image, PictureUploader
 end

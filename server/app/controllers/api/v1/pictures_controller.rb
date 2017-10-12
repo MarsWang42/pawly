@@ -39,6 +39,7 @@ class Api::V1::PicturesController < ApiController
     @pic = set_pic
     @user = current_user
     @user.like(@pic)
+    create_notification @pic
     render :show
   end
 
@@ -52,6 +53,14 @@ class Api::V1::PicturesController < ApiController
   private
     def pic_params
       params.permit(:pic_id)
+    end
+
+    def create_notification(picture)
+      return if picture.creator.id == current_user.id
+      Notification.create(user_id: picture.creator.id,
+                          notified_by_id: current_user.id,
+                          picture_id: picture.id,
+                          notice_type: 'like')
     end
 
     def set_pic

@@ -13,6 +13,12 @@ Rails.application.routes.draw do
       get 'users/feed/:page' => 'users#get_feed'
       get 'users/pets/(:keyword)' => 'users#get_available_pets'
 
+      get 'notifications' => 'notifications#index'
+      get 'notifications/read/:id' => 'notifications#read'
+
+      post 'passwords/forgot' => 'passwords#forgot'
+      post 'passwords/reset' => 'passwords#reset'
+
       post 'username' => 'users#check_username'
       patch 'users/avatar' => 'users#upload_avatar'
       post 'user_token' => 'user_token#create', defaults: {format: :json}
@@ -32,7 +38,8 @@ Rails.application.routes.draw do
       post 'comments' => 'comments#create'
       post 'comments/:picture_id' => 'comments#index'
 
-      post 'adoption' => 'adoption_requests#create'
+      post 'adoption/:pet_id' => 'adoption_requests#create'
+      get 'adoptions/received' => 'adoption_requests#received_index'
     end
   end
 end

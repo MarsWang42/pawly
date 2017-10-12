@@ -53,6 +53,7 @@ class Login extends Component {
             placeholderTextColor={'rgba(255, 255, 255, 0.6)'}
             value={this.state.email}
             style={styles.textInput}
+            keyboardType={'email-address'}
             onChangeText={(text) => this.setState({ email: text })}
             ref={input => { this.inputs[0] = input; }}
             onSubmitEditing={() => this.inputs[1].focus()}

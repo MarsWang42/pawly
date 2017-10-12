@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-  Animated,
-  Dimensions,
-  Image,
   StyleSheet,
   Text,
   TextInput,
@@ -11,12 +8,9 @@ import {
   View,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import * as sessionActions from '../../reducers/session';
 import * as pictureActions from '../../reducers/picture';
-import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
-class Settings extends Component {
+class Comment extends Component {
   constructor() {
     super();
     this.state = {
@@ -124,4 +118,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(Settings);
+export default connect(mapStateToProps)(Comment);

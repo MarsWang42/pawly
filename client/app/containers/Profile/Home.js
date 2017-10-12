@@ -13,6 +13,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import PictureCard from '../Main/PictureCard';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as userActions from '../../reducers/user';
+import * as sessionActions from '../../reducers/session';
 
 const { width } = Dimensions.get('window');
 const HEADER_MAX_HEIGHT = width <= 325 ? 250 : 270;
@@ -36,9 +37,13 @@ class Profile extends Component {
 
   componentDidMount() {
     const { dispatch, currentUser } = this.props;
-    this.props.dispatch({
+    dispatch({
       type: userActions.FETCH_USER_DETAIL,
       id: currentUser.id,
+      token: currentUser.accessToken,
+    });
+    dispatch({
+      type: sessionActions.FETCH_NOTIFICATIONS,
       token: currentUser.accessToken,
     });
   }
@@ -66,7 +71,7 @@ class Profile extends Component {
   }
 
   render() {
-    const { currentUser, userDetails, dispatch, navigation } = this.props;
+    const { currentUser, userDetails, dispatch, navigation, notificationCount } = this.props;
     let currentUserDetail = userDetails[currentUser.id];
     let userDetailFetched = true;
     if (!currentUserDetail) {
@@ -117,6 +122,25 @@ class Profile extends Component {
 
     return (
       <View style={styles.container}>
+        <AnimatedTouchableOpacity
+          style={[
+            styles.notifications,
+            {
+              top: (notificationCount && notificationCount > 0) ? 33 : 35,
+              transform: [{ translateY: settingsTranslate }]
+            },
+          ]}
+          onPress={() => navigation.navigate('Notifications')}
+        >
+          { (notificationCount && notificationCount > 0) ? (
+            <View style={styles.badge}>
+              <Text style={{ fontFamily: 'Lato', color: 'white', fontSize: 12 }}>
+                { notificationCount }
+              </Text>
+            </View>
+          ) : <Icon name={'notifications'} size={24} color={'white'} />
+          }
+        </AnimatedTouchableOpacity>
         <AnimatedTouchableOpacity
           style={[
             styles.settings,
@@ -262,6 +286,7 @@ class Profile extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginBottom: 17
   },
   header: {
     position: 'absolute',
@@ -281,6 +306,21 @@ const styles = StyleSheet.create({
     right: 0,
     width: null,
     height: HEADER_MAX_HEIGHT,
+  },
+  notifications: {
+    position: 'absolute',
+    left: 25,
+    zIndex: 10,
+    width: 80,
+    backgroundColor: 'transparent',
+  },
+  badge: {
+    height: 25,
+    width: 25,
+    borderRadius: 12,
+    backgroundColor: 'orange',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   settings: {
     position: 'absolute',
@@ -419,6 +459,7 @@ const mapStateToProps = (state) => {
   return {
     currentUser: state.session.currentUser,
     userDetails: state.user.userDetails.toJS(),
+    notificationCount: state.session.notificationCount
   };
 };
 

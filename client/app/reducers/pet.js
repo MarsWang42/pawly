@@ -17,6 +17,9 @@ export const EDIT_PET_FAILED = 'EDIT_PET_FAILED';
 export const DELETE_PET = 'DELETE_PET';
 export const DELETE_PET_SUCCEED = 'DELETE_PET_SUCCEED';
 export const DELETE_PET_FAILED = 'DELETE_PET_FAILED';
+export const REQUEST_ADOPTION = 'REQUEST_ADOPTION';
+export const REQUEST_ADOPTION_SUCCEED = 'REQUEST_ADOPTION_SUCCEED';
+export const REQUEST_ADOPTION_FAILED = 'REQUEST_ADOPTION_FAILED';
 
 const fetchPetDetailSucceed = (response, action) => {
   return {
@@ -64,6 +67,17 @@ const deletePetSucceed = (response, action) => {
 
 const deletePetFailed = () => ({
   type: DELETE_PET_FAILED,
+});
+
+const requestAdoptionSucceed = (response, action) => {
+  action.callback && action.callback();
+  return {
+    type: REQUEST_ADOPTION_SUCCEED,
+  };
+};
+
+const requestAdoptionFailed = () => ({
+  type: REQUEST_ADOPTION_FAILED,
 });
 
 export const PetReducer = createReducer({
@@ -167,6 +181,29 @@ export const PetReducer = createReducer({
       ...state,
       isDeletingPet: false,
       deletePetError: 'Create failed.',
+    };
+  },
+  [REQUEST_ADOPTION](state, action) {
+    return loop(
+      { ...state, isRequestingAdoption: true, requestAdoptionError: undefined },
+      Cmd.run(apis.pet.requestAdoption, {
+        successActionCreator: (response) => requestAdoptionSucceed(response, action),
+        failActionCreator: requestAdoptionFailed,
+        args: [action.payload, action.petId, action.token]
+      })
+    );
+  },
+  [REQUEST_ADOPTION_SUCCEED](state, action) {
+    return {
+      ...state,
+      isRequestingAdoption: false,
+    };
+  },
+  [REQUEST_ADOPTION_FAILED](state, action) {
+    return {
+      ...state,
+      isRequestingAdoption: false,
+      requestAdoptionError: 'Create failed.',
     };
   },
 });

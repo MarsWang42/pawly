@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :received_adoption_requests, class_name: :AdoptionRequest,
                                         foreign_key: :adoption_pet_owner_id,
                                         dependent: :destroy
+  has_many :notifications, dependent: :destroy
   has_many :pets, foreign_key: :owner_id, dependent: :destroy
   has_many :comments, foreign_key: :author_id, dependent: :destroy
   has_many :pictures, foreign_key: :creator_id, dependent: :destroy
@@ -97,7 +98,11 @@ class User < ApplicationRecord
     pets.include?(pet)
   end
 
-  def requested_adopt_pet(id)
+  def has_notification?(notification)
+    notifications.include?(notification)
+  end
+
+  def requested_adopt_pet?(id)
     adoption_requests.where(pet_id: id).present?
   end
 

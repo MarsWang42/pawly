@@ -27,7 +27,6 @@ const createPictureSucceed = (response, action) => {
   action.callback && action.callback();
   return {
     type: CREATE_PICTURE_SUCCEED,
-    followingList: response.data.feeds,
   };
 };
 

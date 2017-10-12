@@ -44,6 +44,7 @@ class Api::V1::UsersController < ApiController
 
   def follow
     current_user.follow(set_user)
+    create_notification(set_user, current_user)
     render :json => {
       "currentUserId": current_user.id,
       "followed": true,
@@ -135,5 +136,13 @@ class Api::V1::UsersController < ApiController
     def register_params
       params.require(:username)
       params.permit(:username, :pet_name, :pet_type, :pet_avatar)
+    end
+
+    def create_notification(user, notified_by)
+      return if user.id == notified_by.id
+      notification = Notification.create(user_id: user.id,
+                          notified_by_id: notified_by.id,
+                          notice_type: 'follow')
+      logger.debug(notification.errors.full_messages)
     end
 end

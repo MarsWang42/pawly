@@ -184,7 +184,7 @@ class PictureDetail extends Component {
         >
           <Text style={styles.commentUsername}>{ author.username }</Text>
           <Text style={{ fontFamily: 'Lato', fontSize: 14 }}>
-            { target && (
+            { target ? (
               <Text>
                 <Text>Reply </Text>
                 <Text
@@ -195,7 +195,7 @@ class PictureDetail extends Component {
                 </Text>
                 <Text>:  </Text>
               </Text>
-            ) }
+            ) : null }
             <Text>{ body }</Text>
           </Text>
           <Text style={{ fontFamily: 'Lato', fontSize: 12, color: 'grey', marginTop: 5 }}>
@@ -335,7 +335,7 @@ class PictureDetail extends Component {
               </View>
             ) }
           </View>
-          { pictureDetail.caption && this.renderCaption() }
+          { pictureDetail.caption ? this.renderCaption() : null }
           <View style={{ flexDirection: 'row', marginTop: 5, marginLeft: 10, alignItems: 'center' }}>
             <AnimatableTouchableOpacity
               ref={like => this.like = like}
@@ -351,12 +351,19 @@ class PictureDetail extends Component {
                 name={pictureDetail.liked ? 'heart' : 'heart-outline'}
                 size={24}
                 color={'#e6535a'}
-                style={{ marginTop: 3 }}
+                style={{ marginTop: 3, marginRight: 5 }}
               />
             </AnimatableTouchableOpacity>
-            <Text style={{ fontFamily: 'Lato', fontSize: 14, marginHorizontal: 15 }}>
-              { pictureDetailFetched && likerNames }
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              { pictureDetailFetched && ll > 0 && (
+                <Text style={{ fontFamily: 'Lato-italic', fontSize: 14, marginRight: 5 }}>
+                  Liked by
+                </Text>
+              ) }
+              <Text style={{ fontFamily: 'Lato', fontSize: 14 }}>
+                { pictureDetailFetched && likerNames }
+              </Text>
+            </View>
           </View>
           { isLoading && (
             <View style={{ height: 50, justifyContent: 'center', alignItems: 'center' }}>

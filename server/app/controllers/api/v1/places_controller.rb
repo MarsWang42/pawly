@@ -20,7 +20,7 @@ class Api::V1::PlacesController < ApiController
         place
       end
     end
-    render :list
+    render :index
   end
 
   private

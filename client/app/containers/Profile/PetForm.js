@@ -80,15 +80,16 @@ const app = new Clarifai.App({
 class PetForm extends Component {
   constructor(props) {
     super(props);
+    const { pet } = props;
     this.state = {
       isModalVisible: false,
-      petAvatar: props.pet.avatar || '',
-      petName: props.pet.name || '',
-      petType: props.pet.type || '',
-      bio: props.pet.bio || '',
+      petAvatar: (pet && pet.avatar) || '',
+      petName: (pet && pet.name) || '',
+      petType: (pet && pet.type) || '',
+      bio: (pet && pet.bio) || '',
       isPetAvatarUpdated: false,
-      isRescue: props.pet.isRescue || false,
-      isMissing: props.pet.isMissing || false,
+      isRescue: (pet && pet.isRescue) || false,
+      isMissing: (pet && pet.isMissing) || false,
     };
     this.showPetImagePicker = this.showPetImagePicker.bind(this);
     this.submitForm = this.submitForm.bind(this);
@@ -354,7 +355,14 @@ class PetForm extends Component {
               </TouchableOpacity>
             </View>
           </View>
-          <Text style={{ fontFamily: 'Lato', fontSize: 17, color: 'rgba(255, 255, 255, 0.8)', marginTop: 20 }}>
+          <Text
+            style={{
+              fontFamily: 'Lato',
+              fontSize: 17,
+              color: 'rgba(255, 255, 255, 0.8)',
+              marginTop: 20,
+            }}
+          >
             Bio
           </Text>
           <TextInput

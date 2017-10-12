@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-export const BASE_URL = 'http://localhost:3000/api/v1';
-// export const BASE_URL = 'https://pawly.herokuapp.com/api/v1';
+// export const BASE_URL = 'http://localhost:3000/api/v1';
+export const BASE_URL = 'https://pawly.herokuapp.com/api/v1';
 export const AUTH_URL = `${BASE_URL}/user_token`;
 export const USER_URL = `${BASE_URL}/users`;
 export const USERNAME_URL = `${BASE_URL}/username`;
@@ -13,9 +13,14 @@ export const FOLLOWER_LIST_URL = (userId) => `${USER_URL}/${userId}/followers`;
 export const USER_DETAIL_URL = (userId) => `${USER_URL}/detail/${userId}`;
 export const AVATAR_URL = `${USER_URL}/avatar`;
 
+export const NOTIFICATION_URL = `${BASE_URL}/notifications`;
+export const NOTIFICATION_READ_URL = (id) => `${BASE_URL}/notifications/read/${id}`;
+
 export const PETS_URL = `${BASE_URL}/pets`;
 export const PETS_SEARCH_URL = (keyword) => `${USER_URL}/pets/${keyword}`;
 export const PET_DETAIL_URL = (petId) => `${PETS_URL}/${petId}`;
+export const ADOPTION_URL = (id) => `${BASE_URL}/adoption/${id}`;
+export const RECEIVED_ADOPTIONS_URL = `${BASE_URL}/adoptions/received`;
 
 export const FEED_URL = page => `${USER_URL}/feed/${page}`;
 export const PICTURE_URL = `${BASE_URL}/pictures`;
@@ -105,6 +110,29 @@ export default {
         url: PETS_SEARCH_URL(keyword),
         headers: { Authorization: token },
       }),
+    receivedAdoptions: (token) =>
+      axios({
+        method: 'get',
+        url: RECEIVED_ADOPTIONS_URL,
+        headers: { Authorization: token },
+      }),
+  },
+
+  notification: {
+    get: (token) =>
+      axios({
+        method: 'get',
+        url: NOTIFICATION_URL,
+        headers: { Authorization: token },
+      }),
+    read: (id, token) =>{
+      return axios({
+        method: 'get',
+        url: NOTIFICATION_READ_URL(id),
+        headers: { Authorization: token },
+      })
+
+    }
   },
 
   /* Pet APIs */
@@ -142,6 +170,15 @@ export default {
         headers: {
           Authorization: token,
         },
+      }),
+    requestAdoption: (payload, petId, token) =>
+      axios({
+        method: 'post',
+        url: ADOPTION_URL(petId),
+        headers: {
+          Authorization: token,
+        },
+        data: payload,
       }),
   },
 
