@@ -88,7 +88,7 @@ const uploadAvatarSucceed = (respond, callback) => {
   callback && callback();
   return {
     type: UPLOAD_AVATAR_SUCCEED,
-    ava: respond.data,
+    ava: respond.data.avatar,
   };
 };
 

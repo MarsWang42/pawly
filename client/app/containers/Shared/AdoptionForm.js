@@ -377,12 +377,12 @@ const styles = StyleSheet.create({
   textInput: {
     fontSize: 16,
     color: '#fff',
-    height: 40,
+    height: 50,
     width: width - 140,
   },
   longInput: {
     color: 'white',
-    fontSize: 15,
+    fontSize: 16,
     fontFamily: 'Lato',
     height: 200,
     width: width - 60,

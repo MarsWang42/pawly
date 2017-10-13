@@ -118,7 +118,7 @@ class Api::V1::UsersController < ApiController
     @user = current_user
     @user.avatar = auth_params[:avatar]
     if @user.save
-      render :json => @user.avatar
+      render :json => { avatar: @user.avatar.url }
     else
       render :json => @user.errors
     end

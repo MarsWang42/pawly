@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
   },
   petButtonText: {
     fontFamily: 'Lato',
-    fontSize: 12,
+    fontSize: 13,
     backgroundColor: 'transparent'
   },
   textInputContainer: {
@@ -490,11 +490,11 @@ const styles = StyleSheet.create({
   textInput: {
     width: width - 230,
     color: 'white',
-    fontSize: 14,
+    fontSize: 15,
   },
   bioInput: {
     color: 'white',
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: 'Lato',
     height: height - 400,
     backgroundColor: 'rgba(200, 200, 200, 0.3)',
