@@ -12,6 +12,7 @@ json.pets(@pic.pets) do |pet|
   json.id pet.id
   json.name pet.name
   json.avatar pet.avatar.url
+  json.isRescue pet.is_rescue
 end
 if @pic.place.present?
   json.place do |place|

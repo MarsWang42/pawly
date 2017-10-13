@@ -117,6 +117,8 @@ class PictureDetail extends Component {
             height: 30,
             width: 30,
             borderRadius: 15,
+            borderColor: pet.isRescue ? '#9eff89' : 'white',
+            borderWidth: 2,
           }}
           source={petImageSource}
         />
@@ -277,12 +279,27 @@ class PictureDetail extends Component {
                 { width: pl === 1 ? 60 : pl === 2 ? 70 : 80 }
               ]}
             >
-              <Image style={styles.firstPetAvatar} source={petImageSource(pictureDetail.pets[0].avatar)} />
+              <Image
+                style={[styles.firstPetAvatar,
+                  { borderColor: pictureDetail.pets[0].isRescue ? '#9eff89' : 'white' }
+                ]}
+                source={petImageSource(pictureDetail.pets[0].avatar)}
+              />
               { pictureDetail.pets[1] &&
-                <Image style={styles.secondPetAvatar} source={petImageSource(pictureDetail.pets[1].avatar)} />
+                <Image
+                  style={[styles.secondPetAvatar,
+                    { borderColor: pictureDetail.pets[1].isRescue ? '#9eff89' : 'white' }
+                  ]}
+                  source={petImageSource(pictureDetail.pets[1].avatar)}
+                />
               }
               { pictureDetail.pets[2] &&
-                <Image style={styles.thirdPetAvatar} source={petImageSource(pictureDetail.pets[2].avatar)} />
+                <Image
+                  style={[styles.thirdPetAvatar,
+                    { borderColor: pictureDetail.pets[2].isRescue ? '#9eff89' : 'white' }
+                  ]}
+                  source={petImageSource(pictureDetail.pets[2].avatar)}
+                />
               }
             </TouchableOpacity>
             <View style={styles.petInfoContainer}>
@@ -504,6 +521,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   petName: {
+    width: width - 100,
     fontFamily: 'Lato-Italic',
     fontSize: 14,
   },

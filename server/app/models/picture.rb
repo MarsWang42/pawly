@@ -8,6 +8,7 @@ class Picture < ApplicationRecord
                                   dependent:   :destroy
   has_many :likers, through: :like_relationships, source: :liker
   has_many :notifications, dependent: :destroy
+  has_many :report, as: :reportable
 
   mount_uploader :image, PictureUploader
 end

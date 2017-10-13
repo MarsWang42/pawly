@@ -70,10 +70,11 @@ const fetchFeedFailed = () => ({
   type: FETCH_FEED_FAILED,
 });
 
-const fetchNearbySucceed = (response) => {
+const fetchNearbySucceed = (response, action) => {
   return {
     type: FETCH_NEARBY_SUCCEED,
     placeList: response.data.places,
+    list: action.list,
   };
 };
 
@@ -97,6 +98,7 @@ export const PictureReducer = createReducer({
   followingList: List(),
   followingListPage: 1,
   nearbyList: List(),
+  locationList: List(),
   placeList: List(),
   pictureDetails: Map(),
   isFetchingFeed: false,
@@ -240,7 +242,7 @@ export const PictureReducer = createReducer({
     return loop(
       { ...state, isFetchingNearby: true, fetchNearbyError: undefined },
       Cmd.run(apis.picture.nearby, {
-        successActionCreator: fetchNearbySucceed,
+        successActionCreator: (response) => fetchNearbySucceed(response, action),
         failActionCreator: fetchNearbyFailed,
         args: [
           action.latitude,
@@ -254,13 +256,30 @@ export const PictureReducer = createReducer({
     );
   },
   [FETCH_NEARBY_SUCCEED](state, action) {
-    const nearbyList = action.placeList.reduce((acc, cur) =>
+    const pictureList = action.placeList.reduce((acc, cur) =>
       [...acc, ...cur.pictures], []);
+
+    let updatedNearbyList = state.nearbyList;
+    let updatedLocationList = state.locationList;
+    let updatedPlaceList = state.placeList;
+
+    if (action.list === 'initialize') {
+      updatedNearbyList = fromJS(pictureList);
+      updatedLocationList = fromJS(pictureList);
+      updatedPlaceList = fromJS(action.placeList);
+    } else if (action.list === 'nearby') {
+      updatedNearbyList = fromJS(pictureList);
+    } else if (action.list === 'location') {
+      updatedLocationList = fromJS(pictureList);
+      updatedPlaceList = fromJS(action.placeList);
+    }
+
     return {
       ...state,
       isFetchingNearby: false,
-      placeList: fromJS(action.placeList),
-      nearbyList: fromJS(nearbyList),
+      placeList: updatedPlaceList,
+      nearbyList: updatedNearbyList,
+      locationList: updatedLocationList,
     };
   },
   [FETCH_NEARBY_FAILED](state, action) {

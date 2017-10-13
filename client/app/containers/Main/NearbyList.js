@@ -24,6 +24,7 @@ class NearbyList extends Component {
       latitude: currentLocation.coords.latitude,
       longitude: currentLocation.coords.longitude,
       radius: 10,
+      list: 'nearby',
       token: currentUser.accessToken,
     });
   }

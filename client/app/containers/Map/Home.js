@@ -29,7 +29,7 @@ class Home extends Component {
         latitude: 37.78825,
         longitude: -122.4324,
         latitudeDelta: 0.1500,
-        longitudeDelta: 0.0800,
+        longitudeDelta: 0.1500,
       },
       selectedPicture: undefined,
       selectedPictureId: -1,
@@ -56,7 +56,7 @@ class Home extends Component {
           longitude: nextProps.currentLocation.coords.longitude,
           latitude: nextProps.currentLocation.coords.latitude,
           latitudeDelta: 0.1500,
-          longitudeDelta: 0.0800,
+          longitudeDelta: 0.1500,
         }
       });
       this.updatedLocation = true;
@@ -108,6 +108,7 @@ class Home extends Component {
           longitude: position.coords.longitude,
           latitudeDelta: this.state.region.latitudeDelta / 2,
           longitudeDelta: this.state.region.longitudeDelta / 2,
+          list: 'initialize',
           token: this.props.currentUser.accessToken,
         });
       },
@@ -193,6 +194,7 @@ class Home extends Component {
       longitude: this.state.region.longitude,
       latitudeDelta: this.state.region.latitudeDelta / 2,
       longitudeDelta: this.state.region.longitudeDelta / 2,
+      list: 'location',
       token: this.props.currentUser.accessToken,
     });
   }
@@ -200,7 +202,7 @@ class Home extends Component {
   renderMarkers() {
     const {
       placeList,
-      nearbyList,
+      locationList,
       currentLocation,
       mainTab,
     } = this.props;
@@ -223,7 +225,7 @@ class Home extends Component {
           key={marker.key}
           style={{ zIndex: isSelected ? 100 : 0 }}
           onPress={(e) => {
-            const pictureId = nearbyList.findIndex(picture =>
+            const pictureId = locationList.findIndex(picture =>
               picture.place.placeId === marker.key);
             e.preventDefault();
             e.stopPropagation();
@@ -252,7 +254,7 @@ class Home extends Component {
   }
 
   render() {
-    const { nearbyList } = this.props;
+    const { locationList } = this.props;
     const { region, selectedPlace, opacityAnim, showRedoSearchButton } = this.state;
     const cardWidth = width - 30;
     return (
@@ -264,7 +266,7 @@ class Home extends Component {
         >
           <Text style={styles.title}>Pawly Map</Text>
         </LinearGradient>
-        { nearbyList && (
+        { locationList && (
           <Animated.View
             style={[styles.cardContainer, {
               opacity: opacityAnim,
@@ -275,9 +277,9 @@ class Home extends Component {
               sliderWidth={width}
               itemWidth={cardWidth}
               enableSnap
-              onSnapToItem={(i) => this.snapCarousel(nearbyList[i], i)}
+              onSnapToItem={(i) => this.snapCarousel(locationList[i], i)}
               ref={(carousel) => { this._carousel = carousel; }}
-              data={nearbyList}
+              data={locationList}
               renderItem={this.renderPicture}
             />
           </Animated.View>
@@ -314,7 +316,7 @@ class Home extends Component {
             onRegionChange={this.onRegionChange}
             onPress={() => this.deselectPlace()}
           >
-            { nearbyList && this.renderMarkers() }
+            { locationList && this.renderMarkers() }
           </MapView>
         </View>
       </View>
@@ -382,7 +384,7 @@ const mapStateToProps = (state) => {
   return {
     currentUser: state.session.currentUser,
     currentLocation: state.session.currentLocation,
-    nearbyList: state.picture.nearbyList.toJS(),
+    locationList: state.picture.locationList.toJS(),
     placeList: state.picture.placeList.toJS(),
   };
 };

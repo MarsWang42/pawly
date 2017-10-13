@@ -105,6 +105,10 @@ class PictureCard extends Component {
       petNames = petList[0].name;
     }
 
+    const petImageSource = (url) => (
+      url ? { uri: url } : require('../../assets/img/pet.png')
+    );
+
     return (
       <TouchableOpacity
         activeOpacity={0.8}
@@ -152,7 +156,13 @@ class PictureCard extends Component {
             </View>
           </View>
         </View>
-        <View style={[styles.headerContainer, { backgroundColor: isRescue ? '#9eff89' : 'white' }]}>
+        <View style={styles.headerContainer}>
+          { isRescue && (
+            <View style={styles.rescueTriangle}/>
+          ) }
+          { isRescue && (
+            <Text style={styles.rescueText}>R</Text>
+          ) }
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View
               style={[styles.petAvatarContainer,
@@ -160,17 +170,29 @@ class PictureCard extends Component {
               ]}
             >
               <Image
-                style={styles.firstPetAvatar}
-                source={{ uri: petList[0].avatar || PLACE_HOLDER }}
+                style={[
+                  styles.firstPetAvatar,
+                  { borderColor: petList[0].isRescue ? '#9eff89' : 'white' }
+                ]}
+                source={petImageSource(petList[0].avatar)}
               />
               { petList[1] &&
                 <Image
-                  style={styles.secondPetAvatar}
-                  source={{ uri: petList[1].avatar || PLACE_HOLDER }}
+                  style={[
+                    styles.secondPetAvatar,
+                    { borderColor: petList[1].isRescue ? '#9eff89' : 'white' }
+                  ]}
+                  source={petImageSource(petList[1].avatar)}
                 />
               }
               { petList[2] &&
-                <Image style={styles.thirdPetAvatar} source={{ uri: petList[2].avatar || PLACE_HOLDER }}/>
+                <Image
+                  style={[
+                    styles.thirdPetAvatar,
+                    { borderColor: petList[2].isRescue ? '#9eff89' : 'white' }
+                  ]}
+                  source={petImageSource(petList[2].avatar)}
+                />
               }
             </View>
             <View style={styles.petInfoContainer}>
@@ -209,7 +231,28 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 50,
+    paddingVertical: 5,
+  },
+  rescueTriangle: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 1,
+    width: 0,
+    height: 0,
+    borderTopWidth: 30,
+    borderLeftWidth: 30,
+    borderTopColor: '#3ce694',
+    borderLeftColor: 'transparent',
+  },
+  rescueText: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    zIndex: 2,
+    fontFamily: 'Berlin bold',
+    color: 'white',
+    backgroundColor: 'transparent',
   },
   petAvatarContainer: {
     flexDirection: 'row',
@@ -255,6 +298,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   petName: {
+    width: width - 120,
     fontFamily: 'Lato-Italic',
     fontSize: 14,
   },

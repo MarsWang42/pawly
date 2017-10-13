@@ -4,4 +4,5 @@ json.pets(@pets) do |pet|
   json.type pet.type
   json.avatar pet.avatar
   json.owner pet.owner.username
+  json.isRescue pet.is_rescue
 end
