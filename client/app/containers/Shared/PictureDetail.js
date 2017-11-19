@@ -73,7 +73,7 @@ class PictureDetail extends Component {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       this.setState({ isPetModalOpen: !this.state.isPetModalOpen });
     } else {
-      this.selectPet(pictureDetail.pets[0].id);
+      this.selectPet(pictureDetail.pets[0], pictureDetail.pets[0].id);
     }
   }
 
@@ -95,9 +95,9 @@ class PictureDetail extends Component {
     navigation.navigate(`${view}User`, { userId: id, view });
   }
 
-  selectPet(id) {
+  selectPet(pet, id) {
     const { navigation, dispatch, view } = this.props;
-    navigation.navigate(`${view}Pet`, { petId: id , view });
+    navigation.navigate(`${view}Pet`, { petId: id, pet, view });
     dispatch({
       type: petActions.FETCH_PET_DETAIL,
       id: id,
@@ -109,7 +109,7 @@ class PictureDetail extends Component {
     const petImageSource = pet.avatar ? { uri: pet.avatar } : require('../../assets/img/pet.png');
     return (
       <TouchableOpacity
-        onPress={() => this.selectPet(pet.id)}
+        onPress={() => this.selectPet(pet, pet.id)}
         style={{ justifyContent: 'center', alignItems: 'center', margin: 3 }}
       >
         <Image

@@ -86,6 +86,7 @@ class PetForm extends Component {
       petAvatar: (pet && pet.avatar) || '',
       petName: (pet && pet.name) || '',
       petType: (pet && pet.type) || '',
+      gender: (pet && pet.gender) || '',
       bio: (pet && pet.bio) || '',
       isPetAvatarUpdated: false,
       isRescue: (pet && pet.isRescue) || false,
@@ -166,11 +167,12 @@ class PetForm extends Component {
 
   submitForm() {
     if (this.validate()) {
-      const { isPetAvatarUpdated, petAvatar, petName, petType, bio, isMissing, isRescue } = this.state;
+      const { isPetAvatarUpdated, petAvatar, petName, petType, bio, isMissing, isRescue, gender } = this.state;
       const { currentUser, navigation, pet, dispatch } = this.props;
       let formData = new FormData();
       formData.append('name', petName);
       formData.append('type', petType || 'others');
+      formData.append('gender', gender);
       formData.append('bio', bio);
       formData.append('is_rescue', isRescue);
       formData.append('is_missing', isMissing);
@@ -204,6 +206,7 @@ class PetForm extends Component {
       bio,
       petAvatar,
       petType,
+      gender,
       isRecognizingImage,
       petNameError,
       isRescue,
@@ -353,6 +356,36 @@ class PetForm extends Component {
                 </Text>
                 ) }
               </TouchableOpacity>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: width - 200,
+                  marginTop: 22
+                }}
+              >
+                <TouchableOpacity
+                  style={[styles.genderButton, { backgroundColor: gender === 'male' ? 'white' : 'transparent' }]}
+                  onPress={() => this.setState({ gender: 'male' })}
+                >
+                  <Icon
+                    name={'gender-male'}
+                    size={16}
+                    color={gender === 'male' ? '#2f61d0' : 'white'}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.genderButton, { backgroundColor: gender === 'female' ? 'white' : 'transparent' }]}
+                  onPress={() => this.setState({ gender: 'female' })}
+                >
+                  <Icon
+                    name={'gender-female'}
+                    size={16}
+                    color={gender === 'female' ? '#d1152d' : 'white'}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
           <Text
@@ -492,6 +525,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 15,
   },
+  genderButton: {
+    width: (width - 220) / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 2,
+    backgroundColor: 'transparent',
+    borderColor: 'white',
+    borderWidth: 1,
+    borderRadius: 4,
+  },
   bioInput: {
     color: 'white',
     fontSize: 15,
@@ -527,12 +570,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 6,
     overflow: 'hidden',
-  },
-  warningContainer: {
-    height: 12,
-    marginHorizontal: height <= 480 ? 30 : 40,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   warningContainer: {
     height: 12,

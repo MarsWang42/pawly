@@ -26,10 +26,8 @@ export default class FBLoginButton extends Component {
     // Permission of the token
     LoginManager.logInWithReadPermissions(['public_profile']).then(
       function(result){
-        console.log(result)
         if (!result.isCancelled) {
           AccessToken.getCurrentAccessToken().then((data) => {
-            console.log(this.props.onLogin)
             this.props.onLogin && this.props.onLogin(data);
           })
         }

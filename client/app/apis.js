@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-export const BASE_URL = 'http://localhost:3000/api/v1';
-// export const BASE_URL = 'https://pawly.herokuapp.com/api/v1';
+// export const BASE_URL = 'http://localhost:3000/api/v1';
+export const BASE_URL = 'https://pawly.herokuapp.com/api/v1';
 export const AUTH_URL = `${BASE_URL}/user_token`;
 export const USER_URL = `${BASE_URL}/users`;
 export const USERNAME_URL = `${BASE_URL}/username`;

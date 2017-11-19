@@ -16,6 +16,7 @@ import ScrollableTabView from 'react-native-scrollable-tab-view';
 import DotTabBar from '../../components/Helpers/DotTabBar';
 import { BlurView } from 'react-native-blur';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import IconM from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as userActions from '../../reducers/user';
 import * as pictureActions from '../../reducers/picture';
 
@@ -207,15 +208,23 @@ class Pet extends Component {
               prerenderingSiblingsNumber={1}
             >
               <View
-                label={'main'}
+                tabLabel={'main'}
                 style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}
               >
                 <Image source={petImageSource} style={styles.petAvatar} />
+                { petDetail.gender ? (
+                  <IconM
+                    name={`gender-${petDetail.gender}`}
+                    size={18}
+                    color={'#d1152d'}
+                    style={{ marginTop: 5 }}
+                  />
+                ) : null }
                 { petDetailFetched && petDetail.isRescue && this.renderRescue() }
                 { petDetailFetched && this.renderOwner() }
               </View>
               <View
-                label={'bio'}
+                tabLabel={'bio'}
                 style={{ flex: 1, backgroundColor: 'transparent', justifyContent: 'center', alignItems: 'center' }}
               >
                 <Text style={{ color: 'white', fontFamily: 'Lato', backgroundColor: 'transparent', fontSize: 17 }}>

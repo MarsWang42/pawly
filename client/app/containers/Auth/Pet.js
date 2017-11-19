@@ -85,6 +85,7 @@ class Avatar extends Component {
       petAvatar: '',
       petName: '',
       petType: '',
+      petGender: '',
     };
     this.showPetImagePicker = this.showPetImagePicker.bind(this);
     this.submitForm = this.submitForm.bind(this);
@@ -150,14 +151,17 @@ class Avatar extends Component {
 
   submitForm() {
     if (this.validate()) {
-      const { petAvatar, petName, petType } = this.state;
+      const { petAvatar, petName, petType, petGender } = this.state;
       const { username, currentUser } = this.props;
       let formData = new FormData();
-      formData.append('username', username)
+      formData.append('username', username);
       formData.append('pet_name', petName);
-      formData.append('pet_type', petType);
-      formData.append('pet_avatar',
-        { uri: petAvatar, name: `${uuidv4()}.jpg`, type: 'multipart/formdata' });
+      formData.append('pet_type', petType || 'others');
+      formData.append('pet_gender', petGender);
+      if (petAvatar) {
+        formData.append('pet_avatar',
+          { uri: petAvatar, name: `${uuidv4()}.jpg`, type: 'multipart/formdata' });
+      }
       this.props.dispatch({
         type: actions.UPDATE_USER,
         update: formData,
@@ -168,7 +172,7 @@ class Avatar extends Component {
 
   render() {
     const { currentUser, isLoading } = this.props;
-    const { isLoadingImage, petAvatar, petType, isRecognizingImage, petNameError } = this.state;
+    const { isLoadingImage, petAvatar, petType, petGender, isRecognizingImage, petNameError } = this.state;
 
     const petImageSource = petAvatar ? { uri: petAvatar }
       : require('../../assets/img/pet.png');
@@ -259,6 +263,36 @@ class Avatar extends Component {
               : null
             }
           </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: width - 200,
+              marginTop: 10
+            }}
+          >
+            <TouchableOpacity
+              style={[styles.genderButton, { backgroundColor: petGender === 'male' ? 'white' : 'transparent' }]}
+              onPress={() => this.setState({ petGender: 'male' })}
+            >
+              <Icon
+                name={'gender-male'}
+                size={18}
+                color={petGender === 'male' ? '#2f61d0' : 'white'}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.genderButton, { backgroundColor: petGender === 'female' ? 'white' : 'transparent' }]}
+              onPress={() => this.setState({ petGender: 'female' })}
+            >
+              <Icon
+                name={'gender-female'}
+                size={18}
+                color={petGender === 'female' ? '#d1152d' : 'white'}
+              />
+            </TouchableOpacity>
+          </View>
           <Text style={[styles.title, { marginTop: 15 }]}>
             Type
           </Text>
@@ -331,7 +365,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 26,
     marginTop: 30,
-    marginBottom: 15,
+    marginBottom: 10,
   },
   rowContainer: {
     flex: 1,
@@ -400,11 +434,21 @@ const styles = StyleSheet.create({
     color: 'white',
     marginHorizontal: 5,
   },
+  genderButton: {
+    width: (width - 220) / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 2,
+    backgroundColor: 'transparent',
+    borderColor: 'white',
+    borderWidth: 1,
+    borderRadius: 4,
+  },
   buttonContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 50,
+    marginTop: 30,
 
     height: height <= 480 ? 30 : 40,
     width: 175,
